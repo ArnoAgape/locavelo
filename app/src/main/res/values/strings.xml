@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Lokavelo</string>
+    <string name="app_name" translatable="false">LokaVélo</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
@@ -18,7 +18,7 @@
     <string name="sign_in_google">Sign in with Google</string>
     <string name="sign_in_email">Sign in with your email</string>
     <string name="sign_in_phone">Sign in with your phone number</string>
-    <string name="sign_in_title">Welcome! Log in or sign up to use Lokavelo.</string>
+    <string name="sign_in_title">Welcome! Log in or sign up to use LokaVelo.</string>
 
     // DIALOG
     <string name="cancel">Cancel</string>
