@@ -18,4 +18,14 @@
     <string name="sign_in_email">Continuer avec un email</string>
     <string name="sign_in_phone">Continuer avec un numéro de téléphone</string>
     <string name="sign_in_title">Bienvenue ! Connecte-toi pour continuer à utiliser Lokavélo.</string>
+
+    // DIALOG
+    <string name="cancel">Annuler</string>
+    <string name="close">Fermer</string>
+    <string name="or">Ou</string>
+
+    // CONTENT_DESCRIPTION
+    <string name="cd_remove">Clique ici pour effacer</string>
+    <string name="cd_bike_preview">Aperçu du vélo</string>
+
 </resources>

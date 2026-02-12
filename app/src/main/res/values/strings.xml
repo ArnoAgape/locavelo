@@ -19,4 +19,13 @@
     <string name="sign_in_email">Sign in with email</string>
     <string name="sign_in_phone">Sign in with your phone</string>
     <string name="sign_in_title">Welcome! Log in or sign up to use Lokavelo.</string>
+
+    // DIALOG
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="or">Or</string>
+
+    // CONTENT_DESCRIPTION
+    <string name="cd_remove">Click here to erase</string>
+    <string name="cd_bike_preview">Bike preview</string>
 </resources>

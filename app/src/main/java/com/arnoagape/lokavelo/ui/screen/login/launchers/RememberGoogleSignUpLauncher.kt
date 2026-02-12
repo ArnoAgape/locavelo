@@ -1,11 +1,11 @@
-package com.arnoagape.polyscribe.ui.screen.login.launchers
+package com.arnoagape.lokavelo.ui.screen.login.launchers
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.arnoagape.polyscribe.R
+import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
@@ -43,8 +43,8 @@ fun rememberGoogleSignUpLauncher(
     val signUpIntent = remember {
         AuthUI.getInstance()
             .createSignInIntentBuilder()
-            .setLogo(R.drawable.ic_polyscribe_logo)
-            .setTheme(R.style.Theme_Polyscribe)
+            .setLogo(R.drawable.ic_lokavelo_logo)
+            .setTheme(R.style.Theme_Lokavelo)
             .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build()))
             .build()
     }

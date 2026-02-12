@@ -1,7 +1,5 @@
-package com.arnoagape.polyscribe.ui.common.components
+package com.arnoagape.lokavelo.ui.common.components
 
-import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,14 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.net.toUri
 import coil.compose.AsyncImage
-import com.arnoagape.polyscribe.R
+import com.arnoagape.lokavelo.R
 
 /**
  * Displays a preview of a document based on its type (image/PDF/other).
@@ -44,7 +39,7 @@ import com.arnoagape.polyscribe.R
  * @param onClick Optional callback when the preview is clicked (non-detail only).
  */
 @Composable
-fun ImageFilePreview(
+fun BikePreview(
     modifier: Modifier = Modifier,
     documentUrl: String,
     isDetailScreen: Boolean,
@@ -53,15 +48,12 @@ fun ImageFilePreview(
 
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
-    val context = LocalContext.current
     val baseUrl = documentUrl.substringBefore("?")
 
     val isImage =
         baseUrl.endsWith(".jpg", ignoreCase = true) ||
                 baseUrl.endsWith(".jpeg", ignoreCase = true) ||
                 baseUrl.endsWith(".png", ignoreCase = true)
-
-    val isPdf = baseUrl.endsWith(".pdf", ignoreCase = true)
 
     val previewHeight = if (isDetailScreen) 150.dp else 100.dp
 
@@ -78,7 +70,7 @@ fun ImageFilePreview(
                     },
                 model = documentUrl,
                 placeholder = ColorPainter(Color.DarkGray),
-                contentDescription = stringResource(R.string.contentDescription_file_preview),
+                contentDescription = stringResource(R.string.cd_bike_preview),
                 contentScale = ContentScale.Crop
             )
 
@@ -96,7 +88,7 @@ fun ImageFilePreview(
                     ) {
                         AsyncImage(
                             model = selectedImage,
-                            contentDescription = stringResource(R.string.contentDescription_file_preview),
+                            contentDescription = stringResource(R.string.cd_bike_preview),
                             modifier = Modifier.fillMaxSize()
                         )
                         Icon(
@@ -115,58 +107,10 @@ fun ImageFilePreview(
             }
         }
 
-        isPdf -> {
-            if (isDetailScreen) {
-                Icon(
-                    imageVector = Icons.Default.PictureAsPdf,
-                    contentDescription = stringResource(R.string.contentDescription_file_preview_pdf),
-                    modifier = modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(previewHeight)
-                        .clickable {
-                            try {
-                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                    setDataAndType(documentUrl.toUri(), "application/pdf")
-                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-                                }
-
-                                if (intent.resolveActivity(context.packageManager) != null) {
-                                    context.startActivity(intent)
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.no_pdf_app),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            } catch (_: Exception) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.error_open_pdf),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.PictureAsPdf,
-                    contentDescription = stringResource(R.string.contentDescription_file_preview_pdf),
-                    modifier = modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(previewHeight)
-                        .clickable { onClick?.invoke() }
-                )
-            }
-        }
-
         else -> {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
-                contentDescription = stringResource(R.string.contentDescription_file_preview),
+                contentDescription = stringResource(R.string.cd_bike_preview),
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
@@ -196,7 +140,7 @@ fun FilePreviewList(
     val urlsToDisplay = if (isDetailScreen) fileUrls else listOf(fileUrls.first())
 
     urlsToDisplay.forEach { url ->
-        ImageFilePreview(
+        BikePreview(
             documentUrl = url,
             isDetailScreen = isDetailScreen,
             onClick = onClick

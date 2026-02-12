@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.common.components
+package com.arnoagape.lokavelo.ui.common.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.arnoagape.polyscribe.R
+import com.arnoagape.lokavelo.R
 
 /**
  * Displays a button that opens a confirmation dialog before executing an action.

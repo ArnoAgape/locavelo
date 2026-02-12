@@ -17,7 +17,7 @@ import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginViewModel
 import com.arnoagape.lokavelo.ui.screen.login.launchers.rememberEmailSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
-import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberGoogleSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.login.launchers.rememberGoogleSignUpLauncher
 
 @Composable
 fun LokaveloApp() {

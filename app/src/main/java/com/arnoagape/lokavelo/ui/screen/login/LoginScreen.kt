@@ -40,9 +40,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.common.Event
-import com.arnoagape.lokavelo.ui.theme.LokaVeloTheme
+import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.polyscribe.ui.common.EventsEffect
-import com.arnoagape.polyscribe.ui.common.components.OrSeparator
+import com.arnoagape.lokavelo.ui.common.components.OrSeparator
 
 /**
  * Displays the login screen with multiple sign-in options:
@@ -206,7 +206,7 @@ fun LoginContent(
 @PreviewLightDark
 @Composable
 private fun LoginScreenPreview() {
-    LokaVeloTheme {
+    LokaveloTheme {
         LoginContent(
             onEmailSignInClick = { },
             onGoogleSignInClick = { }
