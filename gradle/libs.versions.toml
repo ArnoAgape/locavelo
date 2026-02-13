@@ -1,5 +1,6 @@
 [versions]
 agp = "9.0.0"
+compressor = "3.0.1"
 coreKtx = "1.17.0"
 kotlin = "2.3.10"
 kotlin-serialization = "2.3.10"
@@ -28,6 +29,7 @@ accompanistPermissions = "0.37.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+compressor = { module = "id.zelory:compressor", version.ref = "compressor" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

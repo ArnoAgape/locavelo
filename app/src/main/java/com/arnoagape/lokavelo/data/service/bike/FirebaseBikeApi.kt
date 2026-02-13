@@ -1,45 +1,70 @@
 package com.arnoagape.lokavelo.data.service.bike
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
+import com.arnoagape.lokavelo.data.compression.ImageCompressor
 import com.arnoagape.lokavelo.data.dto.BikeDto
 import com.arnoagape.lokavelo.domain.model.Bike
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
+import com.google.firebase.storage.FirebaseStorage
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
-class FirebaseBikeApi @Inject constructor() : BikeApi {
+class FirebaseBikeApi @Inject constructor(
+    private val compressor: ImageCompressor
+) : BikeApi {
 
+    private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val bikesCollection = firestore.collection("bikes")
 
-    override fun getAllBikes(): Flow<List<Bike>> {
+    override fun observeBikesForOwner(ownerId: String): Flow<List<Bike>> {
 
         return bikesCollection
+            .whereEqualTo("ownerId", ownerId)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .dataObjects<BikeDto>()
             .map { it.map(Bike::fromDto) }
             .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun addBike(bike: Bike): Result<Bike> =
-        withContext(Dispatchers.IO) {
-            try {
-                val docRef = bikesCollection.document()
-                val savedMedicine = bike.copy(id = docRef.id)
-                docRef.set(savedMedicine.toDto())
-                Result.success(savedMedicine)
+    override suspend fun addBike(localUris: List<Uri>, bike: Bike): List<String> {
 
-            } catch (e: Exception) {
-                Log.e("FirebaseBikeApi", "Error while adding medicine", e)
-                Result.failure(e)
-            }
+        require(localUris.size <= 3) {
+            "Maximum 3 photos allowed"
         }
+
+        val ownerId = requireUserId()
+
+        val bikeRef = bikesCollection.document()
+        val bikeId = bikeRef.id
+
+        val uploadedUrls = uploadBikePictures(
+            ownerId = ownerId,
+            bikeId = bikeId,
+            uris = localUris
+        )
+
+        val finalBike = bike.copy(
+            id = bikeId,
+            ownerId = ownerId,
+            photoUrl = uploadedUrls
+        )
+
+        bikeRef.set(finalBike.toDto()).await()
+
+        return uploadedUrls
+    }
 
     override suspend fun editBike(bike: Bike): Result<Unit> =
         withContext(Dispatchers.IO) {
@@ -63,7 +88,7 @@ class FirebaseBikeApi @Inject constructor() : BikeApi {
      *
      * Data collection and mapping are executed on an IO thread.
      */
-    override fun getBikeById(bikeId: String): Flow<Bike> {
+    override fun getBikeById(bikeId: String, userId: String): Flow<Bike> {
         return bikesCollection
             .whereEqualTo("id", bikeId)
             .limit(1)
@@ -105,5 +130,59 @@ class FirebaseBikeApi @Inject constructor() : BikeApi {
                 Result.failure(e)
             }
         }
+
+    /**
+     * Uploads a bike photo to Firebase Storage.
+     * Validates MIME type and returns the public download URL.
+     */
+    private suspend fun uploadBikePictures(
+        ownerId: String,
+        bikeId: String,
+        uris: List<Uri>
+    ): List<String> {
+
+        return uris.mapNotNull { uri ->
+
+            try {
+
+                val compressedFile = compressor.compress(uri)
+
+                val fileName = "${UUID.randomUUID()}.jpg"
+
+                val storageRef = FirebaseStorage.getInstance()
+                    .reference
+                    .child("bikePictures")
+                    .child("user_$ownerId")
+                    .child("bike_$bikeId")
+                    .child(fileName)
+
+                storageRef.putFile(compressedFile.toUri()).await()
+
+                storageRef.downloadUrl.await().toString()
+            } catch (e: Exception) {
+                Log.e("FirebaseUpload", "Error while uploading", e)
+                null
+            }
+        }
+    }
+
+    /**
+     * Deletes a photo from Firebase Storage.
+     * Validates MIME type and returns the public download URL.
+     */
+    private suspend fun deleteBikeFolder(ownerId: String, bikeId: String) {
+        val folderRef = FirebaseStorage.getInstance()
+            .reference
+            .child("bikePictures")
+            .child("user_$ownerId")
+            .child("bike_$bikeId")
+
+        val list = folderRef.listAll().await()
+
+        list.items.forEach { it.delete().await() }
+    }
+
+    private fun requireUserId(): String =
+        auth.currentUser?.uid ?: throw IllegalStateException("No authenticated user")
 
 }

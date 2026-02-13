@@ -5,6 +5,9 @@
     <string name="success_sign_up">Identifié avec succès</string>
     <string name="success_sign_out">Déconnecté avec succès</string>
     <string name="success_deleted_account">Compte supprimé avec succès</string>
+    <string name="success_bike_added">Vélo ajouté avec succès :)</string>
+    <string name="success_bike_edited">Vélo modifié avec succès :)</string>
+    <string name="success_bike_deleted">Vélo supprimé avec succès :)</string>
 
     // ERROR
     <string name="error_no_network">Connecte-toi à internet</string>

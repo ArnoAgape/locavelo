@@ -41,7 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
-import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.OrSeparator
 
 /**

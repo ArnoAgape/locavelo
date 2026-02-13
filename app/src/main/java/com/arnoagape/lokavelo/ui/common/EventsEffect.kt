@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.common
+package com.arnoagape.lokavelo.ui.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

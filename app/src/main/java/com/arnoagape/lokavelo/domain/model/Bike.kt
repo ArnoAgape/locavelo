@@ -13,7 +13,7 @@ data class Bike(
     val accessories: List<BikeEquipment> = emptyList(),
     val price: Long = 0L,
     val deposit: Long = 0L,
-    val photoUrl: String = "",
+    val photoUrl: List<String> = emptyList(),
     val location: String = "",
     val ownerId: String = "",
     val isElectric: Boolean = false,
