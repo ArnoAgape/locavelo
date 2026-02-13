@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.utils
+package com.arnoagape.lokavelo.ui.utils
 
 import com.google.firebase.Timestamp
 import java.time.Instant

@@ -1,4 +1,4 @@
 package com.arnoagape.lokavelo.ui.screen.owner.home
 
-class OwnerBikeUiState {
+class HomeBikeScreen {
 }

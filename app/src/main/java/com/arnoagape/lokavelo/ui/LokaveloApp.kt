@@ -6,10 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.arnoagape.lokavelo.navigation.AddBike
-import com.arnoagape.lokavelo.navigation.Home
-import com.arnoagape.lokavelo.navigation.Login
-import com.arnoagape.lokavelo.navigation.Profile
 import com.arnoagape.lokavelo.navigation.Screen
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
 import com.arnoagape.lokavelo.ui.screen.home.home.HomeScreen
@@ -22,7 +18,7 @@ import com.arnoagape.lokavelo.ui.screen.login.launchers.rememberGoogleSignUpLaun
 @Composable
 fun LokaveloApp() {
 
-    var backStack by remember { mutableStateOf(listOf<Screen>(Login)) }
+    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Login)) }
 
     val currentScreen = backStack.last()
 
@@ -43,16 +39,42 @@ fun LokaveloApp() {
     }
 
     when (currentScreen) {
-        is Home -> HomeScreen()
+        // ACCOUNT
+        is Screen.Account.AccountHome -> TODO()
+        is Screen.Account.Profile -> ProfileScreen()
 
-        is Login -> LoginScreen(
+        // ACCOUNT - SETTINGS
+        is Screen.Account.Settings.HelpSettings -> TODO()
+        is Screen.Account.Settings.HomeSettings -> TODO()
+        is Screen.Account.Settings.InfoSettings -> TODO()
+        is Screen.Account.Settings.NotificationsSettings -> TODO()
+        is Screen.Account.Settings.PaymentSettings -> TODO()
+        is Screen.Account.Settings.VersionSettings -> TODO()
+
+        // HOME
+        is Screen.Main.Home -> HomeScreen()
+        is Screen.Main.Contact -> TODO()
+        is Screen.Main.DetailPublicBike -> TODO()
+        is Screen.Main.PublicProfile -> TODO()
+
+        // LOGIN
+        is Screen.Login -> LoginScreen(
             onGoogleSignInClick = { googleSignUpLauncher() },
             onEmailSignInClick = { emailSignUpLauncher() },
             onLoginSuccess = { }
         )
 
-        is Profile -> ProfileScreen()
+        // MESSAGING
+        is Screen.Messaging.MessagingDetail -> TODO()
+        is Screen.Messaging.MessagingHome -> TODO()
 
-        is AddBike -> AddBikeScreen()
+        // OWNER
+        is Screen.Owner.AddBike -> AddBikeScreen()
+        is Screen.Owner.DetailBike -> TODO()
+        is Screen.Owner.EditBike -> TODO()
+        is Screen.Owner.HomeBike -> TODO()
+
+        // RENT
+        is Screen.Rent -> TODO()
     }
 }

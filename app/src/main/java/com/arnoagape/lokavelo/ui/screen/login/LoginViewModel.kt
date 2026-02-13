@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.UserRepository
 import com.arnoagape.lokavelo.ui.common.Event
-import com.arnoagape.polyscribe.ui.utils.NetworkUtils
+import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
