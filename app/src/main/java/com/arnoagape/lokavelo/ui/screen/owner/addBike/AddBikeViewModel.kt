@@ -9,7 +9,7 @@ import com.arnoagape.lokavelo.data.repository.UserRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
-import com.arnoagape.lokavelo.domain.model.BikeState
+import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.ui.common.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -51,7 +51,7 @@ class AddBikeViewModel @Inject constructor(
             deposit = 0,
             isElectric = false,
             category = BikeCategory.CITY,
-            state = BikeState.GOOD,
+            state = BikeCondition.GOOD,
             accessories = emptyList(),
             location = ""
         )
@@ -103,6 +103,9 @@ class AddBikeViewModel @Inject constructor(
 
             is AddBikeEvent.CategoryChanged ->
                 _formState.update { it.copy(category = event.category) }
+
+            is AddBikeEvent.BrandChanged ->
+                _formState.update { it.copy(brand = event.brand) }
 
             is AddBikeEvent.StateChanged ->
                 _formState.update { it.copy(state = event.state) }
@@ -173,7 +176,8 @@ data class AddFormState(
     val deposit: Long = 0L,
     val isElectric: Boolean = false,
     val category: BikeCategory? = null,
-    val state: BikeState? = null,
+    val brand: String = "",
+    val state: BikeCondition? = null,
     val accessories: List<BikeEquipment> = emptyList(),
     val location: String = ""
 ) {
@@ -185,7 +189,8 @@ data class AddFormState(
             deposit = deposit,
             isElectric = isElectric,
             category = category,
-            state = state,
+            brand = brand,
+            condition = state,
             accessories = accessories,
             location = location
         )

@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    // TOP BAR
+    <string name="add_bike">Ajouter un vélo</string>
+    <string name="detail_bike">Descriptif</string>
+
+    // BOTTOM BAR
+    <string name="publish_bike">Publier le vélo</string>
+
+    // SUBTITLE
+    <string name="subtitle_add_3_pictures">Ajoute jusqu’à 3 photos</string>
+    <string name="subtitle_characteristics">Ajoute les détails de ton vélo</string>
+    <string name="subtitle_title_description">Ajoute un titre et une description qui définissent
+        bien ton annonce</string>
+    <string name="subtitle_location">Ajoute l’adresse exacte de ton vélo</string>
+    <string name="subtitle_pricing">Tu peux aussi ajouter un tarif à la demi-journée,
+        à la semaine ou au mois</string>
+    <string name="subtitle_deposit">Ce montant sera bloqué sur la carte bancaire du locataire
+        pendant toute la durée de la location</string>
+
+    // MISC WORDS
+    <string name="pictures">Photos</string>
+    <string name="characteristics">Caractéristiques</string>
+    <string name="title_description">Titre &amp; Description</string>
+    <string name="location">Adresse</string>
+    <string name="pricing">Tarif (€)</string>
+    <string name="pricing_day">Tarif par jour</string>
+    <string name="pricing_half_day">Tarif pour une demi-journée</string>
+    <string name="pricing_week">Tarif à la semaine</string>
+    <string name="pricing_month">Tarif au mois</string>
+    <string name="deposit">Caution</string>
+    <string name="deposit_amount">Montant de la caution (€)</string>
+    <string name="brand">Marque</string>
+    <string name="electric_bike">Assistance électrique ?</string>
+    <string name="condition">État</string>
+    <string name="category">Catégorie</string>
+
     // SUCCESS
     <string name="success_user_updated">Tes données ont bien été mises à jour</string>
     <string name="success_sign_up">Identifié avec succès</string>
@@ -22,13 +58,68 @@
     <string name="sign_in_phone">Continue avec ton numéro</string>
     <string name="sign_in_title">Bienvenue !\n Connecte-toi pour utiliser LokaVélo.</string>
 
-    // DIALOG
+    // ACTIONS
     <string name="cancel">Annuler</string>
     <string name="close">Fermer</string>
     <string name="or">Ou</string>
+    <string name="try_again">Réessayer</string>
+    <string name="publishing">Publication en cours…</string>
+    <string name="add_picture">Ajouter une photo</string>
+    <string name="remove_picture">Supprimer</string>
 
     // CONTENT_DESCRIPTION
     <string name="cd_remove">Clique ici pour effacer</string>
     <string name="cd_bike_preview">Aperçu du vélo</string>
+    <string name="cd_go_back">Retour arrière</string>
+
+    // CATEGORY
+    <string name="bike_category_road">Vélo de route</string>
+    <string name="bike_category_mtb">VTT</string>
+    <string name="bike_category_city">Vélo de ville</string>
+    <string name="bike_category_gravel">Gravel</string>
+    <string name="bike_category_bmx">BMX</string>
+    <string name="bike_category_trekking">Trekking</string>
+    <string name="bike_category_tandem">Tandem</string>
+    <string name="bike_category_cargo">Cargo</string>
+    <string name="bike_category_longtail">Longtail</string>
+    <string name="bike_category_folding">Pliable</string>
+    <string name="bike_category_kid">Enfant</string>
+
+    // EQUIPMENT
+    <string name="bike_equipment_bell">Sonnette</string>
+    <string name="bike_equipment_lock">Antivol</string>
+    <string name="bike_equipment_mudguard">Garde-boue</string>
+    <string name="bike_equipment_phone_mount">Support téléphone</string>
+    <string name="bike_equipment_backpack">Sac à dos</string>
+    <string name="bike_equipment_pump">Pompe</string>
+    <string name="bike_equipment_helmet">Casque</string>
+    <string name="bike_equipment_saddle_bag">Sacoche de selle</string>
+    <string name="bike_equipment_wheel_lock">Antivol de roue</string>
+    <string name="bike_equipment_gloves">Gants</string>
+    <string name="bike_equipment_speedometer">Compteur de vitesse</string>
+    <string name="bike_equipment_handlebar_bag">Sacoche de guidon</string>
+    <string name="bike_equipment_reflectors">Réflecteurs</string>
+    <string name="bike_equipment_repair_kit">Kit de réparation</string>
+    <string name="bike_equipment_reflective_vest">Gilet réfléchissant</string>
+    <string name="bike_equipment_front_light">Lumière avant</string>
+    <string name="bike_equipment_rear_light">Lumière arrière</string>
+    <string name="bike_equipment_basket">Panier</string>
+    <string name="bike_equipment_kickstand">Béquille</string>
+    <string name="bike_equipment_rear_rack">Porte-bagage</string>
+    <string name="bike_equipment_puncture_resistant_tire">Pneu anti-crevaison</string>
+    <string name="bike_equipment_tent">Tente</string>
+    <string name="bike_equipment_tire_levers">Démonte-pneus</string>
+    <string name="bike_equipment_bottle_cage">Porte-bidon</string>
+    <string name="bike_equipment_panniers">Sacoches</string>
+
+    // BIKE STATE
+    <string name="bike_state_like_new">Comme neuf</string>
+    <string name="bike_state_excellent">Excellent</string>
+    <string name="bike_state_good">Bon</string>
+    <string name="bike_state_used">Passable</string>
+
+    // COMING SOON…
+    <string name="coming_soon_pricing">Les tarifs demi-journée, semaine et mois seront disponibles
+        prochainement</string>
 
 </resources>

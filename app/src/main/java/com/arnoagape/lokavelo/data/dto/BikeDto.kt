@@ -2,7 +2,7 @@ package com.arnoagape.lokavelo.data.dto
 
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
-import com.arnoagape.lokavelo.domain.model.BikeState
+import com.arnoagape.lokavelo.domain.model.BikeCondition
 import java.io.Serializable
 
 data class BikeDto(
@@ -12,7 +12,7 @@ data class BikeDto(
     val description: String = "",
     val category: BikeCategory? = null,
     val brand: String = "",
-    val state: BikeState? = null,
+    val state: BikeCondition? = null,
     val accessories: List<BikeEquipment> = emptyList(),
     val price: Long = 0L,
     val deposit: Long = 0L,

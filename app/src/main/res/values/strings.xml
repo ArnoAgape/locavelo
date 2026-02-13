@@ -1,6 +1,40 @@
 <resources>
     <string name="app_name" translatable="false">LokaVélo</string>
 
+    // TOP BAR
+    <string name="add_bike">Add a bike</string>
+    <string name="detail_bike">Bike info</string>
+
+    // BOTTOM BAR
+    <string name="publish_bike">Publish bike</string>
+
+    // SUBTITLE
+    <string name="subtitle_add_3_pictures">Add up to 3 pictures</string>
+    <string name="subtitle_characteristics">Fill in the details of your bike</string>
+    <string name="subtitle_title_description">Add a title and a description that define well
+        your post</string>
+    <string name="subtitle_location">Put the exact address where your bike is</string>
+    <string name="subtitle_pricing">You can also add a half-day, weekly, or monthly rate</string>
+    <string name="subtitle_deposit">This amount will be blocked on the renter’s credit card
+        for the entire duration of the rental</string>
+
+    // MISC WORDS
+    <string name="pictures">Pictures</string>
+    <string name="characteristics">Characteristics</string>
+    <string name="title_description">Title &amp; Description</string>
+    <string name="location">Location</string>
+    <string name="pricing">Pricing (€)</string>
+    <string name="pricing_day">Daily rate</string>
+    <string name="pricing_half_day">Price for half a day</string>
+    <string name="pricing_week">Price for a week</string>
+    <string name="pricing_month">Price for a month</string>
+    <string name="deposit">Deposit</string>
+    <string name="deposit_amount">Deposit amount (€)</string>
+    <string name="brand">Brand</string>
+    <string name="electric_bike">Electric?</string>
+    <string name="condition">Condition</string>
+    <string name="category">Category</string>
+
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
     <string name="success_sign_up">Successfully logged in</string>
@@ -23,12 +57,67 @@
     <string name="sign_in_phone">Sign in with your phone number</string>
     <string name="sign_in_title">Welcome! Log in or sign up to use LokaVelo.</string>
 
-    // DIALOG
+    // ACTIONS
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
     <string name="or">Or</string>
+    <string name="try_again">Try again</string>
+    <string name="publishing">Publishing…</string>
+    <string name="add_picture">Add picture</string>
+    <string name="remove_picture">Remove picture</string>
 
     // CONTENT_DESCRIPTION
     <string name="cd_remove">Click here to erase</string>
     <string name="cd_bike_preview">Bike preview</string>
+    <string name="cd_go_back">Go back</string>
+
+    // CATEGORY
+    <string name="bike_category_road">Racing bike</string>
+    <string name="bike_category_mtb">MTB</string>
+    <string name="bike_category_city">City bike</string>
+    <string name="bike_category_gravel">Gravel</string>
+    <string name="bike_category_bmx">BMX</string>
+    <string name="bike_category_trekking">Trekking</string>
+    <string name="bike_category_tandem">Tandem</string>
+    <string name="bike_category_cargo">Cargo</string>
+    <string name="bike_category_longtail">Longtail</string>
+    <string name="bike_category_folding">Folding</string>
+    <string name="bike_category_kid">Kid</string>
+
+    // EQUIPMENT
+    <string name="bike_equipment_bell">Bell</string>
+    <string name="bike_equipment_lock">Lock</string>
+    <string name="bike_equipment_mudguard">Mudguard</string>
+    <string name="bike_equipment_phone_mount">Phone mount</string>
+    <string name="bike_equipment_backpack">Backpack</string>
+    <string name="bike_equipment_pump">Pump</string>
+    <string name="bike_equipment_helmet">Helmet</string>
+    <string name="bike_equipment_saddle_bag">Saddle bag</string>
+    <string name="bike_equipment_wheel_lock">Wheel lock</string>
+    <string name="bike_equipment_gloves">Gloves</string>
+    <string name="bike_equipment_speedometer">Speedometer</string>
+    <string name="bike_equipment_handlebar_bag">Handlebar bag</string>
+    <string name="bike_equipment_reflectors">Reflectors</string>
+    <string name="bike_equipment_repair_kit">Repair kit</string>
+    <string name="bike_equipment_reflective_vest">Reflective vest</string>
+    <string name="bike_equipment_front_light">Front light</string>
+    <string name="bike_equipment_rear_light">Rear light</string>
+    <string name="bike_equipment_basket">Basket</string>
+    <string name="bike_equipment_kickstand">Kickstand</string>
+    <string name="bike_equipment_rear_rack">Rear rack</string>
+    <string name="bike_equipment_puncture_resistant_tire">Puncture-resistant tire</string>
+    <string name="bike_equipment_tent">Tent</string>
+    <string name="bike_equipment_tire_levers">Tire levers</string>
+    <string name="bike_equipment_bottle_cage">Bottle cage</string>
+    <string name="bike_equipment_panniers">Panniers</string>
+
+    // BIKE STATE
+    <string name="bike_state_like_new">Like new</string>
+    <string name="bike_state_excellent">Excellent</string>
+    <string name="bike_state_good">Good</string>
+    <string name="bike_state_used">Used</string>
+
+    // COMING SOON…
+    <string name="coming_soon_pricing">Half-day, weekly, and monthly rates will be available soon.</string>
+
 </resources>

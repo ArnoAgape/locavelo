@@ -14,11 +14,12 @@ import com.arnoagape.lokavelo.ui.screen.login.LoginViewModel
 import com.arnoagape.lokavelo.ui.screen.login.launchers.rememberEmailSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
 import com.arnoagape.lokavelo.ui.screen.login.launchers.rememberGoogleSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 
 @Composable
 fun LokaveloApp() {
 
-    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Login)) }
+    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Owner.AddBike)) }
 
     val currentScreen = backStack.last()
 
@@ -69,7 +70,12 @@ fun LokaveloApp() {
         is Screen.Messaging.MessagingHome -> TODO()
 
         // OWNER
-        is Screen.Owner.AddBike -> AddBikeScreen()
+        is Screen.Owner.AddBike ->
+            AddBikeScreen(
+                viewModel = hiltViewModel<AddBikeViewModel>(),
+                onBackClick = { popBack() },
+                onSaveClick = { navigate(Screen.Owner.HomeBike) }
+            )
         is Screen.Owner.DetailBike -> TODO()
         is Screen.Owner.EditBike -> TODO()
         is Screen.Owner.HomeBike -> TODO()
