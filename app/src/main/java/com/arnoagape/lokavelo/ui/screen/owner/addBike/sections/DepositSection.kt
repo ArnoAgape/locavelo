@@ -1,14 +1,16 @@
 package com.arnoagape.lokavelo.ui.screen.owner.addBike.sections
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.arnoagape.lokavelo.R
 
 @Composable
 fun DepositSection(
-    deposit: Long,
+    deposit: String,
     onDepositChange: (String) -> Unit,
 ) {
     SectionCard(
@@ -17,8 +19,11 @@ fun DepositSection(
     ) {
 
         OutlinedTextField(
-            value = deposit.toString(),
+            value = deposit,
             onValueChange = onDepositChange,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
             label = { Text(stringResource(R.string.deposit_amount)) }
         )
     }

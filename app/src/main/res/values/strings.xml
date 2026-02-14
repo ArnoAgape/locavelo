@@ -23,8 +23,8 @@
     <string name="characteristics">Characteristics</string>
     <string name="title_description">Title &amp; Description</string>
     <string name="location">Location</string>
-    <string name="pricing">Pricing (€)</string>
-    <string name="pricing_day">Daily rate</string>
+    <string name="pricing">Pricing</string>
+    <string name="pricing_day">Daily rate (€)</string>
     <string name="pricing_half_day">Price for half a day</string>
     <string name="pricing_week">Price for a week</string>
     <string name="pricing_month">Price for a month</string>
@@ -34,6 +34,7 @@
     <string name="electric_bike">Electric?</string>
     <string name="condition">Condition</string>
     <string name="category">Category</string>
+    <string name="accessories">Accessories</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
@@ -50,6 +51,7 @@
     <string name="error_sign_up">Sign up canceled or failed</string>
     <string name="error_no_account_bike">An account is mandatory in order to add a bike</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
+    <string name="error_invalid_form">Invalid form</string>
 
     // SIGN IN
     <string name="sign_in_google">Sign in with Google</string>
@@ -70,6 +72,7 @@
     <string name="cd_remove">Click here to erase</string>
     <string name="cd_bike_preview">Bike preview</string>
     <string name="cd_go_back">Go back</string>
+    <string name="cd_expand_accessories">Click here to expand the accessories section</string>
 
     // CATEGORY
     <string name="bike_category_road">Racing bike</string>
@@ -89,12 +92,9 @@
     <string name="bike_equipment_lock">Lock</string>
     <string name="bike_equipment_mudguard">Mudguard</string>
     <string name="bike_equipment_phone_mount">Phone mount</string>
-    <string name="bike_equipment_backpack">Backpack</string>
     <string name="bike_equipment_pump">Pump</string>
     <string name="bike_equipment_helmet">Helmet</string>
     <string name="bike_equipment_saddle_bag">Saddle bag</string>
-    <string name="bike_equipment_wheel_lock">Wheel lock</string>
-    <string name="bike_equipment_gloves">Gloves</string>
     <string name="bike_equipment_speedometer">Speedometer</string>
     <string name="bike_equipment_handlebar_bag">Handlebar bag</string>
     <string name="bike_equipment_reflectors">Reflectors</string>
@@ -105,9 +105,6 @@
     <string name="bike_equipment_basket">Basket</string>
     <string name="bike_equipment_kickstand">Kickstand</string>
     <string name="bike_equipment_rear_rack">Rear rack</string>
-    <string name="bike_equipment_puncture_resistant_tire">Puncture-resistant tire</string>
-    <string name="bike_equipment_tent">Tent</string>
-    <string name="bike_equipment_tire_levers">Tire levers</string>
     <string name="bike_equipment_bottle_cage">Bottle cage</string>
     <string name="bike_equipment_panniers">Panniers</string>
 

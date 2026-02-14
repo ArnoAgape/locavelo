@@ -24,8 +24,8 @@
     <string name="characteristics">Caractéristiques</string>
     <string name="title_description">Titre &amp; Description</string>
     <string name="location">Adresse</string>
-    <string name="pricing">Tarif (€)</string>
-    <string name="pricing_day">Tarif par jour</string>
+    <string name="pricing">Tarif</string>
+    <string name="pricing_day">Tarif par jour (€)</string>
     <string name="pricing_half_day">Tarif pour une demi-journée</string>
     <string name="pricing_week">Tarif à la semaine</string>
     <string name="pricing_month">Tarif au mois</string>
@@ -35,6 +35,7 @@
     <string name="electric_bike">Assistance électrique ?</string>
     <string name="condition">État</string>
     <string name="category">Catégorie</string>
+    <string name="accessories">Accessoires</string>
 
     // SUCCESS
     <string name="success_user_updated">Tes données ont bien été mises à jour</string>
@@ -51,6 +52,7 @@
     <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_account_bike">Un compte est nécessaire pour ajouter un vélo</string>
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier tes infos</string>
+    <string name="error_invalid_form">Formulaire invalide</string>
 
     // SIGN IN
     <string name="sign_in_google">Continue avec Google</string>
@@ -71,6 +73,7 @@
     <string name="cd_remove">Clique ici pour effacer</string>
     <string name="cd_bike_preview">Aperçu du vélo</string>
     <string name="cd_go_back">Retour arrière</string>
+    <string name="cd_expand_accessories">Clique ici pour ouvrir le menu des accessoires</string>
 
     // CATEGORY
     <string name="bike_category_road">Vélo de route</string>
@@ -90,12 +93,9 @@
     <string name="bike_equipment_lock">Antivol</string>
     <string name="bike_equipment_mudguard">Garde-boue</string>
     <string name="bike_equipment_phone_mount">Support téléphone</string>
-    <string name="bike_equipment_backpack">Sac à dos</string>
     <string name="bike_equipment_pump">Pompe</string>
     <string name="bike_equipment_helmet">Casque</string>
     <string name="bike_equipment_saddle_bag">Sacoche de selle</string>
-    <string name="bike_equipment_wheel_lock">Antivol de roue</string>
-    <string name="bike_equipment_gloves">Gants</string>
     <string name="bike_equipment_speedometer">Compteur de vitesse</string>
     <string name="bike_equipment_handlebar_bag">Sacoche de guidon</string>
     <string name="bike_equipment_reflectors">Réflecteurs</string>
@@ -106,9 +106,6 @@
     <string name="bike_equipment_basket">Panier</string>
     <string name="bike_equipment_kickstand">Béquille</string>
     <string name="bike_equipment_rear_rack">Porte-bagage</string>
-    <string name="bike_equipment_puncture_resistant_tire">Pneu anti-crevaison</string>
-    <string name="bike_equipment_tent">Tente</string>
-    <string name="bike_equipment_tire_levers">Démonte-pneus</string>
     <string name="bike_equipment_bottle_cage">Porte-bidon</string>
     <string name="bike_equipment_panniers">Sacoches</string>
 

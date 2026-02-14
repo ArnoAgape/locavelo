@@ -13,8 +13,8 @@ sealed interface AddBikeEvent {
     data class TitleChanged(val title: String) : AddBikeEvent
     data class DescriptionChanged(val description: String) : AddBikeEvent
     data class LocationChanged(val location: String) : AddBikeEvent
-    data class PriceChanged(val price: Long) : AddBikeEvent
-    data class DepositChanged(val deposit: Long) : AddBikeEvent
+    data class PriceChanged(val priceText: String) : AddBikeEvent
+    data class DepositChanged(val depositText: String) : AddBikeEvent
     data class ElectricChanged(val isElectric: Boolean) : AddBikeEvent
     data class CategoryChanged(val category: BikeCategory) : AddBikeEvent
     data class BrandChanged(val brand: String) : AddBikeEvent

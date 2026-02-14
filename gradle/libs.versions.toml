@@ -1,5 +1,5 @@
 [versions]
-agp = "9.0.0"
+agp = "9.0.1"
 compressor = "3.0.1"
 coreKtx = "1.17.0"
 kotlin = "2.3.10"
@@ -27,6 +27,7 @@ firebaseUiStorage = "9.1.1"
 accompanistPermissions = "0.37.3"
 
 [libraries]
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 compressor = { module = "id.zelory:compressor", version.ref = "compressor" }

@@ -75,6 +75,7 @@ dependencies {
 
     // Images
     implementation(libs.coil.compose)
+    implementation(libs.androidx.compose.foundation)
 
     // Tests
     testImplementation(libs.turbine)

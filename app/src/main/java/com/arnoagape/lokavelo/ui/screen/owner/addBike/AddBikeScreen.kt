@@ -7,13 +7,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -90,6 +93,7 @@ fun AddBikeScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState
@@ -124,6 +128,7 @@ fun AddBikeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .consumeWindowInsets(padding)
         ) {
 
             when (state.uiState) {
@@ -188,70 +193,84 @@ private fun AddBikeContent(
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .imePadding()
-            .padding(horizontal = spacing.medium)
-            .padding(bottom = spacing.large),
+            .imePadding(),
+        contentPadding = PaddingValues(
+            start = spacing.medium,
+            end = spacing.medium,
+            bottom = spacing.large
+        ),
         verticalArrangement = Arrangement.spacedBy(spacing.large)
     ) {
 
-        PhotosSection(
-            uris = state.localUris,
-            onAddPhotoClick = { launcher.launch("image/*") },
-            onRemovePhoto = { uri ->
-                onAction(AddBikeEvent.RemovePhoto(uri))
-            }
-        )
+        item { Spacer(modifier = Modifier.height(spacing.small)) }
 
-        CharacteristicsSection(
-            category = state.bike.category,
-            brand = state.bike.brand,
-            state = state.bike.condition,
-            isElectric = state.bike.isElectric,
-            accessories = state.bike.accessories,
-            onCategoryChange = { onAction(AddBikeEvent.CategoryChanged(it)) },
-            onBrandChange = { onAction(AddBikeEvent.BrandChanged(it)) },
-            onStateChange = { onAction(AddBikeEvent.StateChanged(it)) },
-            onElectricChange = { onAction(AddBikeEvent.ElectricChanged(it)) },
-            onAccessoriesChange = { onAction(AddBikeEvent.AccessoriesChanged(it)) }
-        )
+        item {
+            PhotosSection(
+                uris = state.localUris,
+                onAddPhotoClick = { launcher.launch("image/*") },
+                onRemovePhoto = { uri ->
+                    onAction(AddBikeEvent.RemovePhoto(uri))
+                }
+            )
+        }
 
-        TitleDescriptionSection(
-            title = state.bike.title,
-            description = state.bike.description,
-            onTitleChange = {
-                onAction(AddBikeEvent.TitleChanged(it))
-            },
-            onDescriptionChange = {
-                onAction(AddBikeEvent.DescriptionChanged(it))
-            }
-        )
+        item {
+            CharacteristicsSection(
+                category = state.form.category,
+                brand = state.form.brand,
+                state = state.form.condition,
+                isElectric = state.form.isElectric,
+                accessories = state.form.accessories,
+                onCategoryChange = { onAction(AddBikeEvent.CategoryChanged(it)) },
+                onBrandChange = { onAction(AddBikeEvent.BrandChanged(it)) },
+                onStateChange = { onAction(AddBikeEvent.StateChanged(it)) },
+                onElectricChange = { onAction(AddBikeEvent.ElectricChanged(it)) },
+                onAccessoriesChange = { onAction(AddBikeEvent.AccessoriesChanged(it)) }
+            )
+        }
 
-        LocationSection(
-            location = state.bike.location,
-            onLocationChange = {
-                onAction(AddBikeEvent.LocationChanged(it))
-            }
-        )
+        item {
+            TitleDescriptionSection(
+                title = state.form.title,
+                description = state.form.description,
+                onTitleChange = {
+                    onAction(AddBikeEvent.TitleChanged(it))
+                },
+                onDescriptionChange = {
+                    onAction(AddBikeEvent.DescriptionChanged(it))
+                }
+            )
+        }
 
-        PricingSection(
-            price = state.bike.price,
-            onPriceChange = {
-                onAction(AddBikeEvent.PriceChanged(it.toLong()))
-            }
-        )
+        item {
+            LocationSection(
+                location = state.form.location,
+                onLocationChange = {
+                    onAction(AddBikeEvent.LocationChanged(it))
+                }
+            )
+        }
 
-        DepositSection(
-            deposit = state.bike.deposit,
-            onDepositChange = {
-                onAction(AddBikeEvent.DepositChanged(it.toLong()))
-            }
-        )
+        item {
+            PricingSection(
+                price = state.form.priceText,
+                onPriceChange = {
+                    onAction(AddBikeEvent.PriceChanged(it))
+                }
+            )
+        }
 
-        Spacer(modifier = Modifier.height(spacing.extraLarge))
+        item {
+            DepositSection(
+                deposit = state.form.depositText,
+                onDepositChange = {
+                    onAction(AddBikeEvent.DepositChanged(it))
+                }
+            )
+        }
     }
 }
 
@@ -259,9 +278,8 @@ private fun AddBikeContent(
 @Composable
 private fun AddBikeContentPreview() {
     LokaveloTheme {
-        val fakeState = AddBikeScreenState()
         AddBikeContent(
-            state = fakeState,
+            state = AddBikeScreenState(),
             onAction = {}
         )
     }

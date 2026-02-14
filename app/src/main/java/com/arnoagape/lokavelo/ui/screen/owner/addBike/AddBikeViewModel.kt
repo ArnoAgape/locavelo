@@ -6,10 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
 import com.arnoagape.lokavelo.data.repository.UserRepository
-import com.arnoagape.lokavelo.domain.model.Bike
-import com.arnoagape.lokavelo.domain.model.BikeCategory
-import com.arnoagape.lokavelo.domain.model.BikeEquipment
-import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.ui.common.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddBikeViewModel @Inject constructor(
     private val bikeRepository: BikeOwnerRepository,
-    private val userRepository: UserRepository
+    userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AddBikeUiState>(AddBikeUiState.Idle)
@@ -47,13 +43,9 @@ class AddBikeViewModel @Inject constructor(
         AddFormState(
             title = "",
             description = "",
-            price = 0,
-            deposit = 0,
-            isElectric = false,
-            category = BikeCategory.CITY,
-            state = BikeCondition.GOOD,
-            accessories = emptyList(),
-            location = ""
+            location = "",
+            priceText = "",
+            depositText = ""
         )
     )
 
@@ -66,7 +58,7 @@ class AddBikeViewModel @Inject constructor(
         ) { ui, form, uris, signedIn ->
             AddBikeScreenState(
                 uiState = ui,
-                bike = form.toBike(),
+                form = form,
                 localUris = uris,
                 isValid = form.title.isNotBlank() && uris.isNotEmpty(),
                 isSignedIn = signedIn
@@ -90,10 +82,10 @@ class AddBikeViewModel @Inject constructor(
                 _formState.update { it.copy(description = event.description) }
 
             is AddBikeEvent.PriceChanged ->
-                _formState.update { it.copy(price = event.price) }
+                _formState.update { it.copy(priceText = event.priceText) }
 
             is AddBikeEvent.DepositChanged ->
-                _formState.update { it.copy(deposit = event.deposit) }
+                _formState.update { it.copy(depositText = event.depositText) }
 
             is AddBikeEvent.LocationChanged ->
                 _formState.update { it.copy(location = event.location) }
@@ -108,7 +100,7 @@ class AddBikeViewModel @Inject constructor(
                 _formState.update { it.copy(brand = event.brand) }
 
             is AddBikeEvent.StateChanged ->
-                _formState.update { it.copy(state = event.state) }
+                _formState.update { it.copy(condition = event.state) }
 
             is AddBikeEvent.AccessoriesChanged ->
                 _formState.update { it.copy(accessories = event.accessories) }
@@ -134,19 +126,24 @@ class AddBikeViewModel @Inject constructor(
             val form = _formState.value
             val uris = _localUris.value
 
-            if (
-                form.title.isBlank() ||
-                form.price <= 0 ||
-                form.location.isBlank() ||
-                uris.isEmpty()
-            ) return@launch
+            if (!form.isValid(uris)) {
+                _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
+                return@launch
+            }
 
             _uiState.value = AddBikeUiState.Loading
 
+            val bike = form.toBikeOrNull()
+
+            if (bike == null) {
+                _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
+                return@launch
+            }
+
             runCatching {
                 bikeRepository.addBike(
-                    localUris = _localUris.value,
-                    bike = _formState.value.toBike()
+                    localUris = uris,
+                    bike = bike   // ← Bike non nullable
                 )
             }.onSuccess {
                 _uiState.value = AddBikeUiState.Success
@@ -163,35 +160,8 @@ class AddBikeViewModel @Inject constructor(
 
 data class AddBikeScreenState(
     val uiState: AddBikeUiState = AddBikeUiState.Idle,
-    val bike: Bike = Bike(),
+    val form: AddFormState = AddFormState(),
     val isValid: Boolean = false,
     val localUris: List<Uri> = emptyList(),
     val isSignedIn: Boolean = false
 )
-
-data class AddFormState(
-    val title: String = "",
-    val description: String = "",
-    val price: Long = 0L,
-    val deposit: Long = 0L,
-    val isElectric: Boolean = false,
-    val category: BikeCategory? = null,
-    val brand: String = "",
-    val state: BikeCondition? = null,
-    val accessories: List<BikeEquipment> = emptyList(),
-    val location: String = ""
-) {
-    fun toBike(): Bike =
-        Bike(
-            title = title,
-            description = description,
-            price = price,
-            deposit = deposit,
-            isElectric = isElectric,
-            category = category,
-            brand = brand,
-            condition = state,
-            accessories = accessories,
-            location = location
-        )
-}

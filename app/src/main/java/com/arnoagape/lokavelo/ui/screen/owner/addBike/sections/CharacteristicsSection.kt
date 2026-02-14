@@ -1,16 +1,24 @@
 package com.arnoagape.lokavelo.ui.screen.owner.addBike.sections
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -18,10 +26,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
@@ -61,6 +71,9 @@ fun CharacteristicsSection(
                 value = brand,
                 onValueChange = onBrandChange,
                 label = { Text(stringResource(R.string.brand)) },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -186,29 +199,52 @@ fun AccessoriesChips(
     onSelectionChanged: (List<BikeEquipment>) -> Unit
 ) {
     val spacing = LocalSpacing.current
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
 
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalArrangement = Arrangement.spacedBy(spacing.small)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { isExpanded = !isExpanded },
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        BikeEquipment.entries.forEach { equipment ->
+        Text(
+            text = stringResource(R.string.accessories),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f)
+        )
 
-            val isSelected = equipment in selected
+        Icon(
+            imageVector = if (isExpanded)
+                Icons.Default.ExpandLess
+            else
+                Icons.Default.ExpandMore,
+            contentDescription = stringResource(R.string.cd_expand_accessories)
+        )
+    }
+    AnimatedVisibility(visible = isExpanded) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            BikeEquipment.entries.forEach { equipment ->
 
-            FilterChip(
-                selected = isSelected,
-                onClick = {
-                    val updated = if (isSelected) {
-                        selected - equipment
-                    } else {
-                        selected + equipment
+                val isSelected = equipment in selected
+
+                FilterChip(
+                    selected = isSelected,
+                    onClick = {
+                        val updated = if (isSelected) {
+                            selected - equipment
+                        } else {
+                            selected + equipment
+                        }
+                        onSelectionChanged(updated)
+                    },
+                    label = {
+                        Text(stringResource(equipment.labelRes()))
                     }
-                    onSelectionChanged(updated)
-                },
-                label = {
-                    Text(stringResource(equipment.labelRes()))
-                }
-            )
+                )
+            }
         }
     }
 }
