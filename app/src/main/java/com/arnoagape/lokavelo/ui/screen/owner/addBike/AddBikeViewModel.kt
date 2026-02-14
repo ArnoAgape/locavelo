@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
 import com.arnoagape.lokavelo.data.repository.UserRepository
+import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -43,7 +44,7 @@ class AddBikeViewModel @Inject constructor(
         AddFormState(
             title = "",
             description = "",
-            location = "",
+            location = BikeLocation(),
             priceText = "",
             depositText = ""
         )
@@ -87,8 +88,17 @@ class AddBikeViewModel @Inject constructor(
             is AddBikeEvent.DepositChanged ->
                 _formState.update { it.copy(depositText = event.depositText) }
 
-            is AddBikeEvent.LocationChanged ->
-                _formState.update { it.copy(location = event.location) }
+            is AddBikeEvent.AddressChanged ->
+                updateLocation { copy(street = event.address) }
+
+            is AddBikeEvent.Address2Changed ->
+                updateLocation { copy(addressLine2 = event.address2) }
+
+            is AddBikeEvent.ZipChanged ->
+                updateLocation { copy(postalCode = event.zipCode) }
+
+            is AddBikeEvent.CityChanged ->
+                updateLocation { copy(city = event.city) }
 
             is AddBikeEvent.ElectricChanged ->
                 _formState.update { it.copy(isElectric = event.isElectric) }
@@ -154,6 +164,12 @@ class AddBikeViewModel @Inject constructor(
                 _uiState.value = AddBikeUiState.Error.Generic()
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
+        }
+    }
+
+    fun updateLocation(update: BikeLocation.() -> BikeLocation) {
+        _formState.update {
+            it.copy(location = it.location.update())
         }
     }
 }

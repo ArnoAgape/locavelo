@@ -27,7 +27,7 @@ fun PricingSection(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
             ),
-                    label = { Text(stringResource(R.string.pricing_day)) }
+            label = { Text(stringResource(R.string.pricing_day)) }
         )
 
         Text(

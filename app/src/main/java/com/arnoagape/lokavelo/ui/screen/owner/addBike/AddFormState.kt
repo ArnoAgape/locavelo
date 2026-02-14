@@ -5,12 +5,13 @@ import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
+import com.arnoagape.lokavelo.domain.model.BikeLocation
 import kotlin.collections.isNotEmpty
 
 data class AddFormState(
     val title: String = "",
     val description: String = "",
-    val location: String = "",
+    val location: BikeLocation = BikeLocation(),
     val priceText: String = "",
     val depositText: String = "",
     val isElectric: Boolean = false,
@@ -26,7 +27,9 @@ data class AddFormState(
             .toDoubleOrNull()
 
         return title.isNotBlank() &&
-                location.isNotBlank() &&
+                location.street.isNotBlank() &&
+                location.postalCode.isNotBlank() &&
+                location.city.isNotBlank() &&
                 price != null &&
                 price > 0 &&
                 uris.isNotEmpty()

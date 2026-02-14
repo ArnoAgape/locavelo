@@ -12,7 +12,10 @@ sealed interface AddBikeEvent {
 
     data class TitleChanged(val title: String) : AddBikeEvent
     data class DescriptionChanged(val description: String) : AddBikeEvent
-    data class LocationChanged(val location: String) : AddBikeEvent
+    data class AddressChanged(val address: String) : AddBikeEvent
+    data class Address2Changed(val address2: String) : AddBikeEvent
+    data class ZipChanged(val zipCode: String) : AddBikeEvent
+    data class CityChanged(val city: String) : AddBikeEvent
     data class PriceChanged(val priceText: String) : AddBikeEvent
     data class DepositChanged(val depositText: String) : AddBikeEvent
     data class ElectricChanged(val isElectric: Boolean) : AddBikeEvent

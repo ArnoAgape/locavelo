@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui
+package com.arnoagape.lokavelo.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.arnoagape.lokavelo.navigation.Screen
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
 import com.arnoagape.lokavelo.ui.screen.home.home.HomeScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
@@ -20,7 +19,7 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 @Composable
 fun LokaveloApp() {
 
-    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Login)) }
+    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Owner.AddBike)) }
 
     val currentScreen = backStack.last()
 

@@ -23,6 +23,8 @@
     <string name="pictures">Photos</string>
     <string name="characteristics">Caractéristiques</string>
     <string name="title_description">Titre &amp; Description</string>
+    <string name="title">Titre</string>
+    <string name="description">Description</string>
     <string name="location">Adresse</string>
     <string name="pricing">Tarif</string>
     <string name="pricing_day">Tarif par jour (€)</string>
@@ -36,6 +38,10 @@
     <string name="condition">État</string>
     <string name="category">Catégorie</string>
     <string name="accessories">Accessoires</string>
+    <string name="zip_code">Code postal</string>
+    <string name="address_line">Adresse</string>
+    <string name="address_line_2_optional">Adresse ligne 2 (facultatif)</string>
+    <string name="city">Ville</string>
 
     // SUCCESS
     <string name="success_user_updated">Tes données ont bien été mises à jour</string>

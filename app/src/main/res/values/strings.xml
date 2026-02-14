@@ -22,6 +22,8 @@
     <string name="pictures">Pictures</string>
     <string name="characteristics">Characteristics</string>
     <string name="title_description">Title &amp; Description</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
     <string name="location">Location</string>
     <string name="pricing">Pricing</string>
     <string name="pricing_day">Daily rate (€)</string>
@@ -35,6 +37,10 @@
     <string name="condition">Condition</string>
     <string name="category">Category</string>
     <string name="accessories">Accessories</string>
+    <string name="zip_code">Zip Code</string>
+    <string name="address_line">Address</string>
+    <string name="address_line_2_optional">Address line 2 (optional)</string>
+    <string name="city">City</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>

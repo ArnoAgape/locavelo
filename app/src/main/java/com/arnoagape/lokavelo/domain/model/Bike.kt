@@ -5,18 +5,22 @@ import com.arnoagape.lokavelo.data.dto.BikeDto
 data class Bike(
     val id: String = "",
     val createdAt: Long = System.currentTimeMillis(),
+    val ownerId: String = "",
+
+    val photoUrl: List<String> = emptyList(),
     val title: String = "",
     val description: String = "",
     val category: BikeCategory? = null,
     val brand: String = "",
     val condition: BikeCondition? = null,
+    val isElectric: Boolean = false,
     val accessories: List<BikeEquipment> = emptyList(),
+
     val priceInCents: Long? = null,
     val depositInCents: Long? = null,
-    val photoUrl: List<String> = emptyList(),
-    val location: String = "",
-    val ownerId: String = "",
-    val isElectric: Boolean = false,
+
+    val location: BikeLocation,
+
     val isAvailable: Boolean = true
 ) {
 
@@ -28,10 +32,10 @@ data class Bike(
             description = description,
             category = category,
             brand = brand,
-            state = condition,
+            condition = condition,
             accessories = accessories,
-            price = priceInCents,
-            deposit = depositInCents,
+            priceInCents = priceInCents,
+            depositInCents = depositInCents,
             photoUrl = photoUrl,
             location = location,
             ownerId = ownerId,
@@ -49,10 +53,10 @@ data class Bike(
                 description = dto.description,
                 category = dto.category,
                 brand = dto.brand,
-                condition = dto.state,
+                condition = dto.condition,
                 accessories = dto.accessories,
-                priceInCents = dto.price,
-                depositInCents = dto.deposit,
+                priceInCents = dto.priceInCents,
+                depositInCents = dto.depositInCents,
                 photoUrl = dto.photoUrl,
                 location = dto.location,
                 ownerId = dto.ownerId,

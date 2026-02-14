@@ -26,7 +26,7 @@ fun TitleDescriptionSection(
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            label = { Text("Titre") }
+            label = { Text(stringResource(R.string.title)) }
         )
 
         OutlinedTextField(
@@ -35,7 +35,7 @@ fun TitleDescriptionSection(
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            label = { Text("Description") },
+            label = { Text(stringResource(R.string.description)) },
             minLines = 3
         )
     }
