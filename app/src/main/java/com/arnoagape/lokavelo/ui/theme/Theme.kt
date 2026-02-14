@@ -26,7 +26,7 @@ private val DarkColorScheme = darkColorScheme(
     background = DarkBlue,
     onBackground = Color(0xFFEAF4FB),
 
-    surface = Color(0xFF1A446A),
+    surface = Color(0xFF071D32),
     onSurface = Color.White
 )
 
@@ -43,7 +43,7 @@ private val LightColorScheme = lightColorScheme(
     background = Color(0xFFF4F9FD),
     onBackground = DarkBlue,
 
-    surface = Color(0xFFD8EEFF),
+    surface = Color(0xFFF4FaFF),
     onSurface = Color(0xFF1A1A1A)
 )
 

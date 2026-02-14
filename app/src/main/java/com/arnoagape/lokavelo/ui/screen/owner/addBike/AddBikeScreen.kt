@@ -205,7 +205,7 @@ private fun AddBikeContent(
         verticalArrangement = Arrangement.spacedBy(spacing.large)
     ) {
 
-        item { Spacer(modifier = Modifier.height(spacing.small)) }
+        item { Spacer(modifier = Modifier.height(spacing.extraSmall)) }
 
         item {
             PhotosSection(

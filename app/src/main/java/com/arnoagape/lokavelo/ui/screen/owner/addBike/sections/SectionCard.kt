@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun SectionCard(
@@ -34,7 +35,8 @@ fun SectionCard(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = 20.sp
             )
 
             subtitle?.let {
