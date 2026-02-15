@@ -14,6 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -36,6 +37,10 @@ class FirebaseBikeApi @Inject constructor(
             .dataObjects<BikeDto>()
             .map { it.map(Bike::fromDto) }
             .flowOn(Dispatchers.IO)
+            .catch { e ->
+                Log.e("FIRESTORE", "Flow error", e)
+                throw e
+            }
     }
 
     override suspend fun addBike(localUris: List<Uri>, bike: Bike): List<String> {
@@ -60,6 +65,7 @@ class FirebaseBikeApi @Inject constructor(
             ownerId = ownerId,
             photoUrl = uploadedUrls
         )
+        Log.d("SAVE", "Full DTO = $finalBike")
 
         bikeRef.set(finalBike.toDto()).await()
 

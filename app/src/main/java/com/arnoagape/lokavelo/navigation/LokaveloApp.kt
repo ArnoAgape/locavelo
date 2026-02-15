@@ -1,6 +1,7 @@
 package com.arnoagape.lokavelo.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -31,7 +32,9 @@ import com.arnoagape.lokavelo.ui.screen.login.launchers.emailSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
 import com.arnoagape.lokavelo.ui.screen.login.launchers.googleSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.login.launchers.phoneSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeEvent
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
 
@@ -39,17 +42,22 @@ import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
 @Composable
 fun LokaveloApp() {
 
-    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Owner.HomeBike)) }
+    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Login)) }
 
     val currentScreen = backStack.last()
 
-    // Sign-in launchers
+    // viewModels
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val addBikeViewModel: AddBikeViewModel = hiltViewModel()
 
+    // Sign-in launchers
     val emailSignUpLauncher = emailSignUpLauncher(loginViewModel)
     val googleSignUpLauncher = googleSignUpLauncher(loginViewModel)
     val phoneSignUpLauncher = phoneSignUpLauncher(loginViewModel)
+
+    // states
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
+    val addBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
 
     // navigate to
     fun navigate(screen: Screen) {
@@ -116,21 +124,35 @@ fun LokaveloApp() {
         },
 
         bottomBar = {
-            if (currentScreen !is Screen.Owner.AddBike) {
-                BottomBar(
-                    currentScreen = currentScreen,
-                    onItemSelected = { screen ->
-                        backStack = listOf(screen)
-                    }
-                )
+            when (currentScreen) {
+
+                is Screen.Owner.AddBike -> {
+                    PublishButton(
+                        enabled = addBikeState.isValid,
+                        onClick = { addBikeViewModel.onAction(AddBikeEvent.Submit) }
+                    )
+                }
+
+                else -> {
+                    BottomBar(
+                        currentScreen = currentScreen,
+                        onItemSelected = { screen ->
+                            backStack = listOf(screen)
+                        }
+                    )
+                }
             }
         }
     )
     { padding ->
 
-        Box(Modifier.padding(padding)) {
+        Box(
+            Modifier
+                .padding(padding)
+                .consumeWindowInsets(padding)
+        ) {
 
-            when (currentScreen) {
+        when (currentScreen) {
                 // ACCOUNT
                 is Screen.Account.AccountHome -> TODO()
                 is Screen.Account.Profile -> ProfileScreen()

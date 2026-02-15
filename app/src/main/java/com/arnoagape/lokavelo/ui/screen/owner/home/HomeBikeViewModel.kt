@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
-import com.arnoagape.lokavelo.data.repository.UserRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.SelectionState
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeBikeViewModel @Inject constructor(
     private val bikeRepository: BikeOwnerRepository,
-    userRepository: UserRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
@@ -44,15 +43,7 @@ class HomeBikeViewModel @Inject constructor(
 
     private val bikesFlow: Flow<List<Bike>> = bikeRepository.observeBikes()
 
-    val isSignedIn =
-        userRepository.isUserSignedIn()
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                null
-            )
-
-    private val _uiState: Flow<HomeBikeUiState> =
+    private val uiState: Flow<HomeBikeUiState> =
         bikesFlow
             .map { bikes ->
                 if (bikes.isEmpty())
@@ -60,13 +51,16 @@ class HomeBikeViewModel @Inject constructor(
                 else
                     HomeBikeUiState.Success(bikes)
             }
-            .catch { _ ->
+            .onStart {
+                emit(HomeBikeUiState.Loading)
+            }
+            .catch {
                 emit(HomeBikeUiState.Error.Generic())
             }
 
     val state: StateFlow<HomeBikeScreenState> =
         combine(
-            _uiState,
+            uiState,
             _isRefreshing,
             _selection
         ) { ui, refreshing, selection ->

@@ -49,7 +49,6 @@ data class AddFormState(
             .toDoubleOrNull()
             ?.times(100)
             ?.toLong()
-            ?: return null
 
         if (price <= 0) return null
 

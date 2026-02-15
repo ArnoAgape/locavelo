@@ -228,8 +228,7 @@ private fun AddBikeContent(
             .imePadding(),
         contentPadding = PaddingValues(
             start = spacing.medium,
-            end = spacing.medium,
-            bottom = spacing.large
+            end = spacing.medium
         ),
         verticalArrangement = Arrangement.spacedBy(spacing.large)
     ) {

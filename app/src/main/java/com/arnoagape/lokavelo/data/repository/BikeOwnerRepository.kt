@@ -1,14 +1,17 @@
 package com.arnoagape.lokavelo.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.arnoagape.lokavelo.data.service.bike.BikeApi
 import com.arnoagape.lokavelo.domain.model.Bike
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,6 +34,13 @@ class BikeOwnerRepository @Inject constructor(
             .distinctUntilChanged()
             .flatMapLatest { ownerId ->
                 bikeApi.observeBikesForOwner(ownerId)
+            }
+            .onEach { bikes ->
+                Log.d("BikesFlow", "Received ${bikes.size} bikes")
+            }
+            .catch { e ->
+                Log.e("BikesFlow", "Error in observeBikes", e)
+                throw e
             }
 
     fun observeBike(bikeId: String): Flow<Bike?> =

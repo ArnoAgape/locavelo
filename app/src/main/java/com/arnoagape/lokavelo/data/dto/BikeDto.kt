@@ -20,7 +20,7 @@ data class BikeDto(
     val isElectric: Boolean = false,
     val accessories: List<BikeEquipment> = emptyList(),
     val priceInCents: Long = 0L,
-    val depositInCents: Long = 0L,
-    val location: BikeLocation,
+    val depositInCents: Long? = null,
+    val location: BikeLocation = BikeLocation(),
     val isAvailable: Boolean = true
 ) : Serializable

@@ -18,7 +18,7 @@ data class Bike(
     val accessories: List<BikeEquipment> = emptyList(),
 
     val priceInCents: Long = 0L,
-    val depositInCents: Long = 0L,
+    val depositInCents: Long? = null,
 
     val location: BikeLocation = BikeLocation(),
 

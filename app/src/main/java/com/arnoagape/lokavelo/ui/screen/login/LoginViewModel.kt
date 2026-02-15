@@ -59,7 +59,3 @@ class LoginViewModel @Inject constructor(
     }
 
 }
-
-data class LoginScreenState(
-    val isSignedIn: Boolean? = null
-)
