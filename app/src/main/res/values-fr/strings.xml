@@ -44,6 +44,10 @@
     <string name="city">Ville</string>
     <string name="take_picture">Prends une photo</string>
     <string name="browse_gallery">Choisis dans la galerie</string>
+    <string name="rent">Louer</string>
+    <string name="rentals">Locations</string>
+    <string name="messaging">Messagerie</string>
+    <string name="account">Compte</string>
 
     // SUCCESS
     <string name="success_user_updated">Tes données ont bien été mises à jour</string>

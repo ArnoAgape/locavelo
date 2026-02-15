@@ -43,6 +43,10 @@
     <string name="city">City</string>
     <string name="take_picture">Take a picture</string>
     <string name="browse_gallery">Browse gallery</string>
+    <string name="rent">Rent</string>
+    <string name="rentals">Rentals</string>
+    <string name="messaging">Messaging</string>
+    <string name="account">Account</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
