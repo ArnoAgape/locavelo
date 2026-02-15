@@ -36,10 +36,11 @@ sealed interface Screen {
     // OWNER
     sealed interface Owner : Screen {
         data object AddBike : Owner
-        data object DetailBike : Owner
         data object EditBike : Owner
         data object HomeBike : Owner
+        data class DetailBike(val bikeId: String) : Owner
     }
+
 
     // RENT
     data object Rent : Screen

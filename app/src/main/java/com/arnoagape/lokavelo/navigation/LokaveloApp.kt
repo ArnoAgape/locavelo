@@ -1,10 +1,14 @@
 package com.arnoagape.lokavelo.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
 import com.arnoagape.lokavelo.ui.screen.home.home.HomeScreen
@@ -15,6 +19,8 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
 import com.arnoagape.lokavelo.ui.screen.login.launchers.googleSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.login.launchers.phoneSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
 
 @Composable
 fun LokaveloApp() {
@@ -30,7 +36,9 @@ fun LokaveloApp() {
 
     // navigate to
     fun navigate(screen: Screen) {
-        backStack = backStack + screen
+        if (backStack.last() != screen) {
+            backStack = backStack + screen
+        }
     }
 
     // go back
@@ -40,49 +48,74 @@ fun LokaveloApp() {
         }
     }
 
-    when (currentScreen) {
-        // ACCOUNT
-        is Screen.Account.AccountHome -> TODO()
-        is Screen.Account.Profile -> ProfileScreen()
-
-        // ACCOUNT - SETTINGS
-        is Screen.Account.Settings.HelpSettings -> TODO()
-        is Screen.Account.Settings.HomeSettings -> TODO()
-        is Screen.Account.Settings.InfoSettings -> TODO()
-        is Screen.Account.Settings.NotificationsSettings -> TODO()
-        is Screen.Account.Settings.PaymentSettings -> TODO()
-        is Screen.Account.Settings.VersionSettings -> TODO()
-
-        // HOME
-        is Screen.Main.Home -> HomeScreen()
-        is Screen.Main.Contact -> TODO()
-        is Screen.Main.DetailPublicBike -> TODO()
-        is Screen.Main.PublicProfile -> TODO()
-
-        // LOGIN
-        is Screen.Login -> LoginScreen(
-            onGoogleSignInClick = { googleSignUpLauncher() },
-            onEmailSignInClick = { emailSignUpLauncher() },
-            onPhoneSignInClick = { phoneSignUpLauncher() },
-            onLoginSuccess = { navigate(Screen.Owner.AddBike)}
-        )
-
-        // MESSAGING
-        is Screen.Messaging.MessagingDetail -> TODO()
-        is Screen.Messaging.MessagingHome -> TODO()
-
-        // OWNER
-        is Screen.Owner.AddBike ->
-            AddBikeScreen(
-                viewModel = hiltViewModel<AddBikeViewModel>(),
-                onBackClick = { popBack() },
-                onSaveClick = { navigate(Screen.Owner.HomeBike) }
+    Scaffold(
+        bottomBar = {
+            BottomBar(
+                currentScreen = currentScreen,
+                onItemSelected = { screen ->
+                    backStack = listOf(screen) // reset stack
+                }
             )
-        is Screen.Owner.DetailBike -> TODO()
-        is Screen.Owner.EditBike -> TODO()
-        is Screen.Owner.HomeBike -> TODO()
+        }
+    ) { padding ->
 
-        // RENT
-        is Screen.Rent -> TODO()
+        Box(Modifier.padding(padding)) {
+
+            when (currentScreen) {
+                // ACCOUNT
+                is Screen.Account.AccountHome -> TODO()
+                is Screen.Account.Profile -> ProfileScreen()
+
+                // ACCOUNT - SETTINGS
+                is Screen.Account.Settings.HelpSettings -> TODO()
+                is Screen.Account.Settings.HomeSettings -> TODO()
+                is Screen.Account.Settings.InfoSettings -> TODO()
+                is Screen.Account.Settings.NotificationsSettings -> TODO()
+                is Screen.Account.Settings.PaymentSettings -> TODO()
+                is Screen.Account.Settings.VersionSettings -> TODO()
+
+                // HOME
+                is Screen.Main.Home -> HomeScreen()
+                is Screen.Main.Contact -> TODO()
+                is Screen.Main.DetailPublicBike -> TODO()
+                is Screen.Main.PublicProfile -> TODO()
+
+                // LOGIN
+                is Screen.Login -> LoginScreen(
+                    onGoogleSignInClick = { googleSignUpLauncher() },
+                    onEmailSignInClick = { emailSignUpLauncher() },
+                    onPhoneSignInClick = { phoneSignUpLauncher() },
+                    onLoginSuccess = { navigate(Screen.Owner.AddBike) }
+                )
+
+                // MESSAGING
+                is Screen.Messaging.MessagingDetail -> TODO()
+                is Screen.Messaging.MessagingHome -> TODO()
+
+                // OWNER
+                is Screen.Owner.AddBike ->
+                    AddBikeScreen(
+                        viewModel = hiltViewModel<AddBikeViewModel>(),
+                        onBackClick = { popBack() },
+                        onSaveClick = { navigate(Screen.Owner.HomeBike) }
+                    )
+
+                is Screen.Owner.DetailBike -> TODO()
+                is Screen.Owner.EditBike -> TODO()
+                is Screen.Owner.HomeBike ->
+                    HomeBikeScreen(
+                        viewModel = hiltViewModel<HomeBikeViewModel>(),
+                        onBikeClick = { bike ->
+                            navigate(
+                                Screen.Owner.DetailBike(bike.id)
+                            )
+                        },
+                        onFABClick = { navigate(Screen.Owner.AddBike) }
+                    )
+
+                // RENT
+                is Screen.Rent -> TODO()
+            }
+        }
     }
 }

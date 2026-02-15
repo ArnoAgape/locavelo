@@ -1,4 +1,17 @@
 package com.arnoagape.lokavelo.ui.screen.owner.home
 
-class HomeBikeUiState {
+import androidx.annotation.StringRes
+import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.domain.model.Bike
+
+sealed class HomeBikeUiState {
+    object Loading : HomeBikeUiState()
+    data class Success(val bikes: List<Bike>) : HomeBikeUiState()
+    data class Empty(
+        @param:StringRes val messageRes: Int = R.string.error_bike_not_found
+    ) : HomeBikeUiState()
+
+    sealed class Error : HomeBikeUiState() {
+        data class Generic(@param:StringRes val messageRes: Int = R.string.error_generic) : Error()
+    }
 }

@@ -20,6 +20,7 @@
         pendant toute la durée de la location</string>
 
     // MISC WORDS
+    <string name="bikes">Vélos</string>
     <string name="pictures">Photos</string>
     <string name="characteristics">Caractéristiques</string>
     <string name="title_description">Titre &amp; Description</string>
@@ -65,6 +66,11 @@
     <string name="error_no_account_bike">Un compte est nécessaire pour ajouter un vélo</string>
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier tes infos</string>
     <string name="error_invalid_form">Formulaire invalide</string>
+    <string name="error_bike_not_found">Aucun vélo trouvé</string>
+    <string name="error_loading_bike">Une erreur est survenue pendant le chargement de tes vélos</string>
+    <string name="error_delete_bike">Une erreur est survenue pendant la suppression du vélo</string>
+    <string name="error_no_account_add_bike">Tu dois te connecter pour publier une annonce</string>
+    <string name="error_no_account_edit_bike">Tu dois te connecter pour modifier une annonce</string>
 
     // SIGN IN
     <string name="sign_in_google">Continue avec Google</string>
@@ -82,11 +88,26 @@
     <string name="add_picture">Ajouter une photo</string>
     <string name="remove_picture">Supprimer</string>
 
+    // CONFIRM ACTIONS
+    <string name="action_delete_account">Supprimer le compte</string>
+    <string name="confirm_delete_bike">Supprimer l’annonce</string>
+    <string name="bike_deleted">Annonce supprimée</string>
+    <string name="confirm_delete_message_current_bike">
+        Tu es sur le point de supprimer l’annonce. Continuer ?</string>
+    <string name="confirm_delete_message_bikes">
+        Tu es sur le point de supprimer les annonces sélectionnées. Continuer ?</string>
+    <string name="confirm_delete_account_message">
+        Tu es sur le point d’effacer ton compte.
+        Un email te sera envoyé pour confirmer la suppression. Continuer ?</string>
+
     // CONTENT_DESCRIPTION
     <string name="cd_remove">Clique ici pour effacer</string>
     <string name="cd_bike_preview">Aperçu du vélo</string>
     <string name="cd_go_back">Retour arrière</string>
     <string name="cd_expand_accessories">Clique ici pour ouvrir le menu des accessoires</string>
+    <string name="cd_button_add_bike">Clique ici pour ajouter un vélo à louer</string>
+    <string name="cd_button_delete">Supprimer les annonces sélectionnées</string>
+    <string name="cd_button_delete_bike">Supprimer une annonce</string>
 
     // CATEGORY
     <string name="bike_category_road">Vélo de route</string>

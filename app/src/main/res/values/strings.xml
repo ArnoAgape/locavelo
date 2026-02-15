@@ -19,6 +19,7 @@
         for the entire duration of the rental</string>
 
     // MISC WORDS
+    <string name="bikes">Bikes</string>
     <string name="pictures">Pictures</string>
     <string name="characteristics">Characteristics</string>
     <string name="title_description">Title &amp; Description</string>
@@ -64,6 +65,11 @@
     <string name="error_no_account_bike">An account is mandatory in order to add a bike</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
     <string name="error_invalid_form">Invalid form</string>
+    <string name="error_bike_not_found">Bike not found</string>
+    <string name="error_loading_bike">An issue occurred while loading your bikes</string>
+    <string name="error_delete_bike">An issue occurred while deleting the bike</string>
+    <string name="error_no_account_add_bike">An account is mandatory in order to add a bike</string>
+    <string name="error_no_account_edit_bike">An account is mandatory in order to edit a bike</string>
 
     // SIGN IN
     <string name="sign_in_google">Sign in with Google</string>
@@ -81,11 +87,23 @@
     <string name="add_picture">Add picture</string>
     <string name="remove_picture">Remove picture</string>
 
+    // CONFIRM ACTIONS
+    <string name="action_delete_account">Delete account</string>
+    <string name="confirm_delete_bike">Delete bike</string>
+    <string name="bike_deleted">Bike deleted</string>
+    <string name="confirm_delete_message_current_bike">You’re about to delete the bike. Continue?</string>
+    <string name="confirm_delete_message_bikes">You’re about to delete the selected bike(s). Continue?</string>
+    <string name="confirm_delete_account_message">
+        You’re about to delete your account. An email will be sent to confirm the deletion. Continue?</string>
+
     // CONTENT_DESCRIPTION
     <string name="cd_remove">Click here to erase</string>
     <string name="cd_bike_preview">Bike preview</string>
     <string name="cd_go_back">Go back</string>
     <string name="cd_expand_accessories">Click here to expand the accessories section</string>
+    <string name="cd_button_add_bike">Add a new bike</string>
+    <string name="cd_button_delete">Delete the selected elements</string>
+    <string name="cd_button_delete_bike">Delete a bike</string>
 
     // CATEGORY
     <string name="bike_category_road">Racing bike</string>

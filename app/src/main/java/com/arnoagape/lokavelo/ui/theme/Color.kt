@@ -7,7 +7,7 @@ val BlueGrey80 = Color(0xFF9CCBE8)    // secondary
 val Cyan80 = Color(0xFFBFE4F7)        // tertiary
 
 val Blue40 = Color(0xFF63A4D9)        // primary
-val BlueGrey40 = Color(0xFF1F4F91)    // secondary dark
+val Blue = Color(0xFF1F4F91)    // secondary dark
 val Cyan40 = Color(0xFF1767A3)        // tertiary dark
 
 val DarkBlue = Color(0xFF0F1E2E)
