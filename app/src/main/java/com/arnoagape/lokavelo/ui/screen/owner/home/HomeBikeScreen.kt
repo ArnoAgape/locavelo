@@ -3,10 +3,13 @@ package com.arnoagape.lokavelo.ui.screen.owner.home
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -16,8 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
@@ -66,15 +72,15 @@ fun HomeBikeContent(
 ) {
     val refreshState = rememberPullToRefreshState()
 
-    PullToRefreshBox(
-        modifier = Modifier.fillMaxSize(),
-        state = refreshState,
-        isRefreshing = state.isRefreshing,
-        onRefresh = onRefresh
-    ) {
-        when (val ui = state.uiState) {
+    when (val ui = state.uiState) {
 
-            is HomeBikeUiState.Success -> {
+        is HomeBikeUiState.Success -> {
+            PullToRefreshBox(
+                modifier = Modifier.fillMaxSize(),
+                state = refreshState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = onRefresh
+            ) {
                 BikeItem(
                     bikes = ui.bikes,
                     onBikeClick = onBikeClick,
@@ -82,17 +88,42 @@ fun HomeBikeContent(
                     onToggleSelection = onToggleSelection
                 )
             }
+        }
 
-            is HomeBikeUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+        is HomeBikeUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
+        }
 
-            else -> {}
+        is HomeBikeUiState.Empty -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_bike),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        is HomeBikeUiState.Error.Generic -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.error_loading_bike),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

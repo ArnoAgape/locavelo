@@ -48,6 +48,7 @@
     <string name="city">City</string>
     <string name="take_picture">Take a picture</string>
     <string name="browse_gallery">Browse gallery</string>
+    <string name="no_bike">To post a new ad, please press the button "+"</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
@@ -65,8 +66,7 @@
     <string name="error_no_account_bike">An account is mandatory in order to add a bike</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
     <string name="error_invalid_form">Invalid form</string>
-    <string name="error_bike_not_found">Bike not found</string>
-    <string name="error_loading_bike">An issue occurred while loading your bikes</string>
+    <string name="error_loading_bike">An issue occurred while loading bikes</string>
     <string name="error_delete_bike">An issue occurred while deleting the bike</string>
     <string name="error_no_account_add_bike">An account is mandatory in order to add a bike</string>
     <string name="error_no_account_edit_bike">An account is mandatory in order to edit a bike</string>

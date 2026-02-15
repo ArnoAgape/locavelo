@@ -60,7 +60,7 @@ fun LokaveloApp() {
 
     // checks if user signed in
     fun navigateProtected(screen: Screen) {
-        if (isSignedIn == true) {
+        if (isSignedIn) {
             navigate(screen)
         } else {
             backStack = listOf(Screen.Login)
@@ -173,11 +173,7 @@ fun LokaveloApp() {
                 is Screen.Owner.HomeBike ->
                     HomeBikeScreen(
                         viewModel = hiltViewModel<HomeBikeViewModel>(),
-                        onBikeClick = { bike ->
-                            navigate(
-                                Screen.Owner.DetailBike(bike.id)
-                            )
-                        }
+                        onBikeClick = { bike -> navigate(Screen.Owner.DetailBike(bike.id)) }
                     )
 
                 // RENT

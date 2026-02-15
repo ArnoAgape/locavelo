@@ -8,7 +8,7 @@ sealed class HomeBikeUiState {
     object Loading : HomeBikeUiState()
     data class Success(val bikes: List<Bike>) : HomeBikeUiState()
     data class Empty(
-        @param:StringRes val messageRes: Int = R.string.error_bike_not_found
+        @param:StringRes val messageRes: Int = R.string.no_bike
     ) : HomeBikeUiState()
 
     sealed class Error : HomeBikeUiState() {
