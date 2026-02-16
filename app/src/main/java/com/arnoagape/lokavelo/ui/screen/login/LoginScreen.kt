@@ -43,6 +43,9 @@ import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.OrSeparator
+import com.arnoagape.lokavelo.ui.screen.login.launchers.emailSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.login.launchers.googleSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.login.launchers.phoneSignUpLauncher
 
 /**
  * Displays the login screen with multiple sign-in options:
@@ -50,18 +53,17 @@ import com.arnoagape.lokavelo.ui.common.components.OrSeparator
  *
  * @param viewModel ViewModel providing authentication state and events.
  * @param onLoginSuccess Callback executed after successful sign-in.
- * @param onGoogleSignInClick Launches the Google sign-in flow.
- * @param onEmailSignInClick Launches the email sign-in flow.
- * @param onPhoneSignInClick Launches the phone sign-in flow.
  */
 @Composable
 fun LoginScreen(
-    onGoogleSignInClick: () -> Unit,
-    onEmailSignInClick: () -> Unit,
-    onPhoneSignInClick: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
+
     val viewModel: LoginViewModel = hiltViewModel()
+
+    val googleLauncher = googleSignUpLauncher(viewModel)
+    val emailLauncher = emailSignUpLauncher(viewModel)
+    val phoneLauncher = phoneSignUpLauncher(viewModel)
 
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -91,9 +93,9 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             LoginContent(
-                onGoogleSignInClick = { viewModel.onSignInRequested { onGoogleSignInClick() } },
-                onEmailSignInClick = { viewModel.onSignInRequested { onEmailSignInClick() } },
-                onPhoneSignInClick = { viewModel.onSignInRequested { onPhoneSignInClick() }}
+                onGoogleSignInClick = { viewModel.onSignInRequested { googleLauncher() } },
+                onEmailSignInClick = { viewModel.onSignInRequested { emailLauncher() } },
+                onPhoneSignInClick = { viewModel.onSignInRequested { phoneLauncher() }}
             )
         }
     }

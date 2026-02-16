@@ -18,64 +18,77 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.ui.screen.account.home.AccountHomeScreen
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
-import com.arnoagape.lokavelo.ui.screen.home.home.HomeScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.help.HelpSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.home.HomeSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.info.InfoSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.notifications.NotificationsSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.payment.PaymentSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.account.settings.version.VersionSettingsScreen
+import com.arnoagape.lokavelo.ui.screen.main.home.HomeScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginViewModel
-import com.arnoagape.lokavelo.ui.screen.login.launchers.emailSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
-import com.arnoagape.lokavelo.ui.screen.login.launchers.googleSignUpLauncher
-import com.arnoagape.lokavelo.ui.screen.login.launchers.phoneSignUpLauncher
+import com.arnoagape.lokavelo.ui.screen.main.contact.ContactScreen
+import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeScreen
+import com.arnoagape.lokavelo.ui.screen.main.profile.PublicProfileScreen
+import com.arnoagape.lokavelo.ui.screen.messaging.detail.MessagingDetailScreen
+import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeEvent
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
+import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.rent.RentScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LokaveloApp() {
 
-    var backStack by remember { mutableStateOf(listOf<Screen>(Screen.Login)) }
+    // BackStack sauvegardé en String
+    var backStack by rememberSaveable {
+        mutableStateOf(listOf(Screen.Login.route))
+    }
 
-    val currentScreen = backStack.last()
+    val currentRoute = backStack.last()
+    val currentScreen = remember(currentRoute) {
+        screenFromRoute(currentRoute)
+    }
 
-    // viewModels
+    // ViewModels
     val loginViewModel: LoginViewModel = hiltViewModel()
     val addBikeViewModel: AddBikeViewModel = hiltViewModel()
+    val homeBikeViewModel: HomeBikeViewModel = hiltViewModel()
 
-    // Sign-in launchers
-    val emailSignUpLauncher = emailSignUpLauncher(loginViewModel)
-    val googleSignUpLauncher = googleSignUpLauncher(loginViewModel)
-    val phoneSignUpLauncher = phoneSignUpLauncher(loginViewModel)
-
-    // states
+    // States
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
     val addBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
 
-    // navigate to
+    // Navigation helpers
     fun navigate(screen: Screen) {
-        if (backStack.last() != screen) {
-            backStack = backStack + screen
+        if (backStack.last() != screen.route) {
+            backStack = backStack + screen.route
         }
     }
 
-    // checks if user signed in
     fun navigateProtected(screen: Screen) {
         if (isSignedIn) {
             navigate(screen)
         } else {
-            backStack = listOf(Screen.Login)
+            backStack = listOf(Screen.Login.route)
         }
     }
 
-    // go back
     fun popBack() {
         if (backStack.size > 1) {
             backStack = backStack.dropLast(1)
@@ -83,6 +96,7 @@ fun LokaveloApp() {
     }
 
     Scaffold(
+
         topBar = {
             when (currentScreen) {
 
@@ -129,7 +143,9 @@ fun LokaveloApp() {
                 is Screen.Owner.AddBike -> {
                     PublishButton(
                         enabled = addBikeState.isValid,
-                        onClick = { addBikeViewModel.onAction(AddBikeEvent.Submit) }
+                        onClick = {
+                            addBikeViewModel.onAction(AddBikeEvent.Submit)
+                        }
                     )
                 }
 
@@ -137,14 +153,14 @@ fun LokaveloApp() {
                     BottomBar(
                         currentScreen = currentScreen,
                         onItemSelected = { screen ->
-                            backStack = listOf(screen)
+                            backStack = listOf(screen.route)
                         }
                     )
                 }
             }
         }
-    )
-    { padding ->
+
+    ) { padding ->
 
         Box(
             Modifier
@@ -152,36 +168,33 @@ fun LokaveloApp() {
                 .consumeWindowInsets(padding)
         ) {
 
-        when (currentScreen) {
+            when (currentScreen) {
                 // ACCOUNT
-                is Screen.Account.AccountHome -> TODO()
+                is Screen.Account.AccountHome -> AccountHomeScreen()
                 is Screen.Account.Profile -> ProfileScreen()
 
                 // ACCOUNT - SETTINGS
-                is Screen.Account.Settings.HelpSettings -> TODO()
-                is Screen.Account.Settings.HomeSettings -> TODO()
-                is Screen.Account.Settings.InfoSettings -> TODO()
-                is Screen.Account.Settings.NotificationsSettings -> TODO()
-                is Screen.Account.Settings.PaymentSettings -> TODO()
-                is Screen.Account.Settings.VersionSettings -> TODO()
+                is Screen.Account.Settings.HelpSettings -> HelpSettingsScreen()
+                is Screen.Account.Settings.HomeSettings -> HomeSettingsScreen()
+                is Screen.Account.Settings.InfoSettings -> InfoSettingsScreen()
+                is Screen.Account.Settings.NotificationsSettings -> NotificationsSettingsScreen()
+                is Screen.Account.Settings.PaymentSettings -> PaymentSettingsScreen()
+                is Screen.Account.Settings.VersionSettings -> VersionSettingsScreen()
 
                 // HOME
                 is Screen.Main.Home -> HomeScreen()
-                is Screen.Main.Contact -> TODO()
-                is Screen.Main.DetailPublicBike -> TODO()
-                is Screen.Main.PublicProfile -> TODO()
+                is Screen.Main.Contact -> ContactScreen()
+                is Screen.Main.DetailPublicBike -> DetailPublicBikeScreen()
+                is Screen.Main.PublicProfile -> PublicProfileScreen()
 
                 // LOGIN
                 is Screen.Login -> LoginScreen(
-                    onGoogleSignInClick = { googleSignUpLauncher() },
-                    onEmailSignInClick = { emailSignUpLauncher() },
-                    onPhoneSignInClick = { phoneSignUpLauncher() },
                     onLoginSuccess = { navigate(Screen.Owner.HomeBike) }
                 )
 
                 // MESSAGING
-                is Screen.Messaging.MessagingDetail -> TODO()
-                is Screen.Messaging.MessagingHome -> TODO()
+                is Screen.Messaging.MessagingDetail -> MessagingDetailScreen()
+                is Screen.Messaging.MessagingHome -> MessagingHomeScreen()
 
                 // OWNER
                 is Screen.Owner.AddBike ->
@@ -190,17 +203,46 @@ fun LokaveloApp() {
                         onSaveClick = { navigate(Screen.Owner.HomeBike) }
                     )
 
-                is Screen.Owner.DetailBike -> TODO()
-                is Screen.Owner.EditBike -> TODO()
+                is Screen.Owner.DetailBike -> DetailBikeScreen()
+                is Screen.Owner.EditBike -> EditBikeScreen()
                 is Screen.Owner.HomeBike ->
                     HomeBikeScreen(
-                        viewModel = hiltViewModel<HomeBikeViewModel>(),
+                        viewModel = homeBikeViewModel,
                         onBikeClick = { bike -> navigate(Screen.Owner.DetailBike(bike.id)) }
                     )
 
                 // RENT
-                is Screen.Rent -> TODO()
+                is Screen.Rent -> RentScreen()
             }
         }
+    }
+}
+
+fun screenFromRoute(route: String): Screen {
+    return when {
+        route == Screen.Login.route -> Screen.Login
+
+        route == Screen.Owner.HomeBike.route -> Screen.Owner.HomeBike
+        route == Screen.Owner.AddBike.route -> Screen.Owner.AddBike
+        route == Screen.Owner.EditBike.route -> Screen.Owner.EditBike
+        route.startsWith("owner_detail/") ->
+            Screen.Owner.DetailBike.fromRoute(route)
+
+        route == Screen.Account.AccountHome.route ->
+            Screen.Account.AccountHome
+
+        route == Screen.Account.Profile.route ->
+            Screen.Account.Profile
+
+        route == Screen.Main.Home.route ->
+            Screen.Main.Home
+
+        route == Screen.Messaging.MessagingHome.route ->
+            Screen.Messaging.MessagingHome
+
+        route == Screen.Rent.route ->
+            Screen.Rent
+
+        else -> Screen.Login
     }
 }
