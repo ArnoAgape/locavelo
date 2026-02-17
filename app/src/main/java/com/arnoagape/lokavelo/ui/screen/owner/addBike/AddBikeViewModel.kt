@@ -42,7 +42,7 @@ class AddBikeViewModel @Inject constructor(
             )
 
     private val _formState = MutableStateFlow(
-        AddFormState(
+        AddBikeFormState(
             title = "",
             description = "",
             location = BikeLocation(),
@@ -77,7 +77,7 @@ class AddBikeViewModel @Inject constructor(
         )
 
     /**
-     * Handles user actions modifying the file or selected URIs.
+     * Handles user actions modifying the bike or selected URIs.
      */
     fun onAction(event: AddBikeEvent) {
         when (event) {
@@ -164,7 +164,7 @@ class AddBikeViewModel @Inject constructor(
             }.onSuccess {
                 _uiState.value = AddBikeUiState.Success
                 _localUris.value = emptyList()
-                _formState.value = AddFormState()
+                _formState.value = AddBikeFormState()
                 _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_added))
             }.onFailure { throwable ->
                 Log.e("AddBike", "Error while adding bike", throwable)
@@ -184,7 +184,7 @@ class AddBikeViewModel @Inject constructor(
 
 data class AddBikeScreenState(
     val uiState: AddBikeUiState = AddBikeUiState.Idle,
-    val form: AddFormState = AddFormState(),
+    val form: AddBikeFormState = AddBikeFormState(),
     val isValid: Boolean = false,
     val localUris: List<Uri> = emptyList(),
     val isSignedIn: Boolean = false

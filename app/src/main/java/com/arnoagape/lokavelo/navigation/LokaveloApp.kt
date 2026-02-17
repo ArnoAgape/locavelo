@@ -64,7 +64,9 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeUiState
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeEvent
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.rent.RentScreen
@@ -93,12 +95,14 @@ fun LokaveloApp() {
     val addBikeViewModel: AddBikeViewModel = hiltViewModel()
     val homeBikeViewModel: HomeBikeViewModel = hiltViewModel()
     val detailBikeViewModel: DetailBikeViewModel = hiltViewModel()
+    val editBikeViewModel: EditBikeViewModel = hiltViewModel()
 
     // States
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
     val addBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
     val homeBikeScreenState by homeBikeViewModel.state.collectAsStateWithLifecycle()
     val detailBikeScreenState by detailBikeViewModel.state.collectAsStateWithLifecycle()
+    val editBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -271,6 +275,20 @@ fun LokaveloApp() {
                     )
                 }
 
+                is Screen.Owner.EditBike -> {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.edit)) },
+                        navigationIcon = {
+                            IconButton(onClick = { popBack() }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.cd_go_back)
+                                )
+                            }
+                        }
+                    )
+                }
+
                 else -> {}
             }
         },
@@ -293,12 +311,20 @@ fun LokaveloApp() {
 
         bottomBar = {
             when (currentScreen) {
-
                 is Screen.Owner.AddBike -> {
                     PublishButton(
                         enabled = addBikeState.isValid,
                         onClick = {
                             addBikeViewModel.onAction(AddBikeEvent.Submit)
+                        }
+                    )
+                }
+
+                is Screen.Owner.EditBike -> {
+                    PublishButton(
+                        enabled = editBikeState.isValid,
+                        onClick = {
+                            editBikeViewModel.onAction(EditBikeEvent.Submit)
                         }
                     )
                 }
@@ -365,7 +391,11 @@ fun LokaveloApp() {
                     )
 
                 is Screen.Owner.EditBike ->
-                    EditBikeScreen()
+                    EditBikeScreen(
+                        viewModel = editBikeViewModel,
+                        onSaveClick = { popBack() }
+                        )
+
                 is Screen.Owner.HomeBike ->
                     HomeBikeScreen(
                         viewModel = homeBikeViewModel,

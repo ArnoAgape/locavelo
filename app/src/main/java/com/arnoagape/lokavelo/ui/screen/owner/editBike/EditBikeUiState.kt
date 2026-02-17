@@ -1,4 +1,22 @@
 package com.arnoagape.lokavelo.ui.screen.owner.editBike
 
-class EditBikeUiState {
+import androidx.annotation.StringRes
+import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.domain.model.Bike
+
+sealed class EditBikeUiState {
+
+    object Idle : EditBikeUiState()
+    object Loading : EditBikeUiState()
+
+    data class Loaded(val bike: Bike) : EditBikeUiState()
+
+    object Submitting : EditBikeUiState()
+
+    sealed class Error : EditBikeUiState() {
+        object NotFound : Error()
+        data class Generic(
+            @param:StringRes val messageRes: Int = R.string.error_generic
+        ) : Error()
+    }
 }

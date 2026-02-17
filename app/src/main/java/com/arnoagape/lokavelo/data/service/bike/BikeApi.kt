@@ -8,7 +8,7 @@ interface BikeApi {
 
     fun observeBikesForOwner(ownerId: String): Flow<List<Bike>>
     suspend fun addBike(localUris: List<Uri>, bike: Bike): List<String>
-    suspend fun editBike(bike: Bike): Result<Unit>
+    suspend fun editBike(localUris: List<Uri>, bike: Bike): Result<Unit>
     fun getBikeById(bikeId: String, userId: String): Flow<Bike>
     suspend fun deleteBikes(ids: Set<String>): Result<Unit>
     // fun getBikesByCategory(category: BikeCategory, categoryId: String): Flow<List<Bike>>

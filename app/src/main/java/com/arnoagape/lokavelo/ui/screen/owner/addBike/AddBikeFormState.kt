@@ -8,7 +8,7 @@ import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import kotlin.collections.isNotEmpty
 
-data class AddFormState(
+data class AddBikeFormState(
     val title: String = "",
     val description: String = "",
     val location: BikeLocation = BikeLocation(),

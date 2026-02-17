@@ -52,7 +52,7 @@ class BikeOwnerRepository @Inject constructor(
                 bikeApi.getBikeById(bikeId, ownerId)
             }
 
-    suspend fun editBike(bike: Bike) = bikeApi.editBike(bike)
+    suspend fun editBike(localUris: List<Uri>, bike: Bike) = bikeApi.editBike(localUris, bike)
 
     suspend fun deleteBikes(ids: Set<String>) = bikeApi.deleteBikes(ids)
 

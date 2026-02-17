@@ -69,22 +69,49 @@ class FirebaseBikeApi @Inject constructor(
         return uploadedUrls
     }
 
-    override suspend fun editBike(bike: Bike): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            try {
-                val dto = bike.toDto()
+    override suspend fun editBike(
+        localUris: List<Uri>,
+        bike: Bike
+    ): Result<Unit> = withContext(Dispatchers.IO) {
 
-                bikesCollectionForUser(bike.ownerId)
-                    .document(bike.id)
-                    .set(dto)
-
-                Result.success(Unit)
-
-            } catch (e: Exception) {
-                Log.e("FirebaseBikeApi", "Error while editing bike", e)
-                Result.failure(e)
+        try {
+            require(localUris.size + bike.photoUrls.size <= 3) {
+                "Maximum 3 photos allowed"
             }
+
+            val ownerId = requireUserId()
+            val bikeId = bike.id
+
+            // 1️⃣ Upload nouvelles photos
+            val uploadedUrls =
+                if (localUris.isNotEmpty()) {
+                    uploadBikePictures(
+                        ownerId = ownerId,
+                        bikeId = bikeId,
+                        uris = localUris
+                    )
+                } else {
+                    emptyList()
+                }
+
+            // 2️⃣ Fusion anciennes + nouvelles
+            val finalBike = bike.copy(
+                photoUrls = bike.photoUrls + uploadedUrls
+            )
+
+            // 3️⃣ Mise à jour Firestore
+            bikesCollectionForUser(ownerId)
+                .document(bikeId)
+                .set(finalBike.toDto())
+                .await()
+
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Log.e("FirebaseBikeApi", "Error while editing bike", e)
+            Result.failure(e)
         }
+    }
 
     /**
      * Retrieves a single medicine by its identifier.
