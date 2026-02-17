@@ -55,8 +55,6 @@
     <string name="renting">En cours</string>
     <string name="available">Disponible</string>
     <string name="finished">Terminé</string>
-    <string name="search">Rechercher</string>
-    <string name="delete">Supprimer</string>
     <string name="no_accessories">Aucun accessoire</string>
     <string name="no_deposit">Aucune caution</string>
     <string name="no_brand">Aucune marque</string>
@@ -75,6 +73,7 @@
     <string name="error_generic">Une erreur est survenue</string>
     <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_account_bike">Un compte est nécessaire pour ajouter un vélo</string>
+    <string name="error_editing_bike">Une erreur est survenue pendant la modification du vélo</string>
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier tes infos</string>
     <string name="error_invalid_form">Formulaire invalide</string>
     <string name="error_loading_bike">Une erreur est survenue pendant le chargement des vélos</string>
@@ -92,6 +91,9 @@
     // ACTIONS
     <string name="cancel">Annuler</string>
     <string name="close">Fermer</string>
+    <string name="search">Rechercher</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
     <string name="or">Ou</string>
     <string name="try_again">Réessayer</string>
     <string name="publishing">Publication en cours…</string>

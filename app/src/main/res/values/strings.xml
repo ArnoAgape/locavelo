@@ -54,8 +54,6 @@
     <string name="renting">Renting</string>
     <string name="available">Available</string>
     <string name="finished">Finished</string>
-    <string name="search">Search</string>
-    <string name="delete">Delete</string>
     <string name="no_accessories">No accessories</string>
     <string name="no_deposit">No deposit</string>
     <string name="no_brand">No brand</string>
@@ -74,6 +72,7 @@
     <string name="error_generic">An issue occurred</string>
     <string name="error_sign_up">Sign up canceled or failed</string>
     <string name="error_no_account_bike">An account is mandatory in order to add a bike</string>
+    <string name="error_editing_bike">An issue occurred while editing the bike</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
     <string name="error_invalid_form">Invalid form</string>
     <string name="error_loading_bike">An issue occurred while loading bikes</string>
@@ -91,6 +90,9 @@
     // ACTIONS
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="search">Search</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
     <string name="or">Or</string>
     <string name="try_again">Try again</string>
     <string name="publishing">Publishing…</string>

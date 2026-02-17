@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -61,6 +62,7 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeEvent
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeUiState
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
@@ -96,6 +98,7 @@ fun LokaveloApp() {
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
     val addBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
     val homeBikeScreenState by homeBikeViewModel.state.collectAsStateWithLifecycle()
+    val detailBikeScreenState by detailBikeViewModel.state.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -238,6 +241,32 @@ fun LokaveloApp() {
                                     stringResource(R.string.cd_go_back)
                                 )
                             }
+                        },
+                        actions = {
+                            if (detailBikeScreenState.bikeState is DetailBikeUiState.Success) {
+                                val bike =
+                                    (detailBikeScreenState.bikeState as DetailBikeUiState.Success).bike
+                                IconButton(
+                                    onClick = {
+                                        navigateProtected(Screen.Owner.EditBike(bike.id))
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = stringResource(R.string.edit)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        detailBikeViewModel.requestDeleteConfirmation()
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.delete)
+                                    )
+                                }
+                            }
                         }
                     )
                 }
@@ -331,10 +360,12 @@ fun LokaveloApp() {
                 is Screen.Owner.DetailBike ->
                     DetailBikeScreen(
                         bikeId = currentScreen.bikeId,
-                        viewModel = detailBikeViewModel
+                        viewModel = detailBikeViewModel,
+                        onBikeDeleted = { popBack() }
                     )
 
-                is Screen.Owner.EditBike -> EditBikeScreen()
+                is Screen.Owner.EditBike ->
+                    EditBikeScreen()
                 is Screen.Owner.HomeBike ->
                     HomeBikeScreen(
                         viewModel = homeBikeViewModel,
@@ -354,7 +385,9 @@ fun screenFromRoute(route: String): Screen {
 
         route == Screen.Owner.HomeBike.route -> Screen.Owner.HomeBike
         route == Screen.Owner.AddBike.route -> Screen.Owner.AddBike
-        route == Screen.Owner.EditBike.route -> Screen.Owner.EditBike
+        route.startsWith("owner_edit/") ->
+            Screen.Owner.EditBike.fromRoute(route)
+
         route.startsWith("owner_detail/") ->
             Screen.Owner.DetailBike.fromRoute(route)
 

@@ -33,6 +33,7 @@ import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
+import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PhotosContent
 import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.AccessoriesRow
 import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailCard
@@ -50,11 +51,13 @@ import java.util.Locale
 @Composable
 fun DetailBikeScreen(
     bikeId: String,
-    viewModel: DetailBikeViewModel
+    viewModel: DetailBikeViewModel,
+    onBikeDeleted: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
 
     LaunchedEffect(bikeId) {
         viewModel.setBikeId(bikeId)
@@ -69,11 +72,35 @@ fun DetailBikeScreen(
                 )
             }
 
-            else -> Unit
+            is Event.ShowSuccessMessage -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(event.message),
+                    duration = SnackbarDuration.Short
+                )
+
+                if (event.message == R.string.success_bike_deleted) {
+                    onBikeDeleted()
+                }
+            }
         }
     }
 
     DetailBikeContent(state = state)
+
+    if (showDeleteDialog) {
+        ConfirmDeleteDialog(
+            show = true,
+            onConfirm = {
+                viewModel.dismissDeleteDialog()
+                viewModel.deleteBike()
+            },
+            onDismiss = {
+                viewModel.dismissDeleteDialog()
+            },
+            confirmButtonTitle = stringResource(R.string.confirm_delete_bike),
+            confirmButtonMessage = stringResource(R.string.confirm_delete_message_current_bike)
+        )
+    }
 
 }
 
@@ -86,7 +113,7 @@ fun DetailBikeContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        when (val ui = state.uiState) {
+        when (val ui = state.bikeState) {
 
             is DetailBikeUiState.Success -> {
                 DetailItem(bike = ui.bike)
@@ -250,7 +277,7 @@ private fun DetailBikeScreenPreview() {
             )
 
         val previewState = DetailScreenState(
-            uiState = DetailBikeUiState.Success(fakeBike)
+            bikeState = DetailBikeUiState.Success(fakeBike)
         )
 
         DetailBikeContent(state = previewState)

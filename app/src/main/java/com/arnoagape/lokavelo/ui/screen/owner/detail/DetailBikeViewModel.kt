@@ -2,6 +2,7 @@ package com.arnoagape.lokavelo.ui.screen.owner.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
 import com.arnoagape.lokavelo.data.repository.UserRepository
 import com.arnoagape.lokavelo.ui.common.Event
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -37,11 +39,20 @@ class DetailBikeViewModel @Inject constructor(
 
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
-
+    private val _showDeleteDialog = MutableStateFlow(false)
+    val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
     private val _bikeId = MutableStateFlow<String?>(null)
 
     fun setBikeId(id: String) {
         _bikeId.value = id
+    }
+
+    fun requestDeleteConfirmation() {
+        _showDeleteDialog.value = true
+    }
+
+    fun dismissDeleteDialog() {
+        _showDeleteDialog.value = false
     }
 
     private val isUserSignedIn =
@@ -84,7 +95,7 @@ class DetailBikeViewModel @Inject constructor(
             isUserSignedIn
         ) { ui, signedIn ->
             DetailScreenState(
-                uiState = ui,
+                bikeState = ui,
                 isSignedIn = signedIn == true
             )
         }.stateIn(
@@ -92,9 +103,26 @@ class DetailBikeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = DetailScreenState()
         )
+
+    fun deleteBike() = viewModelScope.launch {
+        val bike = (bikeState.value as? DetailBikeUiState.Success)?.bike
+
+        if (bike == null) {
+            _events.trySend(Event.ShowMessage(R.string.error_editing_bike))
+            return@launch
+        }
+
+        val result = bikeRepository.deleteBikes(setOf(bike.id))
+
+        if (result.isSuccess) {
+            _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_deleted))
+        } else {
+            _events.trySend(Event.ShowMessage(R.string.error_delete_bike))
+        }
+    }
 }
 
 data class DetailScreenState(
-    val uiState: DetailBikeUiState = DetailBikeUiState.Loading,
+    val bikeState: DetailBikeUiState = DetailBikeUiState.Loading,
     val isSignedIn: Boolean = false
 )

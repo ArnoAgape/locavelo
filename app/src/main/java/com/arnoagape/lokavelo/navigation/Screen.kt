@@ -87,8 +87,15 @@ sealed interface Screen {
             override val route = "owner_add"
         }
 
-        data object EditBike : Owner {
-            override val route = "owner_edit"
+        data class EditBike(val bikeId: String) : Owner {
+            override val route = "owner_edit/$bikeId"
+
+            companion object {
+                fun fromRoute(route: String): DetailBike {
+                    val id = route.substringAfter("owner_edit/")
+                    return DetailBike(id)
+                }
+            }
         }
 
         data object HomeBike : Owner {
