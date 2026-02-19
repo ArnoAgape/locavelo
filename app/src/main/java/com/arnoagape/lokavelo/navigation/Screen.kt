@@ -91,9 +91,9 @@ sealed interface Screen {
             override val route = "owner_edit/$bikeId"
 
             companion object {
-                fun fromRoute(route: String): DetailBike {
+                fun fromRoute(route: String): EditBike {
                     val id = route.substringAfter("owner_edit/")
-                    return DetailBike(id)
+                    return EditBike(id)
                 }
             }
         }

@@ -17,12 +17,13 @@ import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
 @Composable
 fun PublishButton(
+    isSubmitting: Boolean,
     enabled: Boolean,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = enabled && !isSubmitting,
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
@@ -41,7 +42,8 @@ private fun PublishButtonPreview() {
     LokaveloTheme {
         PublishButton(
             enabled = true,
-            onClick = {}
+            onClick = {},
+            isSubmitting = false
         )
     }
 }

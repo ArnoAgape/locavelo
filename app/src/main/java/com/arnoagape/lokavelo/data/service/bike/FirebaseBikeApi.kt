@@ -159,6 +159,7 @@ class FirebaseBikeApi @Inject constructor(
                     if (id.isBlank()) error("Bike ID empty")
                     bikesCollectionForUser(ownerId).document(id).delete()
                 }
+                deleteBikeFolder(ownerId, ids)
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -204,7 +205,7 @@ class FirebaseBikeApi @Inject constructor(
      * Deletes a photo from Firebase Storage.
      * Validates MIME type and returns the public download URL.
      */
-    private suspend fun deleteBikeFolder(ownerId: String, bikeId: String) {
+    private suspend fun deleteBikeFolder(ownerId: String, bikeId: Set<String>) {
         val folderRef = FirebaseStorage.getInstance()
             .reference
             .child("bikePictures")

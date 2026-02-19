@@ -1,10 +1,12 @@
 package com.arnoagape.lokavelo.ui.screen.owner.editBike
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,11 +41,26 @@ class EditBikeViewModel @Inject constructor(
 
     private val bikeId = MutableStateFlow<String?>(null)
 
+    private val _uiState = MutableStateFlow<EditBikeUiState>(EditBikeUiState.Idle)
+
     private val _events = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = _events.receiveAsFlow()
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
+    private val _remotePhotoUrls = MutableStateFlow<List<String>>(emptyList())
     private val _isSubmitting = MutableStateFlow(false)
+
+    private val _originalBike = MutableStateFlow<Bike?>(null)
+
+    private val _formState = MutableStateFlow(
+        EditBikeFormState(
+            title = "",
+            description = "",
+            location = BikeLocation(),
+            priceText = "",
+            depositText = ""
+        )
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val bikeFlow: StateFlow<EditBikeUiState> =
@@ -65,6 +82,8 @@ class EditBikeViewModel @Inject constructor(
             .onEach { state ->
                 if (state is EditBikeUiState.Loaded) {
                     val bike = state.bike
+                    _originalBike.value = bike
+                    _remotePhotoUrls.value = bike.photoUrls
                     _formState.value = EditBikeFormState(
                         title = bike.title,
                         description = bike.description,
@@ -85,28 +104,36 @@ class EditBikeViewModel @Inject constructor(
                 EditBikeUiState.Idle
             )
 
-    private val _formState = MutableStateFlow(
-        EditBikeFormState(
-            title = "",
-            description = "",
-            location = BikeLocation(),
-            priceText = "",
-            depositText = ""
-        )
-    )
+    fun setBikeId(id: String) {
+        bikeId.value = id
+    }
+
+    fun removeRemotePhoto(url: String) {
+        _remotePhotoUrls.update { it - url }
+    }
 
     val state: StateFlow<EditBikeScreenState> =
         combine(
             bikeFlow,
             _formState,
             _localUris,
+            _remotePhotoUrls,
             _isSubmitting
-        ) { ui, form, uris, submitting ->
+        ) { ui, form, uris, remote, submitting ->
+
+            val totalPhotos = remote.size + uris.size
 
             EditBikeScreenState(
                 uiState = if (submitting) EditBikeUiState.Submitting else ui,
                 form = form,
-                localUris = uris
+                isValid = form.title.isNotBlank() &&
+                        form.priceText.isNotBlank() &&
+                        form.location.street.isNotBlank() &&
+                        form.location.city.isNotBlank() &&
+                        form.location.postalCode.isNotBlank() &&
+                        totalPhotos > 0,
+                localUris = uris,
+                remotePhotoUrls = remote
             )
         }.stateIn(
             scope = viewModelScope,
@@ -175,30 +202,38 @@ class EditBikeViewModel @Inject constructor(
 
             val form = _formState.value
             val uris = _localUris.value
+            val original = _originalBike.value ?: return@launch
 
-            if (!form.isValid(uris)) {
+            val totalPhotos = _remotePhotoUrls.value.size + uris.size
+
+            if (!form.isValid(totalPhotos)) {
                 _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
                 return@launch
             }
 
-            val bike = form.toBikeOrNull()
-            if (bike == null) {
-                _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
-                return@launch
-            }
+            _uiState.value = EditBikeUiState.Submitting
 
-            _isSubmitting.value = true
+            val updatedBike = form.toUpdatedBikeOrNull(original)
+                ?: run {
+                    _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
+                    return@launch
+                }
+
+            val finalBike = updatedBike.copy(
+                photoUrls = _remotePhotoUrls.value
+            )
 
             runCatching {
-                bikeRepository.editBike(localUris = uris, bike = bike)
+                bikeRepository.editBike(localUris = uris, bike = finalBike)
             }.onSuccess {
 
-                _isSubmitting.value = false
+                _uiState.value = EditBikeUiState.Loaded(updatedBike)
                 _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_edited))
 
-            }.onFailure {
+            }.onFailure { throwable ->
+                Log.e("EditBike", "Error while editing bike", throwable)
 
-                _isSubmitting.value = false
+                _uiState.value = EditBikeUiState.Error.Generic()
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
         }
@@ -214,5 +249,7 @@ class EditBikeViewModel @Inject constructor(
 data class EditBikeScreenState(
     val uiState: EditBikeUiState = EditBikeUiState.Idle,
     val form: EditBikeFormState = EditBikeFormState(),
-    val localUris: List<Uri> = emptyList()
+    val isValid: Boolean = false,
+    val localUris: List<Uri> = emptyList(),
+    val remotePhotoUrls: List<String> = emptyList()
 )

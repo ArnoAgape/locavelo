@@ -1,12 +1,10 @@
 package com.arnoagape.lokavelo.ui.screen.owner.editBike
 
-import android.net.Uri
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
-import kotlin.collections.isNotEmpty
 
 data class EditBikeFormState(
     val title: String = "",
@@ -20,22 +18,16 @@ data class EditBikeFormState(
     val condition: BikeCondition? = null,
     val accessories: List<BikeEquipment> = emptyList()
 ) {
-    fun isValid(uris: List<Uri>): Boolean {
-
-        val price = priceText
-            .replace(",", ".")
-            .toDoubleOrNull()
-
+    fun isValid(totalPhotos: Int): Boolean {
         return title.isNotBlank() &&
+                priceText.isNotBlank() &&
                 location.street.isNotBlank() &&
-                location.postalCode.isNotBlank() &&
                 location.city.isNotBlank() &&
-                price != null &&
-                price > 0 &&
-                uris.isNotEmpty()
+                location.postalCode.isNotBlank() &&
+                totalPhotos > 0
     }
 
-    fun toBikeOrNull(): Bike? {
+    fun toUpdatedBikeOrNull(original: Bike): Bike? {
 
         val price = priceText
             .replace(",", ".")
@@ -52,7 +44,7 @@ data class EditBikeFormState(
 
         if (price <= 0) return null
 
-        return Bike(
+        return original.copy(
             title = title,
             description = description,
             location = location,

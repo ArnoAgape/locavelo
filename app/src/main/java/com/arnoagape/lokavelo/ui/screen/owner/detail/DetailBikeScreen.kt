@@ -183,14 +183,6 @@ fun DetailItem(bike: Bike) {
             }
         }
 
-        // Title & Description
-        item {
-            DetailCard(title = stringResource(R.string.title_description)) {
-                Text(bike.title)
-                Text(bike.description)
-            }
-        }
-
         // Characteristics
         item {
             DetailCard(title = stringResource(R.string.characteristics)) {
@@ -221,14 +213,11 @@ fun DetailItem(bike: Bike) {
             }
         }
 
-        // Pricing
+        // Title & Description
         item {
-            DetailCard(title = stringResource(R.string.pricing)) {
-                DetailRow(stringResource(R.string.pricing_day), formattedPrice)
-                DetailRow(
-                    stringResource(R.string.deposit),
-                    formattedDeposit ?: stringResource(R.string.no_deposit)
-                )
+            DetailCard(title = stringResource(R.string.title_description)) {
+                Text(bike.title)
+                Text(bike.description)
             }
         }
 
@@ -244,6 +233,17 @@ fun DetailItem(bike: Bike) {
                 }
                 DetailRow(stringResource(R.string.zip_code), bike.location.postalCode)
                 DetailRow(stringResource(R.string.city), bike.location.city)
+            }
+        }
+
+        // Pricing
+        item {
+            DetailCard(title = stringResource(R.string.pricing)) {
+                DetailRow(stringResource(R.string.pricing_day), formattedPrice)
+                DetailRow(
+                    stringResource(R.string.deposit),
+                    formattedDeposit ?: stringResource(R.string.no_deposit)
+                )
             }
         }
 

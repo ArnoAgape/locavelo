@@ -59,6 +59,7 @@ import com.arnoagape.lokavelo.ui.screen.main.profile.PublicProfileScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.detail.MessagingDetailScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeEvent
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeUiState
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
@@ -66,6 +67,7 @@ import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeUiState
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeEvent
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeUiState
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
@@ -102,7 +104,7 @@ fun LokaveloApp() {
     val addBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
     val homeBikeScreenState by homeBikeViewModel.state.collectAsStateWithLifecycle()
     val detailBikeScreenState by detailBikeViewModel.state.collectAsStateWithLifecycle()
-    val editBikeState by addBikeViewModel.state.collectAsStateWithLifecycle()
+    val editBikeState by editBikeViewModel.state.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -316,7 +318,8 @@ fun LokaveloApp() {
                         enabled = addBikeState.isValid,
                         onClick = {
                             addBikeViewModel.onAction(AddBikeEvent.Submit)
-                        }
+                        },
+                        isSubmitting = addBikeState.uiState is AddBikeUiState.Submitting
                     )
                 }
 
@@ -325,7 +328,8 @@ fun LokaveloApp() {
                         enabled = editBikeState.isValid,
                         onClick = {
                             editBikeViewModel.onAction(EditBikeEvent.Submit)
-                        }
+                        },
+                        isSubmitting = editBikeState.uiState is EditBikeUiState.Submitting
                     )
                 }
 
@@ -392,6 +396,7 @@ fun LokaveloApp() {
 
                 is Screen.Owner.EditBike ->
                     EditBikeScreen(
+                        bikeId = currentScreen.bikeId,
                         viewModel = editBikeViewModel,
                         onSaveClick = { popBack() }
                         )

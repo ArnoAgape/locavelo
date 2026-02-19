@@ -96,7 +96,7 @@
     <string name="or">Or</string>
     <string name="try_again">Try again</string>
     <string name="publishing">Publishing…</string>
-    <string name="editing">Editing…</string>
+    <string name="loading">Loading…</string>
     <string name="add_picture">Add picture</string>
     <string name="remove_picture">Remove picture</string>
     <string name="press_again_exit">Press again to exit the app</string>

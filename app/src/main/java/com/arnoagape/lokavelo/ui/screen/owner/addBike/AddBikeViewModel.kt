@@ -33,6 +33,8 @@ class AddBikeViewModel @Inject constructor(
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
 
+    private val _isSubmitting = MutableStateFlow(false)
+
     private val isSignedIn =
         userRepository.isUserSignedIn()
             .stateIn(
@@ -56,10 +58,11 @@ class AddBikeViewModel @Inject constructor(
             _uiState,
             _formState,
             _localUris,
+            _isSubmitting,
             isSignedIn
-        ) { ui, form, uris, signedIn ->
+        ) { ui, form, uris, submitting, signedIn ->
             AddBikeScreenState(
-                uiState = ui,
+                uiState = if (submitting) AddBikeUiState.Submitting else ui,
                 form = form,
                 localUris = uris,
                 isValid = form.title.isNotBlank() &&
@@ -147,7 +150,7 @@ class AddBikeViewModel @Inject constructor(
                 return@launch
             }
 
-            _uiState.value = AddBikeUiState.Loading
+            _uiState.value = AddBikeUiState.Submitting
 
             val bike = form.toBikeOrNull()
 

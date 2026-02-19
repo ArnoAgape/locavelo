@@ -69,6 +69,20 @@ fun CharacteristicsSection(
                 onSelected = onCategoryChange
             )
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.electric_bike))
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Switch(
+                    checked = isElectric,
+                    onCheckedChange = onElectricChange
+                )
+            }
+
             OutlinedTextField(
                 value = brand,
                 onValueChange = onBrandChange,
@@ -83,20 +97,6 @@ fun CharacteristicsSection(
                 selected = state,
                 onSelected = onStateChange
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(stringResource(R.string.electric_bike))
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Switch(
-                    checked = isElectric,
-                    onCheckedChange = onElectricChange
-                )
-            }
 
             AccessoriesChips(
                 selected = accessories,

@@ -7,9 +7,11 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,9 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +43,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.common.Event
@@ -59,6 +63,7 @@ import com.arnoagape.lokavelo.ui.utils.createImageUri
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBikeScreen(
+    bikeId: String,
     viewModel: EditBikeViewModel,
     onSaveClick: () -> Unit
 ) {
@@ -67,22 +72,27 @@ fun EditBikeScreen(
     val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(bikeId) {
+        viewModel.setBikeId(bikeId)
+    }
+
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
-                val result = snackbarHostState.showSnackbar(
+                snackbarHostState.showSnackbar(
                     message = resources.getString(event.message),
                     actionLabel = resources.getString(R.string.try_again),
                     withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.editBike()
-                }
             }
 
             is Event.ShowSuccessMessage -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    R.string.success_bike_edited,
+                    Toast.LENGTH_SHORT
+                ).show()
                 onSaveClick()
             }
 
@@ -93,7 +103,8 @@ fun EditBikeScreen(
         is EditBikeUiState.Idle, is EditBikeUiState.Loaded -> {
             EditBikeContent(
                 state = state,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                removeRemotePhoto = { viewModel.removeRemotePhoto(it) }
             )
         }
 
@@ -118,7 +129,23 @@ fun EditBikeScreen(
             }
         }
 
-        else -> {}
+        is EditBikeUiState.Submitting -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.publishing),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -127,7 +154,8 @@ fun EditBikeScreen(
 @Composable
 private fun EditBikeContent(
     state: EditBikeScreenState,
-    onAction: (EditBikeEvent) -> Unit
+    onAction: (EditBikeEvent) -> Unit,
+    removeRemotePhoto: (String) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -237,11 +265,21 @@ private fun EditBikeContent(
         item { Spacer(modifier = Modifier.height(spacing.extraSmall)) }
 
         item {
+            val allUris = state.remotePhotoUrls.map { it.toUri() } + state.localUris
+
             PhotosSection(
-                uris = state.localUris,
+                uris = allUris,
                 onAddPhotoClick = { showSheet = true },
                 onRemovePhoto = { uri ->
-                    onAction(EditBikeEvent.RemovePhoto(uri))
+
+                    val remoteMatch = state.remotePhotoUrls
+                        .firstOrNull { it == uri.toString() }
+
+                    if (remoteMatch != null) {
+                        removeRemotePhoto(remoteMatch)
+                    } else {
+                        onAction(EditBikeEvent.RemovePhoto(uri))
+                    }
                 },
                 isEditable = true
             )
@@ -324,7 +362,8 @@ private fun EditBikeContentPreview() {
     LokaveloTheme {
         EditBikeContent(
             state = EditBikeScreenState(),
-            onAction = {}
+            onAction = {},
+            removeRemotePhoto = {}
         )
     }
 }
