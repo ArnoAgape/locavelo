@@ -18,6 +18,7 @@ data class EditBikeFormState(
     val condition: BikeCondition? = null,
     val accessories: List<BikeEquipment> = emptyList()
 ) {
+
     fun isValid(totalPhotos: Int): Boolean {
         return title.isNotBlank() &&
                 priceText.isNotBlank() &&
@@ -56,6 +57,23 @@ data class EditBikeFormState(
             condition = condition,
             accessories = accessories
         )
+    }
+
+    companion object {
+        fun fromBike(bike: Bike): EditBikeFormState {
+            return EditBikeFormState(
+                title = bike.title,
+                description = bike.description,
+                location = bike.location,
+                priceText = (bike.priceInCents / 100).toString(),
+                depositText = bike.depositInCents?.div(100)?.toString() ?: "",
+                isElectric = bike.isElectric,
+                category = bike.category,
+                brand = bike.brand,
+                condition = bike.condition,
+                accessories = bike.accessories
+            )
+        }
     }
 
 }

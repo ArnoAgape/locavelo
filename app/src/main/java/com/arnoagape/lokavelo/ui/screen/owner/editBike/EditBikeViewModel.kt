@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
-import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +14,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -40,136 +35,92 @@ class EditBikeViewModel @Inject constructor(
     private val bikeRepository: BikeOwnerRepository
 ) : ViewModel() {
 
-    private val bikeId = MutableStateFlow<String?>(null)
-
     private val _events = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = _events.receiveAsFlow()
 
-    private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
-    private val _remotePhotoUrls = MutableStateFlow<List<String>>(emptyList())
-    private val _isSubmitting = MutableStateFlow(false)
+    private val bikeId = MutableStateFlow<String?>(null)
 
-    private val _originalBike = MutableStateFlow<Bike?>(null)
-
-    private val _formState = MutableStateFlow(
-        EditBikeFormState(
-            title = "",
-            description = "",
-            location = BikeLocation(),
-            priceText = "",
-            depositText = ""
-        )
-    )
-
-    private val bikeFlow: StateFlow<EditBikeUiState> =
-        bikeId
-            .flatMapLatest { id ->
-                if (id == null) {
-                    flowOf(EditBikeUiState.Idle)
-                } else {
-                    bikeRepository.observeBike(id)
-                        .map { bike ->
-                            bike?.let {
-                                EditBikeUiState.Loaded(it)
-                            } ?: EditBikeUiState.Error.NotFound
-                        }
-                        .onStart { emit(EditBikeUiState.Loading) }
-                        .catch { e ->
-
-                            if (_isSubmitting.value) {
-                                emit(EditBikeUiState.Submitting)
-                            } else {
-                                Log.e("EDIT_FLOW", "Flow error", e)
-                                emit(
-                                    EditBikeUiState.Error.Generic()
-                                )
-                            }
-                        }
-                }
-            }
-            .onEach { state ->
-                if (state is EditBikeUiState.Loaded) {
-                    val bike = state.bike
-                    _originalBike.value = bike
-                    _remotePhotoUrls.value = bike.photoUrls
-                    _formState.value = EditBikeFormState(
-                        title = bike.title,
-                        description = bike.description,
-                        location = bike.location,
-                        priceText = (bike.priceInCents / 100).toString(),
-                        depositText = bike.depositInCents?.div(100)?.toString() ?: "",
-                        isElectric = bike.isElectric,
-                        category = bike.category,
-                        brand = bike.brand,
-                        condition = bike.condition,
-                        accessories = bike.accessories
-                    )
-                }
-            }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                EditBikeUiState.Idle
-            )
+    private val _state = MutableStateFlow(EditBikeScreenState())
+    val state: StateFlow<EditBikeScreenState> = _state
 
     fun setBikeId(id: String) {
         bikeId.value = id
+        observeBike()
     }
 
-    fun resetSubmitting() {
-        _isSubmitting.value = false
+    private fun observeBike() {
+        viewModelScope.launch {
+            bikeId
+                .filterNotNull()
+                .flatMapLatest { id ->
+                    bikeRepository.observeBike(id)
+                }
+                .collect { bike ->
+
+                    if (bike == null) {
+                        _state.updateState {
+                            it.copy(uiState = EditBikeUiState.Error.NotFound)
+                        }
+                        return@collect
+                    }
+
+                    _state.updateState {
+                        it.copy(
+                            uiState = EditBikeUiState.Loaded(bike),
+                            form = EditBikeFormState.fromBike(bike),
+                            remotePhotoUrls = bike.photoUrls,
+                            localUris = emptyList()
+                        )
+                    }
+                }
+        }
     }
 
-    fun removeRemotePhoto(url: String) {
-        _remotePhotoUrls.update { it - url }
-    }
+    val hasUnsavedChanges: StateFlow<Boolean> =
+        state.map { current ->
 
-    val state: StateFlow<EditBikeScreenState> =
-        combine(
-            bikeFlow,
-            _formState,
-            _localUris,
-            _remotePhotoUrls,
-            _isSubmitting
-        ) { ui, form, uris, remote, submitting ->
+            val original =
+                (current.uiState as? EditBikeUiState.Loaded)?.bike
+                    ?: return@map false
 
-            val totalPhotos = remote.size + uris.size
+            val formChanged =
+                current.form != EditBikeFormState.fromBike(original)
 
-            EditBikeScreenState(
-                uiState = if (submitting) EditBikeUiState.Submitting else ui,
-                form = form,
-                isValid = form.title.isNotBlank() &&
-                        form.priceText.isNotBlank() &&
-                        form.location.street.isNotBlank() &&
-                        form.location.city.isNotBlank() &&
-                        form.location.postalCode.isNotBlank() &&
-                        totalPhotos > 0,
-                localUris = uris,
-                remotePhotoUrls = remote
-            )
+            val photosChanged =
+                current.localUris.isNotEmpty() ||
+                        current.remotePhotoUrls != original.photoUrls
+
+            formChanged || photosChanged
+
         }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = EditBikeScreenState()
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
         )
 
-    /**
-     * Handles user actions modifying the bike or selected URIs.
-     */
     fun onAction(event: EditBikeEvent) {
+
         when (event) {
 
             is EditBikeEvent.TitleChanged ->
-                _formState.update { it.copy(title = event.title) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(title = event.title))
+                }
 
             is EditBikeEvent.DescriptionChanged ->
-                _formState.update { it.copy(description = event.description) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(description = event.description))
+                }
 
             is EditBikeEvent.PriceChanged ->
-                _formState.update { it.copy(priceText = event.priceText) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(priceText = event.priceText))
+                }
 
             is EditBikeEvent.DepositChanged ->
-                _formState.update { it.copy(depositText = event.depositText) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(depositText = event.depositText))
+                }
 
             is EditBikeEvent.AddressChanged ->
                 updateLocation { copy(street = event.address) }
@@ -184,97 +135,149 @@ class EditBikeViewModel @Inject constructor(
                 updateLocation { copy(city = event.city) }
 
             is EditBikeEvent.ElectricChanged ->
-                _formState.update { it.copy(isElectric = event.isElectric) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(isElectric = event.isElectric))
+                }
 
             is EditBikeEvent.CategoryChanged ->
-                _formState.update { it.copy(category = event.category) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(category = event.category))
+                }
 
             is EditBikeEvent.BrandChanged ->
-                _formState.update { it.copy(brand = event.brand) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(brand = event.brand))
+                }
 
             is EditBikeEvent.StateChanged ->
-                _formState.update { it.copy(condition = event.state) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(condition = event.state))
+                }
 
             is EditBikeEvent.AccessoriesChanged ->
-                _formState.update { it.copy(accessories = event.accessories) }
+                _state.updateState {
+                    it.copy(form = it.form.copy(accessories = event.accessories))
+                }
 
             is EditBikeEvent.AddPhoto ->
-                _localUris.update { (it + event.uri).take(3) }
+                _state.updateState {
+                    it.copy(localUris = (it.localUris + event.uri).take(3))
+                }
 
             is EditBikeEvent.RemovePhoto ->
-                _localUris.update { it - event.uri }
-
-            is EditBikeEvent.ReplacePhoto -> {
-
-                // Si l'ancienne est locale
-                _localUris.update { current ->
-                    current.map {
-                        if (it == event.oldUri) event.newUri else it
-                    }
+                _state.updateState {
+                    it.copy(localUris = it.localUris - event.uri)
                 }
 
-                // Si l'ancienne était distante
-                _remotePhotoUrls.update { remoteList ->
-                    remoteList.filterNot { it == event.oldUri.toString() }
+            is EditBikeEvent.RemoveRemotePhoto ->
+                _state.updateState {
+                    it.copy(
+                        remotePhotoUrls = it.remotePhotoUrls - event.url
+                    )
                 }
 
-                // Ajouter la nouvelle locale si elle n'existe pas déjà
-                _localUris.update { current ->
-                    if (current.contains(event.newUri)) current
-                    else current + event.newUri
+            is EditBikeEvent.ReplacePhoto ->
+                _state.updateState { photo ->
+                    val updatedLocal =
+                        photo.localUris.map { uri ->
+                            if (uri == event.oldUri) event.newUri else uri
+                        }
+
+                    val updatedRemote =
+                        photo.remotePhotoUrls.filterNot {
+                            it == event.oldUri.toString()
+                        }
+
+                    photo.copy(
+                        localUris =
+                            if (updatedLocal.contains(event.newUri))
+                                updatedLocal
+                            else updatedLocal + event.newUri,
+                        remotePhotoUrls = updatedRemote
+                    )
                 }
-            }
 
             EditBikeEvent.Submit ->
                 editBike()
         }
     }
 
-    fun editBike() {
+    private fun editBike() {
+
         viewModelScope.launch {
 
-            val form = _formState.value
-            val uris = _localUris.value
-            val original = _originalBike.value ?: return@launch
+            val current = _state.value
+            val original =
+                (current.uiState as? EditBikeUiState.Loaded)?.bike
+                    ?: return@launch
 
-            val totalPhotos = _remotePhotoUrls.value.size + uris.size
+            val totalPhotos =
+                current.localUris.size + current.remotePhotoUrls.size
 
-            if (!form.isValid(totalPhotos)) {
+            if (!current.form.isValid(totalPhotos)) {
                 _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
                 return@launch
             }
 
-            _isSubmitting.value = true
+            _state.update {
+                it.copy(uiState = EditBikeUiState.Submitting)
+            }
 
-            val updatedBike = form.toUpdatedBikeOrNull(original)
-                ?: run {
-                    _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
-                    return@launch
-                }
+            val updatedBike =
+                current.form.toUpdatedBikeOrNull(original)
+                    ?: return@launch
 
             val finalBike = updatedBike.copy(
-                photoUrls = _remotePhotoUrls.value
+                photoUrls = current.remotePhotoUrls
             )
 
             runCatching {
-                bikeRepository.editBike(localUris = uris, bike = finalBike)
+                bikeRepository.editBike(
+                    localUris = current.localUris,
+                    bike = finalBike
+                )
             }.onSuccess {
 
-                _isSubmitting.value = true
-                _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_edited))
+                _events.trySend(
+                    Event.ShowSuccessMessage(R.string.success_bike_edited)
+                )
 
             }.onFailure { throwable ->
+
                 Log.e("EditBike", "Error while editing bike", throwable)
 
-                _isSubmitting.value = false
+                _state.updateState {
+                    it.copy(uiState = EditBikeUiState.Error.Generic())
+                }
+
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
         }
     }
 
-    fun updateLocation(update: BikeLocation.() -> BikeLocation) {
-        _formState.update {
-            it.copy(location = it.location.update())
+    private fun updateLocation(update: BikeLocation.() -> BikeLocation) {
+        _state.updateState {
+            it.copy(
+                form = it.form.copy(
+                    location = it.form.location.update()
+                )
+            )
+        }
+    }
+
+    private fun computeIsValid(state: EditBikeScreenState): Boolean {
+
+        val totalPhotos = state.localUris.size + state.remotePhotoUrls.size
+
+        return state.form.isValid(totalPhotos)
+    }
+
+    private fun MutableStateFlow<EditBikeScreenState>.updateState(
+        reducer: (EditBikeScreenState) -> EditBikeScreenState
+    ) {
+        update { current ->
+            val updated = reducer(current)
+            updated.copy(isValid = computeIsValid(updated))
         }
     }
 }

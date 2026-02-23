@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
+import com.arnoagape.lokavelo.ui.common.components.AlertDialogNonSaved
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.CharacteristicsSection
@@ -74,13 +76,22 @@ fun EditBikeScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val hasUnsavedChanges by viewModel.hasUnsavedChanges.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    BackHandler {
+        if (hasUnsavedChanges) {
+            showExitDialog = true
+        } else {
+            onBack()
+        }
+    }
 
     LaunchedEffect(bikeId) {
         viewModel.setBikeId(bikeId)
-        viewModel.resetSubmitting()
     }
 
     EventsEffect(viewModel.eventsFlow) { event ->
@@ -110,7 +121,15 @@ fun EditBikeScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.edit)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(
+                        onClick = {
+                            if (hasUnsavedChanges) {
+                                showExitDialog = true
+                            } else {
+                                onBack()
+                            }
+                        }
+                    ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             stringResource(R.string.cd_go_back)
@@ -143,8 +162,7 @@ fun EditBikeScreen(
             EditBikeContent(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
-                onAction = viewModel::onAction,
-                removeRemotePhoto = viewModel::removeRemotePhoto
+                onAction = viewModel::onAction
             )
 
             // 🎯 OVERLAY LOADING / SUBMIT
@@ -167,6 +185,16 @@ fun EditBikeScreen(
                 )
             }
         }
+
+        if (showExitDialog) {
+            AlertDialogNonSaved(
+                onConfirm = {
+                    showExitDialog = false
+                    onBack()
+                },
+                onDismiss = { showExitDialog = false }
+            )
+        }
     }
 }
 
@@ -175,8 +203,7 @@ fun EditBikeScreen(
 private fun EditBikeContent(
     modifier: Modifier = Modifier,
     state: EditBikeScreenState,
-    onAction: (EditBikeEvent) -> Unit,
-    removeRemotePhoto: (String) -> Unit
+    onAction: (EditBikeEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -297,7 +324,7 @@ private fun EditBikeContent(
                         .firstOrNull { it == uri.toString() }
 
                     if (remoteMatch != null) {
-                        removeRemotePhoto(remoteMatch)
+                        onAction(EditBikeEvent.RemoveRemotePhoto(remoteMatch))
                     } else {
                         onAction(EditBikeEvent.RemovePhoto(uri))
                     }
@@ -386,8 +413,7 @@ private fun EditBikeContentPreview() {
     LokaveloTheme {
         EditBikeContent(
             state = EditBikeScreenState(),
-            onAction = {},
-            removeRemotePhoto = {}
+            onAction = {}
         )
     }
 }

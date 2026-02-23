@@ -89,6 +89,7 @@
 
     // ACTIONS
     <string name="cancel">Cancel</string>
+    <string name="discard_changes">Discard changes</string>
     <string name="close">Close</string>
     <string name="search">Search</string>
     <string name="delete">Delete</string>
@@ -112,6 +113,8 @@
     <string name="confirm_delete_message_bikes">You’re about to delete the selected bike(s). Continue?</string>
     <string name="confirm_delete_account_message">
         You’re about to delete your account. An email will be sent to confirm the deletion. Continue?</string>
+    <string name="unsaved_changes">Unsaved changes</string>
+    <string name="confirm_unsaved_changes">You have unsaved changes. Are you sure you want to leave this page?</string>
 
     // CONTENT_DESCRIPTION
     <string name="cd_remove">Click here to erase</string>
