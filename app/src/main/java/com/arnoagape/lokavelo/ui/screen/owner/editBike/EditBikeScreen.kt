@@ -141,7 +141,7 @@ fun EditBikeScreen(
 
         bottomBar = {
             PublishButton(
-                enabled = state.isValid,
+                enabled = true,
                 onClick = {
                     viewModel.onAction(EditBikeEvent.Submit)
                 },
@@ -322,6 +322,7 @@ private fun EditBikeContent(
 
             PhotosSection(
                 uris = allUris,
+                photosError = state.form.photosError,
                 onAddPhotoClick = { showSheet = true },
                 onRemovePhoto = { uri ->
 
@@ -345,9 +346,11 @@ private fun EditBikeContent(
             CharacteristicsSection(
                 category = state.form.category,
                 brand = state.form.brand,
-                state = state.form.condition,
+                condition = state.form.condition,
                 isElectric = state.form.isElectric,
                 accessories = state.form.accessories,
+                categoryError = state.form.categoryError,
+                conditionError = state.form.conditionError,
                 onCategoryChange = { onAction(EditBikeEvent.CategoryChanged(it)) },
                 onBrandChange = { onAction(EditBikeEvent.BrandChanged(it)) },
                 onStateChange = { onAction(EditBikeEvent.StateChanged(it)) },
@@ -360,6 +363,7 @@ private fun EditBikeContent(
             TitleDescriptionSection(
                 title = state.form.title,
                 description = state.form.description,
+                titleError = state.form.titleError,
                 onTitleChange = {
                     onAction(EditBikeEvent.TitleChanged(it))
                 },
@@ -375,6 +379,9 @@ private fun EditBikeContent(
                 addressLine2 = state.form.location.addressLine2,
                 zipCode = state.form.location.postalCode,
                 city = state.form.location.city,
+                addressError = state.form.streetError,
+                zipCodeError = state.form.postalCodeError,
+                cityError = state.form.cityError,
                 onAddressLineChange = {
                     onAction(EditBikeEvent.AddressChanged(it))
                 },
@@ -393,6 +400,7 @@ private fun EditBikeContent(
         item {
             PricingSection(
                 price = state.form.priceText,
+                priceError = state.form.priceError,
                 onPriceChange = {
                     onAction(EditBikeEvent.PriceChanged(it))
                 }

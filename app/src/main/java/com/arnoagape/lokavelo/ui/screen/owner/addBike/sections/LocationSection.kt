@@ -26,6 +26,9 @@ fun LocationSection(
     addressLine2: String,
     zipCode: String,
     city: String,
+    addressError: Boolean,
+    zipCodeError: Boolean,
+    cityError: Boolean,
     onAddressLineChange: (String) -> Unit,
     onAddressLine2Change: (String) -> Unit,
     onZipCodeChange: (String) -> Unit,
@@ -40,6 +43,7 @@ fun LocationSection(
 
             AddressLineField(
                 value = addressLine,
+                addressError = addressError,
                 onValueChange = onAddressLineChange
             )
 
@@ -55,12 +59,14 @@ fun LocationSection(
                 ZipCodeField(
                     modifier = Modifier.weight(0.4f),
                     value = zipCode,
+                    zipCodeError = zipCodeError,
                     onValueChange = onZipCodeChange
                 )
 
                 CityField(
                     modifier = Modifier.weight(0.6f),
                     value = city,
+                    cityError = cityError,
                     onValueChange = onCityChange
                 )
             }
@@ -72,12 +78,19 @@ fun LocationSection(
 @Composable
 fun AddressLineField(
     value: String,
+    addressError: Boolean,
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
+        isError = addressError,
+        supportingText = {
+            if (addressError) {
+                Text(stringResource(R.string.required))
+            }
+        },
         label = {
             Text(
                 text = stringResource(R.string.address_line)
@@ -121,12 +134,19 @@ fun AddressLine2Field(
 fun CityField(
     modifier: Modifier = Modifier,
     value: String,
+    cityError: Boolean,
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        isError = cityError,
+        supportingText = {
+            if (cityError) {
+                Text(stringResource(R.string.required))
+            }
+        },
         label = {
             Text(
                 text = stringResource(R.string.city)
@@ -144,12 +164,19 @@ fun CityField(
 fun ZipCodeField(
     modifier: Modifier = Modifier,
     value: String,
+    zipCodeError: Boolean,
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        isError = zipCodeError,
+        supportingText = {
+            if (zipCodeError) {
+                Text(stringResource(R.string.required))
+            }
+        },
         label = {
             Text(
                 text = stringResource(R.string.zip_code),

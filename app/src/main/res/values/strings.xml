@@ -57,6 +57,7 @@
     <string name="no_accessories">No accessories</string>
     <string name="no_deposit">No deposit</string>
     <string name="no_brand">No brand</string>
+    <string name="required">Required</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>

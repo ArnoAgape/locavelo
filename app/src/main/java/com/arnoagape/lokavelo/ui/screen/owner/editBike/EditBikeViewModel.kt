@@ -58,13 +58,13 @@ class EditBikeViewModel @Inject constructor(
                 .collect { bike ->
 
                     if (bike == null) {
-                        _state.updateState {
+                        _state.update {
                             it.copy(uiState = EditBikeUiState.Error.NotFound)
                         }
                         return@collect
                     }
 
-                    _state.updateState {
+                    _state.update {
                         it.copy(
                             uiState = EditBikeUiState.Loaded(bike),
                             form = EditBikeFormState.fromBike(bike),
@@ -103,22 +103,22 @@ class EditBikeViewModel @Inject constructor(
         when (event) {
 
             is EditBikeEvent.TitleChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(title = event.title))
                 }
 
             is EditBikeEvent.DescriptionChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(description = event.description))
                 }
 
             is EditBikeEvent.PriceChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(priceText = event.priceText))
                 }
 
             is EditBikeEvent.DepositChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(depositText = event.depositText))
                 }
 
@@ -135,32 +135,32 @@ class EditBikeViewModel @Inject constructor(
                 updateLocation { copy(city = event.city) }
 
             is EditBikeEvent.ElectricChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(isElectric = event.isElectric))
                 }
 
             is EditBikeEvent.CategoryChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(category = event.category))
                 }
 
             is EditBikeEvent.BrandChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(brand = event.brand))
                 }
 
             is EditBikeEvent.StateChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(condition = event.state))
                 }
 
             is EditBikeEvent.AccessoriesChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(accessories = event.accessories))
                 }
 
             is EditBikeEvent.AddPhoto ->
-                _state.updateState { current ->
+                _state.update { current ->
 
                     val totalPhotos =
                         current.localUris.size + current.remotePhotoUrls.size
@@ -175,19 +175,19 @@ class EditBikeViewModel @Inject constructor(
                 }
 
             is EditBikeEvent.RemovePhoto ->
-                _state.updateState {
+                _state.update {
                     it.copy(localUris = it.localUris - event.uri)
                 }
 
             is EditBikeEvent.RemoveRemotePhoto ->
-                _state.updateState {
+                _state.update {
                     it.copy(
                         remotePhotoUrls = it.remotePhotoUrls - event.url
                     )
                 }
 
             is EditBikeEvent.ReplacePhoto ->
-                _state.updateState { current ->
+                _state.update { current ->
 
                     // 1️⃣ local
                     val localIndex = current.localUris.indexOfFirst {
@@ -197,7 +197,7 @@ class EditBikeViewModel @Inject constructor(
                     if (localIndex != -1) {
                         val updatedLocal = current.localUris.toMutableList()
                         updatedLocal[localIndex] = event.newUri
-                        return@updateState current.copy(localUris = updatedLocal)
+                        return@update current.copy(localUris = updatedLocal)
                     }
 
                     // 2️⃣ remote → on garde la position
@@ -211,7 +211,7 @@ class EditBikeViewModel @Inject constructor(
 
                         updatedRemote[remoteIndex] = event.newUri.toString()
 
-                        return@updateState current.copy(
+                        return@update current.copy(
                             remotePhotoUrls = updatedRemote
                         )
                     }
@@ -220,8 +220,64 @@ class EditBikeViewModel @Inject constructor(
                 }
 
             EditBikeEvent.Submit ->
-                editBike()
+                onPublishClicked()
         }
+    }
+
+    fun validateForm(): Boolean {
+
+        val current = state.value.form
+        val totalPhotos = state.value.remotePhotoUrls.size + state.value.localUris.size
+        val photosError = totalPhotos == 0
+
+        val titleError = current.title.isBlank()
+        val categoryError = current.category == null
+        val conditionError = current.condition == null
+
+        val price = current.priceText
+            .replace(",", ".")
+            .toDoubleOrNull()
+
+        val priceError = price == null || price <= 0
+
+        val streetError = current.location.street.isBlank()
+        val postalCodeError = current.location.postalCode.isBlank()
+        val cityError = current.location.city.isBlank()
+
+        _state.update {
+            it.copy(
+                form = current.copy(
+                    titleError = titleError,
+                    categoryError = categoryError,
+                    conditionError = conditionError,
+                    priceError = priceError,
+                    streetError = streetError,
+                    postalCodeError = postalCodeError,
+                    cityError = cityError,
+                    photosError = photosError
+                )
+            )
+        }
+
+        return !(titleError ||
+                categoryError ||
+                conditionError ||
+                priceError ||
+                streetError ||
+                postalCodeError ||
+                cityError ||
+                photosError)
+    }
+
+    private fun onPublishClicked() {
+        if (!validateForm()) {
+            viewModelScope.launch {
+                _events.send(Event.ShowMessage(R.string.error_invalid_form))
+            }
+            return
+        }
+
+        editBike()
     }
 
     private fun editBike() {
@@ -232,14 +288,6 @@ class EditBikeViewModel @Inject constructor(
             val original =
                 (current.uiState as? EditBikeUiState.Loaded)?.bike
                     ?: return@launch
-
-            val totalPhotos =
-                current.localUris.size + current.remotePhotoUrls.size
-
-            if (!current.form.isValid(totalPhotos)) {
-                _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
-                return@launch
-            }
 
             _state.update {
                 it.copy(uiState = EditBikeUiState.Submitting)
@@ -268,7 +316,7 @@ class EditBikeViewModel @Inject constructor(
 
                 Log.e("EditBike", "Error while editing bike", throwable)
 
-                _state.updateState {
+                _state.update {
                     it.copy(uiState = EditBikeUiState.Error.Generic())
                 }
 
@@ -278,28 +326,12 @@ class EditBikeViewModel @Inject constructor(
     }
 
     private fun updateLocation(update: BikeLocation.() -> BikeLocation) {
-        _state.updateState {
+        _state.update {
             it.copy(
                 form = it.form.copy(
                     location = it.form.location.update()
                 )
             )
-        }
-    }
-
-    private fun computeIsValid(state: EditBikeScreenState): Boolean {
-
-        val totalPhotos = state.localUris.size + state.remotePhotoUrls.size
-
-        return state.form.isValid(totalPhotos)
-    }
-
-    private fun MutableStateFlow<EditBikeScreenState>.updateState(
-        reducer: (EditBikeScreenState) -> EditBikeScreenState
-    ) {
-        update { current ->
-            val updated = reducer(current)
-            updated.copy(isValid = computeIsValid(updated))
         }
     }
 }

@@ -12,6 +12,7 @@ import com.arnoagape.lokavelo.R
 fun TitleDescriptionSection(
     title: String,
     description: String,
+    titleError: Boolean,
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit
 ) {
@@ -20,23 +21,31 @@ fun TitleDescriptionSection(
         subtitle = stringResource(R.string.subtitle_title_description)
     ) {
 
+
         OutlinedTextField(
             value = title,
-            onValueChange = onTitleChange,
+            onValueChange = { onTitleChange(it) },
+            label = { Text(stringResource(R.string.title)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            label = { Text(stringResource(R.string.title)) }
+            isError = titleError,
+            supportingText = {
+                if (titleError) {
+                    Text(stringResource(R.string.required))
+                }
+            }
         )
 
         OutlinedTextField(
             value = description,
-            onValueChange = onDescriptionChange,
+            onValueChange = { onDescriptionChange(it) },
+            label = { Text(stringResource(R.string.description)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            label = { Text(stringResource(R.string.description)) },
             minLines = 3
         )
+
     }
 }

@@ -54,22 +54,22 @@ class AddBikeViewModel @Inject constructor(
         when (event) {
 
             is AddBikeEvent.TitleChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(title = event.title))
                 }
 
             is AddBikeEvent.DescriptionChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(description = event.description))
                 }
 
             is AddBikeEvent.PriceChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(priceText = event.priceText))
                 }
 
             is AddBikeEvent.DepositChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(depositText = event.depositText))
                 }
 
@@ -86,32 +86,32 @@ class AddBikeViewModel @Inject constructor(
                 updateLocation { copy(city = event.city) }
 
             is AddBikeEvent.ElectricChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(isElectric = event.isElectric))
                 }
 
             is AddBikeEvent.CategoryChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(category = event.category))
                 }
 
             is AddBikeEvent.BrandChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(brand = event.brand))
                 }
 
             is AddBikeEvent.StateChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(condition = event.state))
                 }
 
             is AddBikeEvent.AccessoriesChanged ->
-                _state.updateState {
+                _state.update {
                     it.copy(form = it.form.copy(accessories = event.accessories))
                 }
 
             is AddBikeEvent.AddPhoto ->
-                _state.updateState { current ->
+                _state.update { current ->
 
                     if (current.localUris.size >= 3) current
                     else current.copy(
@@ -120,12 +120,12 @@ class AddBikeViewModel @Inject constructor(
                 }
 
             is AddBikeEvent.RemovePhoto ->
-                _state.updateState {
+                _state.update {
                     it.copy(localUris = it.localUris - event.uri)
                 }
 
             is AddBikeEvent.ReplacePhoto ->
-                _state.updateState { current ->
+                _state.update { current ->
 
                     val index = current.localUris.indexOfFirst {
                         it.toString() == event.oldUri.toString()
@@ -140,8 +140,65 @@ class AddBikeViewModel @Inject constructor(
                 }
 
             AddBikeEvent.Submit ->
-                addBike()
+                onPublishClicked()
         }
+    }
+
+    fun validateForm(): Boolean {
+
+        val current = state.value.form
+        val totalPhotos = state.value.localUris.size
+
+        val titleError = current.title.isBlank()
+        val categoryError = current.category == null
+        val conditionError = current.condition == null
+
+        val price = current.priceText
+            .replace(",", ".")
+            .toDoubleOrNull()
+
+        val priceError = price == null || price <= 0
+
+        val streetError = current.location.street.isBlank()
+        val postalCodeError = current.location.postalCode.isBlank()
+        val cityError = current.location.city.isBlank()
+
+        val photosError = totalPhotos == 0
+
+        _state.update {
+            it.copy(
+                form = current.copy(
+                    titleError = titleError,
+                    categoryError = categoryError,
+                    conditionError = conditionError,
+                    priceError = priceError,
+                    streetError = streetError,
+                    postalCodeError = postalCodeError,
+                    cityError = cityError,
+                    photosError = photosError
+                )
+            )
+        }
+
+        return !(titleError ||
+                categoryError ||
+                conditionError ||
+                priceError ||
+                streetError ||
+                postalCodeError ||
+                cityError ||
+                photosError)
+    }
+
+    private fun onPublishClicked() {
+        if (!validateForm()) {
+            viewModelScope.launch {
+                _events.send(Event.ShowMessage(R.string.error_invalid_form))
+            }
+            return
+        }
+
+        addBike()
     }
 
     /**
@@ -153,12 +210,6 @@ class AddBikeViewModel @Inject constructor(
         viewModelScope.launch {
 
             val current = _state.value
-            val totalPhotos = current.localUris.size
-
-            if (!current.form.isValid(totalPhotos)) {
-                _events.trySend(Event.ShowMessage(R.string.error_invalid_form))
-                return@launch
-            }
 
             _state.update {
                 it.copy(uiState = AddBikeUiState.Submitting)
@@ -194,28 +245,12 @@ class AddBikeViewModel @Inject constructor(
     }
 
     private fun updateLocation(update: BikeLocation.() -> BikeLocation) {
-        _state.updateState {
+        _state.update {
             it.copy(
                 form = it.form.copy(
                     location = it.form.location.update()
                 )
             )
-        }
-    }
-
-    private fun computeIsValid(state: AddBikeScreenState): Boolean {
-
-        val totalPhotos = state.localUris.size
-
-        return state.form.isValid(totalPhotos)
-    }
-
-    private fun MutableStateFlow<AddBikeScreenState>.updateState(
-        reducer: (AddBikeScreenState) -> AddBikeScreenState
-    ) {
-        update { current ->
-            val updated = reducer(current)
-            updated.copy(isValid = computeIsValid(updated))
         }
     }
 

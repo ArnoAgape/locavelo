@@ -16,17 +16,17 @@ data class EditBikeFormState(
     val category: BikeCategory? = null,
     val brand: String = "",
     val condition: BikeCondition? = null,
-    val accessories: List<BikeEquipment> = emptyList()
-) {
+    val accessories: List<BikeEquipment> = emptyList(),
 
-    fun isValid(totalPhotos: Int): Boolean {
-        return title.isNotBlank() &&
-                priceText.isNotBlank() &&
-                location.street.isNotBlank() &&
-                location.city.isNotBlank() &&
-                location.postalCode.isNotBlank() &&
-                totalPhotos > 0
-    }
+    val photosError: Boolean = false,
+    val titleError: Boolean = false,
+    val categoryError: Boolean = false,
+    val conditionError: Boolean = false,
+    val priceError: Boolean = false,
+    val streetError: Boolean = false,
+    val postalCodeError: Boolean = false,
+    val cityError: Boolean = false
+) {
 
     fun toUpdatedBikeOrNull(original: Bike): Bike? {
 

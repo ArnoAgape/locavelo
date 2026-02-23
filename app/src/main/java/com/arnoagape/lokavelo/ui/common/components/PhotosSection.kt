@@ -79,6 +79,7 @@ import java.net.URL
 @Composable
 fun PhotosSection(
     uris: List<Uri>,
+    photosError: Boolean,
     onAddPhotoClick: () -> Unit = {},
     onRemovePhoto: (Uri) -> Unit = {},
     onPhotoEdited: (Uri, Uri) -> Unit = { _, _ -> },
@@ -88,6 +89,12 @@ fun PhotosSection(
         title = stringResource(R.string.pictures),
         subtitle = stringResource(R.string.subtitle_add_3_pictures)
     ) {
+        if (photosError) {
+            Text(
+                text = stringResource(R.string.required),
+                color = MaterialTheme.colorScheme.error
+            )
+        }
         PhotosContent(
             uris = uris,
             onAddPhotoClick = onAddPhotoClick,

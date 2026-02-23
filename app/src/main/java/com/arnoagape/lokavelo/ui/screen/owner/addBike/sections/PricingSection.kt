@@ -13,6 +13,7 @@ import com.arnoagape.lokavelo.R
 @Composable
 fun PricingSection(
     price: String,
+    priceError: Boolean,
     onPriceChange: (String) -> Unit,
 ) {
     SectionCard(
@@ -22,6 +23,12 @@ fun PricingSection(
 
         OutlinedTextField(
             value = price,
+            isError = priceError,
+            supportingText = {
+                if (priceError) {
+                    Text(stringResource(R.string.required))
+                }
+            },
             onValueChange = onPriceChange,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,

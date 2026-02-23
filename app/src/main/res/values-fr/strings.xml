@@ -58,6 +58,7 @@
     <string name="no_accessories">Aucun accessoire</string>
     <string name="no_deposit">Aucune caution</string>
     <string name="no_brand">Aucune marque</string>
+    <string name="required">Obligatoire</string>
 
     // SUCCESS
     <string name="success_user_updated">Tes données ont bien été mises à jour</string>

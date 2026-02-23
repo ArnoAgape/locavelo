@@ -129,7 +129,7 @@ fun AddBikeScreen(
 
         bottomBar = {
             PublishButton(
-                enabled = state.isValid,
+                enabled = true,
                 onClick = {
                     viewModel.onAction(AddBikeEvent.Submit)
                 },
@@ -308,6 +308,7 @@ private fun AddBikeContent(
         item {
             PhotosSection(
                 uris = state.localUris,
+                photosError = state.form.photosError,
                 onAddPhotoClick = { showSheet = true },
                 onRemovePhoto = { uri ->
                     onAction(AddBikeEvent.RemovePhoto(uri))
@@ -323,9 +324,11 @@ private fun AddBikeContent(
             CharacteristicsSection(
                 category = state.form.category,
                 brand = state.form.brand,
-                state = state.form.condition,
+                condition = state.form.condition,
                 isElectric = state.form.isElectric,
                 accessories = state.form.accessories,
+                categoryError = state.form.categoryError,
+                conditionError = state.form.conditionError,
                 onCategoryChange = { onAction(AddBikeEvent.CategoryChanged(it)) },
                 onBrandChange = { onAction(AddBikeEvent.BrandChanged(it)) },
                 onStateChange = { onAction(AddBikeEvent.StateChanged(it)) },
@@ -338,6 +341,7 @@ private fun AddBikeContent(
             TitleDescriptionSection(
                 title = state.form.title,
                 description = state.form.description,
+                titleError = state.form.titleError,
                 onTitleChange = {
                     onAction(AddBikeEvent.TitleChanged(it))
                 },
@@ -353,6 +357,9 @@ private fun AddBikeContent(
                 addressLine2 = state.form.location.addressLine2,
                 zipCode = state.form.location.postalCode,
                 city = state.form.location.city,
+                addressError = state.form.streetError,
+                zipCodeError = state.form.postalCodeError,
+                cityError = state.form.cityError,
                 onAddressLineChange = {
                     onAction(AddBikeEvent.AddressChanged(it))
                 },
@@ -371,6 +378,7 @@ private fun AddBikeContent(
         item {
             PricingSection(
                 price = state.form.priceText,
+                priceError = state.form.priceError,
                 onPriceChange = {
                     onAction(AddBikeEvent.PriceChanged(it))
                 }

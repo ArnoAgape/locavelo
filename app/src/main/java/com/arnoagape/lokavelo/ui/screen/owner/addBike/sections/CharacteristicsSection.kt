@@ -45,9 +45,11 @@ import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 fun CharacteristicsSection(
     category: BikeCategory?,
     brand: String,
-    state: BikeCondition?,
+    condition: BikeCondition?,
     isElectric: Boolean,
     accessories: List<BikeEquipment>,
+    categoryError: Boolean,
+    conditionError: Boolean,
     onCategoryChange: (BikeCategory) -> Unit,
     onBrandChange: (String) -> Unit,
     onStateChange: (BikeCondition) -> Unit,
@@ -61,12 +63,13 @@ fun CharacteristicsSection(
         subtitle = stringResource(R.string.subtitle_characteristics)
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+            verticalArrangement = Arrangement.spacedBy(spacing.small)
         ) {
 
             CategoryDropdown(
                 selected = category,
-                onSelected = onCategoryChange
+                onSelected = onCategoryChange,
+                isError = categoryError
             )
 
             Row(
@@ -85,7 +88,7 @@ fun CharacteristicsSection(
 
             OutlinedTextField(
                 value = brand,
-                onValueChange = onBrandChange,
+                onValueChange = { onBrandChange(it) },
                 label = { Text(stringResource(R.string.brand)) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences
@@ -94,8 +97,9 @@ fun CharacteristicsSection(
             )
 
             StateDropdown(
-                selected = state,
-                onSelected = onStateChange
+                selected = condition,
+                onSelected = onStateChange,
+                isError = conditionError
             )
 
             AccessoriesChips(
@@ -110,6 +114,7 @@ fun CharacteristicsSection(
 @Composable
 fun CategoryDropdown(
     selected: BikeCategory?,
+    isError: Boolean,
     onSelected: (BikeCategory) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -126,6 +131,12 @@ fun CategoryDropdown(
             label = { Text(stringResource(R.string.category)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            isError = isError,
+            supportingText = {
+                if (isError) {
+                    Text(stringResource(R.string.required))
+                }
             },
             modifier = Modifier
                 .menuAnchor(
@@ -157,6 +168,7 @@ fun CategoryDropdown(
 @Composable
 fun StateDropdown(
     selected: BikeCondition?,
+    isError: Boolean,
     onSelected: (BikeCondition) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -173,6 +185,12 @@ fun StateDropdown(
             label = { Text(stringResource(R.string.condition)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            isError = isError,
+            supportingText = {
+                if (isError) {
+                    Text(stringResource(R.string.required))
+                }
             },
             modifier = Modifier
                 .menuAnchor(
