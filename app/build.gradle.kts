@@ -58,7 +58,6 @@ dependencies {
 
     // Firebase & Firestore
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth)
     implementation (libs.firebase.firestore)
@@ -89,5 +88,5 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugRuntimeOnly(libs.androidx.compose.ui.test.manifest)
 }

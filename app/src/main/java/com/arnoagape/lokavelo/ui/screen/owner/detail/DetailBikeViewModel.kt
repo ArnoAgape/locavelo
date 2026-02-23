@@ -43,6 +43,7 @@ class DetailBikeViewModel @Inject constructor(
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
     private val _bikeId = MutableStateFlow<String?>(null)
+    private val _isDeleting = MutableStateFlow(false)
 
     fun setBikeId(id: String) {
         _bikeId.value = id
@@ -70,20 +71,30 @@ class DetailBikeViewModel @Inject constructor(
             .flatMapLatest { bikeId ->
                 bikeRepository.observeBike(bikeId)
             }
-            .map { bike ->
-                when (bike) {
-                    null -> DetailBikeUiState.Error.Empty("Impossible to find the bike")
-                    else -> DetailBikeUiState.Success(bike)
+            .combine(_isDeleting) { bike, isDeleting ->
+
+                when {
+                    isDeleting -> DetailBikeUiState.Deleting
+
+                    bike == null -> DetailBikeUiState.Loading
+
+                    else ->
+                        DetailBikeUiState.Success(bike)
                 }
             }
             .onStart { emit(DetailBikeUiState.Loading) }
             .catch { e ->
-                Log.e("DETAIL_FLOW", "Flow error", e)
-                emit(
-                    DetailBikeUiState.Error.Generic(
-                        e.message ?: "Unknown error"
+
+                if (_isDeleting.value) {
+                    emit(DetailBikeUiState.Deleting)
+                } else {
+                    Log.e("DETAIL_FLOW", "Flow error", e)
+                    emit(
+                        DetailBikeUiState.Error.Generic(
+                            e.message ?: "Unknown error"
+                        )
                     )
-                )
+                }
             }
             .stateIn(
                 viewModelScope,
@@ -107,6 +118,7 @@ class DetailBikeViewModel @Inject constructor(
         )
 
     fun deleteBike() = viewModelScope.launch {
+
         val bike = (bikeState.value as? DetailBikeUiState.Success)?.bike
 
         if (bike == null) {
@@ -114,12 +126,21 @@ class DetailBikeViewModel @Inject constructor(
             return@launch
         }
 
+        _isDeleting.value = true
+
         val result = bikeRepository.deleteBikes(setOf(bike.id))
 
         if (result.isSuccess) {
+
+            _isDeleting.value = true
+
+            _bikeId.value = null
+
             _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_deleted))
+
         } else {
-            Log.e("DELETE_DEBUG", "Delete failed", result.exceptionOrNull())
+
+            _isDeleting.value = false
             _events.trySend(Event.ShowMessage(R.string.error_delete_bike))
         }
     }

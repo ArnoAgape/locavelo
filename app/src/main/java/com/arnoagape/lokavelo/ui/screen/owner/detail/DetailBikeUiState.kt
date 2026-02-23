@@ -9,9 +9,8 @@ sealed class DetailBikeUiState {
 
     object Loading : DetailBikeUiState()
     data class Success(val bike: Bike) : DetailBikeUiState()
-
+    object Deleting : DetailBikeUiState()
     sealed class Error : DetailBikeUiState() {
-        data class Empty(val message: String = "No bike found") : Error()
         data class Generic(val message: String = "Unknown error") : Error()
     }
 }

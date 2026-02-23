@@ -45,10 +45,10 @@ class AddBikeViewModel @Inject constructor(
 
     private val _formState = MutableStateFlow(
         AddBikeFormState(
-            title = "",
+            title = "test",
             description = "",
             location = BikeLocation(),
-            priceText = "",
+            priceText = "300",
             depositText = ""
         )
     )

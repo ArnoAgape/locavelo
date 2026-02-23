@@ -98,6 +98,7 @@
     <string name="try_again">Réessayer</string>
     <string name="publishing">Publication en cours…</string>
     <string name="loading">Les données chargent…</string>
+    <string name="deleting">Suppression en cours…</string>
     <string name="add_picture">Ajouter une photo</string>
     <string name="remove_picture">Supprimer</string>
     <string name="press_again_exit">Appuie à nouveau pour quitter</string>

@@ -97,7 +97,7 @@ fun LokaveloApp() {
 
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = Screen.Owner.HomeBike.route,
             modifier = Modifier
                 .padding(padding)
                 .consumeWindowInsets(padding)

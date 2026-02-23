@@ -49,9 +49,7 @@ fun BikeItem(
     onToggleSelection: (String) -> Unit,
     onEnterSelectionMode: () -> Unit
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
+    LazyColumn {
         items(
             items = bikes,
             key = { it.id }

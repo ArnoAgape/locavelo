@@ -144,24 +144,32 @@ fun DetailBikeScreen(
                 .fillMaxSize()
         ) {
 
-            // 🎯 CONTENU PRINCIPAL
-            DetailBikeContent(
-                modifier = Modifier.fillMaxSize(),
-                state = state
-            )
+            when (state.bikeState) {
 
-            // 🎯 OVERLAY LOADING
-            if (state.bikeState is DetailBikeUiState.Loading) {
-                LoadingOverlay(
-                    text = stringResource(R.string.loading)
-                )
-            }
+                is DetailBikeUiState.Success -> {
+                    DetailBikeContent(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state
+                    )
+                }
 
-            // 🎯 ERREUR OVERLAY
-            if (state.bikeState is DetailBikeUiState.Error) {
-                ErrorOverlay(
-                    message = stringResource(R.string.error_generic)
-                )
+                is DetailBikeUiState.Loading -> {
+                    LoadingOverlay(
+                        text = stringResource(R.string.loading)
+                    )
+                }
+
+                is DetailBikeUiState.Deleting -> {
+                    LoadingOverlay(
+                        text = stringResource(R.string.deleting)
+                    )
+                }
+
+                is DetailBikeUiState.Error -> {
+                    ErrorOverlay(
+                        message = stringResource(R.string.error_generic)
+                    )
+                }
             }
         }
     }
