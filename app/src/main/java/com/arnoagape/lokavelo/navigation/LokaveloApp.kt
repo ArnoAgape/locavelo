@@ -1,12 +1,20 @@
 package com.arnoagape.lokavelo.navigation
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
@@ -15,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.screen.account.home.AccountHomeScreen
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
 import com.arnoagape.lokavelo.ui.screen.account.settings.help.HelpSettingsScreen
@@ -51,6 +60,39 @@ fun LokaveloApp() {
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    var lastBackPressedTime by remember { mutableLongStateOf(0L) }
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
+    // appuie deux fois pour quitter
+    BackHandler {
+
+        val currentRoute =
+            currentBackStackEntry?.destination?.route?.substringBefore("/")
+
+        val isOnRootScreen =
+            currentRoute == Screen.Owner.HomeBike.route ||
+                    currentRoute == Screen.Rent.route ||
+                    currentRoute == Screen.Account.AccountHome.route ||
+                    currentRoute == Screen.Messaging.MessagingHome.route
+
+        if (!isOnRootScreen) {
+            navController.popBackStack()
+        } else {
+            val currentTime = System.currentTimeMillis()
+
+            if (currentTime - lastBackPressedTime < 2000) {
+                (context as? Activity)?.finish()
+            } else {
+                lastBackPressedTime = currentTime
+                Toast.makeText(
+                    context,
+                    resources.getString(R.string.press_again_exit),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     fun navigateProtected(route: String) {
         if (isSignedIn) {

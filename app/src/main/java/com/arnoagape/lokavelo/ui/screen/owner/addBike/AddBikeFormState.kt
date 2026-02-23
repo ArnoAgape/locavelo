@@ -6,6 +6,7 @@ import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
+import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeFormState
 import kotlin.collections.isNotEmpty
 
 data class AddBikeFormState(
@@ -64,6 +65,23 @@ data class AddBikeFormState(
             condition = condition,
             accessories = accessories
         )
+    }
+
+    companion object {
+        fun fromBike(bike: Bike): AddBikeFormState {
+            return AddBikeFormState(
+                title = bike.title,
+                description = bike.description,
+                location = bike.location,
+                priceText = (bike.priceInCents / 100).toString(),
+                depositText = bike.depositInCents?.div(100)?.toString() ?: "",
+                isElectric = bike.isElectric,
+                category = bike.category,
+                brand = bike.brand,
+                condition = bike.condition,
+                accessories = bike.accessories
+            )
+        }
     }
 
 }

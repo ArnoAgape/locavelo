@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -44,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -346,22 +346,31 @@ fun PhotoEditorDialog(
                 TextButton(
                     onClick = {
 
-                        if (!isCropping && rotation % 360f == 0f) {
-                            onDismiss()
-                            return@TextButton
-                        }
-
                         scope.launch {
                             isLoading = true
 
                             val newUri = withContext(Dispatchers.IO) {
-                                cropAndRotateImage(
-                                    context,
-                                    localUri!!,
-                                    scale,
-                                    offset,
-                                    rotation
-                                )
+                                when {
+                                    isCropping -> {
+                                        cropAndRotateImage(
+                                            context,
+                                            localUri!!,
+                                            scale,
+                                            offset,
+                                            rotation
+                                        )
+                                    }
+
+                                    rotation % 360f != 0f -> {
+                                        rotateOnly(
+                                            context,
+                                            localUri!!,
+                                            rotation
+                                        )
+                                    }
+
+                                    else -> localUri!!
+                                }
                             }
 
                             isLoading = false
@@ -528,27 +537,56 @@ fun cropAndRotateImage(
     rotation: Float
 ): Uri {
 
-    val input = context.contentResolver.openInputStream(uri)
-    val original = BitmapFactory.decodeStream(input)
-    input?.close()
+    val original = context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it)
+    } ?: throw IllegalStateException("Unable to decode bitmap")
 
-    // 1️⃣ Rotation d’abord
-    val rotationMatrix = Matrix().apply {
-        postRotate(rotation)
+    // ✅ Correction EXIF
+    val orientation = context.contentResolver.openInputStream(uri)?.use {
+        ExifInterface(it).getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+    } ?: ExifInterface.ORIENTATION_NORMAL
+
+    val exifMatrix = Matrix().apply {
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(270f)
+        }
     }
 
-    val rotated = Bitmap.createBitmap(
+    val corrected = Bitmap.createBitmap(
         original,
         0,
         0,
         original.width,
         original.height,
-        rotationMatrix,
+        exifMatrix,
         true
     )
 
-    // 2️⃣ Calcul du crop basé sur scale et offset
+    if (corrected != original) {
+        original.recycle()
+    }
 
+    // ✅ Rotation utilisateur
+    val rotated = Bitmap.createBitmap(
+        corrected,
+        0,
+        0,
+        corrected.width,
+        corrected.height,
+        Matrix().apply { postRotate(rotation) },
+        true
+    )
+
+    if (rotated != corrected) {
+        corrected.recycle()
+    }
+
+    // ✅ Calcul crop
     val bitmapWidth = rotated.width.toFloat()
     val bitmapHeight = rotated.height.toFloat()
 
@@ -560,8 +598,11 @@ fun cropAndRotateImage(
 
     val cropSize = minOf(visibleWidth, visibleHeight)
 
-    val left = (centerX - cropSize / 2).coerceIn(0f, bitmapWidth - cropSize)
-    val top = (centerY - cropSize / 2).coerceIn(0f, bitmapHeight - cropSize)
+    val left = (centerX - cropSize / 2)
+        .coerceIn(0f, bitmapWidth - cropSize)
+
+    val top = (centerY - cropSize / 2)
+        .coerceIn(0f, bitmapHeight - cropSize)
 
     val cropped = Bitmap.createBitmap(
         rotated,
@@ -571,6 +612,10 @@ fun cropAndRotateImage(
         cropSize.toInt()
     )
 
+    if (rotated != cropped) {
+        rotated.recycle()
+    }
+
     val file = File(
         context.cacheDir,
         "cropped_${System.currentTimeMillis()}.jpg"
@@ -579,6 +624,48 @@ fun cropAndRotateImage(
     FileOutputStream(file).use {
         cropped.compress(Bitmap.CompressFormat.JPEG, 95, it)
     }
+
+    cropped.recycle()
+
+    return file.toUri()
+}
+
+fun rotateOnly(
+    context: Context,
+    uri: Uri,
+    rotation: Float
+): Uri {
+
+    val input = context.contentResolver.openInputStream(uri)
+    val original = BitmapFactory.decodeStream(input)
+    input?.close()
+
+    val matrix = Matrix().apply {
+        postRotate(rotation)
+    }
+
+    val rotated = Bitmap.createBitmap(
+        original,
+        0,
+        0,
+        original.width,
+        original.height,
+        matrix,
+        true
+    )
+
+    original.recycle()
+
+    val file = File(
+        context.cacheDir,
+        "rotated_${System.currentTimeMillis()}.jpg"
+    )
+
+    FileOutputStream(file).use {
+        rotated.compress(Bitmap.CompressFormat.JPEG, 95, it)
+    }
+
+    rotated.recycle()
 
     return file.toUri()
 }
