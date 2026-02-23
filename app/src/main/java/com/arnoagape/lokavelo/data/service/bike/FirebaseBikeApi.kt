@@ -1,8 +1,13 @@
 package com.arnoagape.lokavelo.data.service.bike
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.exifinterface.media.ExifInterface
 import com.arnoagape.lokavelo.data.compression.ImageCompressor
 import com.arnoagape.lokavelo.data.dto.BikeDto
 import com.arnoagape.lokavelo.domain.model.Bike
@@ -12,6 +17,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.FirebaseStorage
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +25,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 
 class FirebaseBikeApi @Inject constructor(
-    private val compressor: ImageCompressor
+    private val compressor: ImageCompressor,
+    @param:ApplicationContext private val context: Context
 ) : BikeApi {
 
     private val auth = FirebaseAuth.getInstance()
@@ -198,7 +207,11 @@ class FirebaseBikeApi @Inject constructor(
 
             try {
 
-                val compressedFile = compressor.compress(uri)
+                // 🔥 1️⃣ Normalisation EXIF
+                val normalizedUri = normalizeImage(context, uri)
+
+                // 🔥 2️⃣ Compression
+                val compressedFile = compressor.compress(normalizedUri)
 
                 val fileName = "${UUID.randomUUID()}.jpg"
 
@@ -212,6 +225,7 @@ class FirebaseBikeApi @Inject constructor(
                 storageRef.putFile(compressedFile.toUri()).await()
 
                 storageRef.downloadUrl.await().toString()
+
             } catch (e: Exception) {
                 Log.e("FirebaseUpload", "Error while uploading", e)
                 null
@@ -252,4 +266,56 @@ class FirebaseBikeApi @Inject constructor(
     private fun requireUserId(): String =
         auth.currentUser?.uid ?: throw IllegalStateException("No authenticated user")
 
+}
+
+fun normalizeImage(
+    context: Context,
+    uri: Uri
+): Uri {
+
+    val original = context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it)
+    } ?: throw IllegalStateException("Decode failed")
+
+    val orientation = context.contentResolver.openInputStream(uri)?.use {
+        ExifInterface(it).getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+    } ?: ExifInterface.ORIENTATION_NORMAL
+
+    val matrix = Matrix().apply {
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(270f)
+        }
+    }
+
+    val corrected = Bitmap.createBitmap(
+        original,
+        0,
+        0,
+        original.width,
+        original.height,
+        matrix,
+        true
+    )
+
+    if (corrected != original) {
+        original.recycle()
+    }
+
+    val file = File(
+        context.cacheDir,
+        "normalized_${System.currentTimeMillis()}.jpg"
+    )
+
+    FileOutputStream(file).use {
+        corrected.compress(Bitmap.CompressFormat.JPEG, 95, it)
+    }
+
+    corrected.recycle()
+
+    return file.toUri()
 }

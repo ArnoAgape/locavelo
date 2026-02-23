@@ -160,8 +160,18 @@ class EditBikeViewModel @Inject constructor(
                 }
 
             is EditBikeEvent.AddPhoto ->
-                _state.updateState {
-                    it.copy(localUris = (it.localUris + event.uri).take(3))
+                _state.updateState { current ->
+
+                    val totalPhotos =
+                        current.localUris.size + current.remotePhotoUrls.size
+
+                    if (totalPhotos >= 3) {
+                        current
+                    } else {
+                        current.copy(
+                            localUris = current.localUris + event.uri
+                        )
+                    }
                 }
 
             is EditBikeEvent.RemovePhoto ->
@@ -177,24 +187,36 @@ class EditBikeViewModel @Inject constructor(
                 }
 
             is EditBikeEvent.ReplacePhoto ->
-                _state.updateState { photo ->
-                    val updatedLocal =
-                        photo.localUris.map { uri ->
-                            if (uri == event.oldUri) event.newUri else uri
-                        }
+                _state.updateState { current ->
 
-                    val updatedRemote =
-                        photo.remotePhotoUrls.filterNot {
-                            it == event.oldUri.toString()
-                        }
+                    // 1️⃣ local
+                    val localIndex = current.localUris.indexOfFirst {
+                        it.toString() == event.oldUri.toString()
+                    }
 
-                    photo.copy(
-                        localUris =
-                            if (updatedLocal.contains(event.newUri))
-                                updatedLocal
-                            else updatedLocal + event.newUri,
-                        remotePhotoUrls = updatedRemote
-                    )
+                    if (localIndex != -1) {
+                        val updatedLocal = current.localUris.toMutableList()
+                        updatedLocal[localIndex] = event.newUri
+                        return@updateState current.copy(localUris = updatedLocal)
+                    }
+
+                    // 2️⃣ remote → on garde la position
+                    val remoteIndex = current.remotePhotoUrls.indexOfFirst {
+                        it == event.oldUri.toString()
+                    }
+
+                    if (remoteIndex != -1) {
+
+                        val updatedRemote = current.remotePhotoUrls.toMutableList()
+
+                        updatedRemote[remoteIndex] = event.newUri.toString()
+
+                        return@updateState current.copy(
+                            remotePhotoUrls = updatedRemote
+                        )
+                    }
+
+                    current
                 }
 
             EditBikeEvent.Submit ->

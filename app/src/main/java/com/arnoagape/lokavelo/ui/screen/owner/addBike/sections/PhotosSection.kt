@@ -421,31 +421,6 @@ fun PhotoEditorDialog(
     }
 }
 
-suspend fun downloadImageToCache(
-    context: Context,
-    uri: Uri
-): Uri = withContext(Dispatchers.IO) {
-
-    val url = URL(uri.toString())
-    val connection = url.openConnection()
-    connection.connect()
-
-    val input = connection.getInputStream()
-
-    val file = File(
-        context.cacheDir,
-        "temp_${System.currentTimeMillis()}.jpg"
-    )
-
-    FileOutputStream(file).use { output ->
-        input.copyTo(output)
-    }
-
-    input.close()
-
-    file.toUri()
-}
-
 @Composable
 fun AddPhotoButton(
     onClick: () -> Unit
@@ -527,6 +502,31 @@ fun FullScreenImageViewer(
             )
         }
     }
+}
+
+suspend fun downloadImageToCache(
+    context: Context,
+    uri: Uri
+): Uri = withContext(Dispatchers.IO) {
+
+    val url = URL(uri.toString())
+    val connection = url.openConnection()
+    connection.connect()
+
+    val input = connection.getInputStream()
+
+    val file = File(
+        context.cacheDir,
+        "temp_${System.currentTimeMillis()}.jpg"
+    )
+
+    FileOutputStream(file).use { output ->
+        input.copyTo(output)
+    }
+
+    input.close()
+
+    file.toUri()
 }
 
 fun cropAndRotateImage(
@@ -636,11 +636,28 @@ fun rotateOnly(
     rotation: Float
 ): Uri {
 
-    val input = context.contentResolver.openInputStream(uri)
-    val original = BitmapFactory.decodeStream(input)
-    input?.close()
+    val original = context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it)
+    } ?: throw IllegalStateException("Unable to decode bitmap")
+
+    // ✅ Correction EXIF
+    val orientation = context.contentResolver.openInputStream(uri)?.use {
+        ExifInterface(it).getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+    } ?: ExifInterface.ORIENTATION_NORMAL
 
     val matrix = Matrix().apply {
+
+        // EXIF
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(270f)
+        }
+
+        // Rotation utilisateur
         postRotate(rotation)
     }
 
@@ -654,7 +671,9 @@ fun rotateOnly(
         true
     )
 
-    original.recycle()
+    if (rotated != original) {
+        original.recycle()
+    }
 
     val file = File(
         context.cacheDir,

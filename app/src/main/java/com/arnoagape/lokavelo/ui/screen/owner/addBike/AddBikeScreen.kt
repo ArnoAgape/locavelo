@@ -209,9 +209,14 @@ private fun AddBikeContent(
 
     val galleryLauncher =
         rememberLauncherForActivityResult(
-            ActivityResultContracts.PickVisualMedia()
-        ) { uri ->
-            uri?.let { onAction(AddBikeEvent.AddPhoto(it)) }
+            contract = ActivityResultContracts.PickMultipleVisualMedia()
+        ) { uris ->
+
+            if (uris.isNotEmpty()) {
+                uris.forEach { uri ->
+                    onAction(AddBikeEvent.AddPhoto(uri))
+                }
+            }
         }
 
     fun launchGallery() {
