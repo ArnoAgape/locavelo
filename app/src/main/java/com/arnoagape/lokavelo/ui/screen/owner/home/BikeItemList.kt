@@ -62,7 +62,9 @@ fun BikeItem(
                 onSelectToggle = { onToggleSelection(bike.id) },
                 onClick = { onBikeClick(bike) },
                 onLongClick = {
-                    onEnterSelectionMode()
+                    if (!selectionState.isSelectionMode) {
+                        onEnterSelectionMode()
+                    }
                     onToggleSelection(bike.id)
                 }
             ) {

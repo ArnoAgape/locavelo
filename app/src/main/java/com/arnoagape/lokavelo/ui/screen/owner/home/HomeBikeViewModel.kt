@@ -130,8 +130,14 @@ class HomeBikeViewModel @Inject constructor(
     fun toggleSelection(id: String) {
         _selection.update { sel ->
             val set = sel.selectedIds.toMutableSet()
+
             if (!set.add(id)) set.remove(id)
-            sel.copy(selectedIds = set)
+
+            if (set.isEmpty()) {
+                SelectionState()
+            } else {
+                sel.copy(selectedIds = set)
+            }
         }
     }
 

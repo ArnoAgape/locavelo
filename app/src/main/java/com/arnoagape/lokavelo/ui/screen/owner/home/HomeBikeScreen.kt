@@ -1,13 +1,13 @@
 package com.arnoagape.lokavelo.ui.screen.owner.home
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Search
@@ -59,6 +59,18 @@ fun HomeBikeScreen(
     val context = LocalContext.current
     val focusRequester = remember { FocusRequester() }
 
+    BackHandler(
+        enabled = state.selection.isSelectionMode || state.isSearchActive
+    ) {
+        when {
+            state.selection.isSelectionMode ->
+                viewModel.exitSelectionMode()
+
+            state.isSearchActive ->
+                viewModel.toggleSearch()
+        }
+    }
+
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
@@ -98,20 +110,29 @@ fun HomeBikeScreen(
                         }
 
                         if (state.selection.isSelectionMode) {
+
+                            val hasSelection = state.selection.selectedIds.isNotEmpty()
+
                             IconButton(
                                 onClick = {
-                                    if (state.selection.selectedIds.isEmpty())
-                                        viewModel.exitSelectionMode()
-                                    else
+                                    if (hasSelection)
                                         viewModel.requestDeleteConfirmation()
+                                    else
+                                        viewModel.exitSelectionMode()
                                 }
                             ) {
                                 Icon(
-                                    if (state.selection.selectedIds.isEmpty())
-                                        Icons.Default.Close
-                                    else
-                                        Icons.Default.DeleteForever,
-                                    null
+                                    imageVector =
+                                        if (hasSelection)
+                                            Icons.Default.DeleteForever
+                                        else
+                                            Icons.Default.Delete,
+                                    contentDescription = null,
+                                    tint =
+                                        if (hasSelection)
+                                            MaterialTheme.colorScheme.error
+                                        else
+                                            MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         } else {
@@ -131,7 +152,8 @@ fun HomeBikeScreen(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    stringResource(R.string.add_bike))
+                    stringResource(R.string.add_bike)
+                )
             }
         }
 
