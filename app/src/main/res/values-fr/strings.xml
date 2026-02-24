@@ -34,7 +34,8 @@
     <string name="description">Description</string>
     <string name="location">Adresse</string>
     <string name="pricing">Tarif</string>
-    <string name="pricing_day">Tarif par jour (€)</string>
+    <string name="pricing_day_amount">Tarif par jour (€)</string>
+    <string name="pricing_day">Tarif par jour</string>
     <string name="pricing_half_day">Tarif pour une demi-journée</string>
     <string name="pricing_week">Tarif à la semaine</string>
     <string name="pricing_month">Tarif au mois</string>

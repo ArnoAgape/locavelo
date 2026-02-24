@@ -17,7 +17,7 @@ fun PricingSection(
     onPriceChange: (String) -> Unit,
 ) {
     SectionCard(
-        title = stringResource(R.string.pricing),
+        title = stringResource(R.string.pricing_day),
         subtitle = stringResource(R.string.subtitle_pricing)
     ) {
 
@@ -34,7 +34,7 @@ fun PricingSection(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
             ),
-            label = { Text(stringResource(R.string.pricing_day)) }
+            label = { Text(stringResource(R.string.pricing_day_amount)) }
         )
 
         Text(

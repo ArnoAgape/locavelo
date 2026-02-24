@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,8 +34,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository,
-    userRepository: UserRepository,
+    private val bikeRepository: BikeOwnerRepository
 ) : ViewModel() {
 
     private val _events = Channel<Event>()
@@ -56,42 +56,23 @@ class DetailBikeViewModel @Inject constructor(
         _showDeleteDialog.value = false
     }
 
-    private val isUserSignedIn =
-        userRepository.isUserSignedIn()
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                null
-            )
-
     private val bikeState: StateFlow<DetailBikeUiState> =
         _bikeId
             .filterNotNull()
             .flatMapLatest { bikeId ->
                 bikeRepository.observeBike(bikeId)
             }
-            .combine(_isDeleting) { bike, isDeleting ->
-
-                when {
-                    isDeleting -> DetailBikeUiState.Deleting
-
-                    bike == null -> DetailBikeUiState.Loading
-
-                    else ->
-                        DetailBikeUiState.Success(bike)
+            .filterNotNull()
+            .map { bike ->
+                if (_isDeleting.value) {
+                    DetailBikeUiState.Deleting
+                } else {
+                    DetailBikeUiState.Success(bike)
                 }
             }
-            .onStart { emit(DetailBikeUiState.Loading) }
             .catch { e ->
-
-                if (_isDeleting.value) {
-                    emit(DetailBikeUiState.Deleting)
-                } else {
-                    Log.e("DETAIL_FLOW", "Flow error", e)
-                    emit(
-                        DetailBikeUiState.Error.Generic()
-                    )
-                }
+                Log.e("DETAIL_FLOW", "Flow error", e)
+                emit(DetailBikeUiState.Error.Generic())
             }
             .stateIn(
                 viewModelScope,
@@ -100,19 +81,17 @@ class DetailBikeViewModel @Inject constructor(
             )
 
     val state: StateFlow<DetailScreenState> =
-        combine(
-            bikeState,
-            isUserSignedIn
-        ) { ui, signedIn ->
-            DetailScreenState(
-                bikeState = ui,
-                isSignedIn = signedIn == true
+        bikeState
+            .map { ui ->
+                DetailScreenState(
+                    bikeState = ui
+                )
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = DetailScreenState()
             )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = DetailScreenState()
-        )
 
     fun deleteBike() = viewModelScope.launch {
 
