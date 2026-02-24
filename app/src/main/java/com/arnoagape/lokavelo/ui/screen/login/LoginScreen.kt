@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -45,7 +44,6 @@ import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.OrSeparator
 import com.arnoagape.lokavelo.ui.screen.login.launchers.emailSignUpLauncher
 import com.arnoagape.lokavelo.ui.screen.login.launchers.googleSignUpLauncher
-import com.arnoagape.lokavelo.ui.screen.login.launchers.phoneSignUpLauncher
 
 /**
  * Displays the login screen with multiple sign-in options:
@@ -63,7 +61,6 @@ fun LoginScreen(
 
     val googleLauncher = googleSignUpLauncher(viewModel)
     val emailLauncher = emailSignUpLauncher(viewModel)
-    val phoneLauncher = phoneSignUpLauncher(viewModel)
 
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -94,8 +91,7 @@ fun LoginScreen(
         ) {
             LoginContent(
                 onGoogleSignInClick = { viewModel.onSignInRequested { googleLauncher() } },
-                onEmailSignInClick = { viewModel.onSignInRequested { emailLauncher() } },
-                onPhoneSignInClick = { viewModel.onSignInRequested { phoneLauncher() }}
+                onEmailSignInClick = { viewModel.onSignInRequested { emailLauncher() } }
             )
         }
     }
@@ -104,8 +100,7 @@ fun LoginScreen(
 @Composable
 fun LoginContent(
     onGoogleSignInClick: () -> Unit,
-    onEmailSignInClick: () -> Unit,
-    onPhoneSignInClick: () -> Unit
+    onEmailSignInClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -139,43 +134,13 @@ fun LoginContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            /** ---------- PHONE BUTTON ---------- **/
+            /** ---------- EMAIL BUTTON ---------- **/
             Button(
-                onClick = onPhoneSignInClick,
+                onClick = { onEmailSignInClick() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 border = ButtonDefaults.outlinedButtonBorder(enabled = true)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(stringResource(R.string.sign_in_phone))
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            /** ---------- SEPARATOR ---------- **/
-            OrSeparator()
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            /** ---------- EMAIL BUTTON ---------- **/
-            OutlinedButton(
-                onClick = { onEmailSignInClick() },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                border = BorderStroke(
-                    1.5.dp,
-                    MaterialTheme.colorScheme.primary
-                )
             ) {
                 Icon(
                     imageVector = Icons.Default.Email,
@@ -186,7 +151,12 @@ fun LoginContent(
                 Text(stringResource(R.string.sign_in_email))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
+
+            /** ---------- SEPARATOR ---------- **/
+            OrSeparator()
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             /** ---------- GOOGLE BUTTON ---------- **/
             OutlinedButton(
@@ -215,14 +185,30 @@ fun LoginContent(
     }
 }
 
+/** ---------- PHONE BUTTON ---------- **/
+/*Button(
+    onClick = onPhoneSignInClick,
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(50.dp),
+    border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+) {
+    Icon(
+        imageVector = Icons.Default.Phone,
+        contentDescription = null,
+        modifier = Modifier.size(24.dp)
+    )
+    Spacer(modifier = Modifier.width(12.dp))
+    Text(stringResource(R.string.sign_in_phone))
+}*/
+
 @PreviewLightDark
 @Composable
 private fun LoginScreenPreview() {
     LokaveloTheme {
         LoginContent(
             onEmailSignInClick = { },
-            onGoogleSignInClick = { },
-            onPhoneSignInClick = { }
+            onGoogleSignInClick = { }
         )
     }
 }
