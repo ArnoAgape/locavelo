@@ -278,16 +278,16 @@ class AddBikeViewModel @Inject constructor(
 
             val current = _state.value
 
-            _state.update {
-                it.copy(uiState = AddBikeUiState.Submitting)
-            }
-
             val bike = current.form.toBikeOrNull()
                 ?: return@launch
 
             val localUris = current.photos
                 .filterIsInstance<PhotoItem.Local>()
                 .map { it.uri }
+
+            _state.update {
+                it.copy(isSaving = true)
+            }
 
             runCatching {
                 bikeRepository.addBike(
@@ -307,7 +307,9 @@ class AddBikeViewModel @Inject constructor(
                 Log.e("AddBike", "Error while adding bike", throwable)
 
                 _state.update {
-                    it.copy(uiState = AddBikeUiState.Error.Generic())
+                    it.copy(
+                        uiState = AddBikeUiState.Error.Generic(),
+                        isSaving = false)
                 }
 
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
@@ -351,5 +353,6 @@ data class AddBikeScreenState(
     val uiState: AddBikeUiState = AddBikeUiState.Idle,
     val form: AddBikeFormState = AddBikeFormState(),
     val isValid: Boolean = false,
-    val photos: List<PhotoItem> = emptyList()
+    val photos: List<PhotoItem> = emptyList(),
+    val isSaving: Boolean = false
 )

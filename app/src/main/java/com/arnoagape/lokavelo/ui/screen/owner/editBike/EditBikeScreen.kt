@@ -140,11 +140,12 @@ fun EditBikeScreen(
 
         bottomBar = {
             PublishButton(
-                enabled = true,
+                enabled = !state.isSaving,
                 onClick = {
                     viewModel.onAction(EditBikeEvent.Submit)
                 },
-                isSubmitting = state.uiState is EditBikeUiState.Submitting
+                isLoading = state.isSaving,
+                submitText = stringResource(R.string.edit_bike_button)
             )
         }
 
@@ -166,16 +167,8 @@ fun EditBikeScreen(
             )
 
             // 🎯 OVERLAY LOADING / SUBMIT
-            if (
-                state.uiState is EditBikeUiState.Loading ||
-                state.uiState is EditBikeUiState.Submitting
-            ) {
-                LoadingOverlay(
-                    text = if (state.uiState is EditBikeUiState.Submitting)
-                        stringResource(R.string.publishing)
-                    else
-                        stringResource(R.string.loading)
-                )
+            if (state.uiState is EditBikeUiState.Loading) {
+                LoadingOverlay(text = stringResource(R.string.loading))
             }
 
             // 🎯 ERREUR PLEIN ÉCRAN

@@ -3,36 +3,45 @@ package com.arnoagape.lokavelo.ui.screen.owner.addBike.sections
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
 @Composable
 fun PublishButton(
-    isSubmitting: Boolean,
+    isLoading: Boolean,
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    submitText: String
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled && !isSubmitting,
+        enabled = enabled && !isLoading,
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .navigationBarsPadding(),
         shape = RoundedCornerShape(10.dp)
     ) {
-        Text(
-            text = stringResource(R.string.publish_bike),
-            fontSize = 15.sp)
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp
+            )
+        } else {
+            Text(
+                text = submitText,
+                fontSize = 15.sp
+            )
+        }
     }
 }
 
@@ -43,7 +52,8 @@ private fun PublishButtonPreview() {
         PublishButton(
             enabled = true,
             onClick = {},
-            isSubmitting = false
+            isLoading = false,
+            submitText = "Ajouter"
         )
     }
 }

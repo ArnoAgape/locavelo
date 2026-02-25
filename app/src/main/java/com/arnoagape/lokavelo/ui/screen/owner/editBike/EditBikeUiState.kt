@@ -8,11 +8,7 @@ sealed class EditBikeUiState {
 
     object Idle : EditBikeUiState()
     object Loading : EditBikeUiState()
-
     data class Loaded(val bike: Bike) : EditBikeUiState()
-
-    object Submitting : EditBikeUiState()
-
     sealed class Error : EditBikeUiState() {
         object NotFound : Error()
         data class Generic(

@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     // TOP BAR
-    <string name="add_bike">Publier une annonce</string>
+    <string name="add_bike">Ajouter un vélo</string>
     <string name="detail_bike">Descriptif</string>
     <string name="rent">Louer</string>
     <string name="rentals">Locations</string>
@@ -10,7 +10,8 @@
     <string name="account">Compte</string>
 
     // BOTTOM BAR
-    <string name="publish_bike">Publier le vélo</string>
+    <string name="add_bike_button">Ajouter</string>
+    <string name="edit_bike_button">Sauvegarder</string>
 
     // SUBTITLE
     <string name="subtitle_add_3_pictures">Ajoute jusqu’à 3 photos</string>

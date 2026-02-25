@@ -6,6 +6,7 @@ import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
+import com.arnoagape.lokavelo.ui.utils.toPriceText
 
 data class EditBikeFormState(
     val title: String = "",
@@ -79,11 +80,11 @@ data class EditBikeFormState(
                 title = bike.title,
                 description = bike.description,
                 location = bike.location,
-                priceText = (bike.priceInCents / 100).toString(),
-                halfDayPriceText = bike.priceHalfDayInCents?.div(100)?.toString() ?: "",
-                weekPriceText = bike.priceWeekInCents?.div(100)?.toString() ?: "",
-                monthPriceText = bike.priceMonthInCents?.div(100)?.toString() ?: "",
-                depositText = bike.depositInCents?.div(100)?.toString() ?: "",
+                priceText = bike.priceInCents.toPriceText(),
+                halfDayPriceText = bike.priceHalfDayInCents.toPriceText(),
+                weekPriceText = bike.priceWeekInCents.toPriceText(),
+                monthPriceText = bike.priceMonthInCents.toPriceText(),
+                depositText = bike.depositInCents.toPriceText(),
                 electric = bike.electric,
                 category = bike.category,
                 brand = bike.brand,

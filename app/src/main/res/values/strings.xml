@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">LokaVélo</string>
 
     // TOP BAR
-    <string name="add_bike">Post an ad</string>
+    <string name="add_bike">Add a bike</string>
     <string name="detail_bike">Bike info</string>
     <string name="rent">Rent</string>
     <string name="rentals">Rentals</string>
@@ -10,7 +10,8 @@
     <string name="account">Account</string>
 
     // BOTTOM BAR
-    <string name="publish_bike">Publish bike</string>
+    <string name="add_bike_button">Add</string>
+    <string name="edit_bike_button">Save</string>
 
     // SUBTITLE
     <string name="subtitle_add_3_pictures">Add up to 3 pictures</string>

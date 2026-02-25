@@ -74,7 +74,7 @@ class EditBikeViewModel @Inject constructor(
                             form = EditBikeFormState.fromBike(bike),
                             photos = bike.photoUrls.map { url ->
                                 PhotoItem.Remote(
-                                    id = UUID.randomUUID().toString(),
+                                    id = url,
                                     url = url
                                 )
                             }
@@ -337,10 +337,6 @@ class EditBikeViewModel @Inject constructor(
                 (current.uiState as? EditBikeUiState.Loaded)?.bike
                     ?: return@launch
 
-            _state.update {
-                it.copy(uiState = EditBikeUiState.Submitting)
-            }
-
             val updatedBike =
                 current.form.toUpdatedBikeOrNull(original)
                     ?: return@launch
@@ -356,6 +352,10 @@ class EditBikeViewModel @Inject constructor(
             val finalBike = updatedBike.copy(
                 photoUrls = remoteUrls
             )
+
+            _state.update {
+                it.copy(isSaving = true)
+            }
 
             runCatching {
                 bikeRepository.editBike(
@@ -416,5 +416,6 @@ data class EditBikeScreenState(
     val uiState: EditBikeUiState = EditBikeUiState.Idle,
     val form: EditBikeFormState = EditBikeFormState(),
     val isValid: Boolean = false,
+    val isSaving: Boolean = false,
     val photos: List<PhotoItem> = emptyList()
 )

@@ -133,7 +133,8 @@ fun AddBikeScreen(
                 onClick = {
                     viewModel.onAction(AddBikeEvent.Submit)
                 },
-                isSubmitting = state.uiState is AddBikeUiState.Submitting
+                isLoading = state.isSaving,
+                submitText = stringResource(R.string.add_bike_button)
             )
         }
 
@@ -155,16 +156,8 @@ fun AddBikeScreen(
             )
 
             // 🎯 OVERLAY LOADING / SUBMIT
-            if (
-                state.uiState is AddBikeUiState.Loading ||
-                state.uiState is AddBikeUiState.Submitting
-            ) {
-                LoadingOverlay(
-                    text = if (state.uiState is AddBikeUiState.Submitting)
-                        stringResource(R.string.publishing)
-                    else
-                        stringResource(R.string.loading)
-                )
+            if (state.uiState is AddBikeUiState.Loading) {
+                LoadingOverlay(text = stringResource(R.string.loading))
             }
 
             // 🎯 ERREUR PLEIN ÉCRAN

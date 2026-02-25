@@ -1,5 +1,7 @@
 package com.arnoagape.lokavelo.ui.utils
 
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -31,4 +33,15 @@ fun Long.toPriceString(): String {
         }
 
     return formatter.format(this / 100.0)
+}
+
+fun Long?.toPriceText(): String {
+    if (this == null) return ""
+
+    val value = this / 100.0
+
+    val symbols = DecimalFormatSymbols(Locale.FRANCE)
+    val formatter = DecimalFormat("#.##", symbols)
+
+    return formatter.format(value)
 }
