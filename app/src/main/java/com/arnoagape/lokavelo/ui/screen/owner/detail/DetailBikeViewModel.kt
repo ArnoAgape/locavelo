@@ -1,6 +1,5 @@
 package com.arnoagape.lokavelo.ui.screen.owner.detail
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
@@ -12,7 +11,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -59,22 +57,23 @@ class DetailBikeViewModel @Inject constructor(
             .flatMapLatest { bikeId ->
                 bikeRepository.observeBike(bikeId)
             }
-            .filterNotNull()
             .map { bike ->
-                if (_isDeleting.value) {
-                    DetailBikeUiState.Deleting
-                } else {
-                    DetailBikeUiState.Success(bike)
+
+                when {
+                    _isDeleting.value ->
+                        DetailBikeUiState.Deleting
+
+                    bike == null ->
+                        DetailBikeUiState.Idle
+
+                    else ->
+                        DetailBikeUiState.Success(bike)
                 }
-            }
-            .catch { e ->
-                Log.e("DETAIL_FLOW", "Flow error", e)
-                emit(DetailBikeUiState.Error.Generic())
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                DetailBikeUiState.Loading
+                DetailBikeUiState.Idle
             )
 
     val state: StateFlow<DetailScreenState> =
@@ -104,15 +103,8 @@ class DetailBikeViewModel @Inject constructor(
         val result = bikeRepository.deleteBikes(setOf(bike.id))
 
         if (result.isSuccess) {
-
-            _isDeleting.value = true
-
-            _bikeId.value = null
-
             _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_deleted))
-
         } else {
-
             _isDeleting.value = false
             _events.trySend(Event.ShowMessage(R.string.error_delete_bike))
         }
@@ -120,6 +112,6 @@ class DetailBikeViewModel @Inject constructor(
 }
 
 data class DetailScreenState(
-    val bikeState: DetailBikeUiState = DetailBikeUiState.Loading,
+    val bikeState: DetailBikeUiState = DetailBikeUiState.Idle,
     val isSignedIn: Boolean = false
 )

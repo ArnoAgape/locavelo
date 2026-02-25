@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.GeocodingRepository
+import com.arnoagape.lokavelo.domain.model.AddressSuggestion
+import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
@@ -12,12 +15,17 @@ import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 import com.arnoagape.lokavelo.ui.utils.toPriceString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,10 +41,11 @@ import kotlin.collections.toMutableList
  * Manages form state, validation, and user interactions
  * related to bike edition.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class EditBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository
+    private val bikeRepository: BikeOwnerRepository,
+    private val geocodingRepository: GeocodingRepository
 ) : ViewModel() {
 
     private val _events = Channel<Event>(Channel.BUFFERED)
@@ -44,55 +53,72 @@ class EditBikeViewModel @Inject constructor(
 
     private val bikeId = MutableStateFlow<String?>(null)
 
+    private val addressQuery = MutableStateFlow("")
+
+    val suggestions: StateFlow<List<AddressSuggestion>> =
+        addressQuery
+            .debounce(400)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                if (query.length < 3) {
+                    flowOf(emptyList())
+                } else {
+                    flowOf(geocodingRepository.search(query))
+                }
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList()
+            )
+
+    private val bikeFlow: StateFlow<Bike?> =
+        bikeId
+            .filterNotNull()
+            .flatMapLatest { id ->
+                bikeRepository.observeBike(id)
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null
+            )
+
     private val _state = MutableStateFlow(EditBikeScreenState())
-    val state: StateFlow<EditBikeScreenState> = _state
+    val state: StateFlow<EditBikeScreenState> =
+        combine(_state, suggestions, bikeFlow) { state, suggestions, bike ->
+
+            bike?.let {
+
+                if (!state.isFormInitialized) {
+                    state.copy(
+                        suggestions = suggestions,
+                        uiState = EditBikeUiState.Loaded(it),
+                        form = EditBikeFormState.fromBike(it),
+                        photos = it.photoUrls.map { url ->
+                            PhotoItem.Remote(id = url, url = url)
+                        },
+                        isFormInitialized = true
+                    )
+                } else {
+                    state.copy(
+                        suggestions = suggestions,
+                        uiState = EditBikeUiState.Loaded(it)
+                    )
+                }
+
+            } ?: state.copy(
+                suggestions = suggestions,
+                uiState = EditBikeUiState.Idle
+            )
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            EditBikeScreenState()
+        )
 
     fun setBikeId(id: String) {
         bikeId.value = id
-        observeBike()
-    }
-
-    private fun observeBike() {
-        viewModelScope.launch {
-            bikeId
-                .filterNotNull()
-                .flatMapLatest { id ->
-                    bikeRepository.observeBike(id)
-                }
-                .collect { bike ->
-
-                    val current = _state.value
-                    if (bike == null) {
-                        _state.update {
-                            it.copy(uiState = EditBikeUiState.Error.NotFound)
-                        }
-                        return@collect
-                    }
-
-                    if (!current.isFormInitialized) {
-                        _state.update {
-                            it.copy(
-                                uiState = EditBikeUiState.Loaded(bike),
-                                form = EditBikeFormState.fromBike(bike),
-                                photos = bike.photoUrls.map { url ->
-                                    PhotoItem.Remote(
-                                        id = url,
-                                        url = url
-                                    )
-                                },
-                                isFormInitialized = true
-                            )
-                        }
-                    } else {
-                        _state.update {
-                            it.copy(
-                                uiState = EditBikeUiState.Loaded(bike)
-                            )
-                        }
-                    }
-
-                }
-        }
     }
 
     val hasUnsavedChanges: StateFlow<Boolean> =
@@ -207,8 +233,10 @@ class EditBikeViewModel @Inject constructor(
                     it.copy(form = it.form.copy(depositText = event.depositText))
                 }
 
-            is EditBikeEvent.AddressChanged ->
+            is EditBikeEvent.AddressChanged -> {
+                addressQuery.value = event.address
                 updateLocation { copy(street = event.address) }
+            }
 
             is EditBikeEvent.Address2Changed ->
                 updateLocation { copy(addressLine2 = event.address2) }
@@ -392,6 +420,26 @@ class EditBikeViewModel @Inject constructor(
         }
     }
 
+    fun onSuggestionSelected(suggestion: AddressSuggestion) {
+        _state.update {
+            it.copy(
+                form = it.form.copy(
+                    location = BikeLocation(
+                        street = suggestion.street ?: "",
+                        postalCode = suggestion.postalCode ?: "",
+                        city = suggestion.city ?: "",
+                        country = suggestion.country ?: "",
+                        latitude = suggestion.lat,
+                        longitude = suggestion.lon
+                    )
+                ),
+                suggestions = emptyList()
+            )
+        }
+
+        addressQuery.value = ""
+    }
+
     private fun updateLocation(update: BikeLocation.() -> BikeLocation) {
         _state.update {
             it.copy(
@@ -429,5 +477,6 @@ data class EditBikeScreenState(
     val isValid: Boolean = false,
     val isSaving: Boolean = false,
     val isFormInitialized: Boolean = false,
-    val photos: List<PhotoItem> = emptyList()
+    val photos: List<PhotoItem> = emptyList(),
+    val suggestions: List<AddressSuggestion> = emptyList()
 )

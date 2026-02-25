@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.AlertDialogNonSaved
@@ -152,7 +153,9 @@ fun AddBikeScreen(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
                 onAction = viewModel::onAction,
-                onMovePhoto = viewModel::movePhoto
+                onMovePhoto = viewModel::movePhoto,
+                suggestions = state.suggestions,
+                onSuggestionSelected = viewModel::onSuggestionSelected
             )
 
             // 🎯 OVERLAY LOADING / SUBMIT
@@ -186,7 +189,9 @@ private fun AddBikeContent(
     modifier: Modifier = Modifier,
     state: AddBikeScreenState,
     onMovePhoto: (Int, Int) -> Unit,
-    onAction: (AddBikeEvent) -> Unit
+    onAction: (AddBikeEvent) -> Unit,
+    suggestions: List<AddressSuggestion>,
+    onSuggestionSelected: (AddressSuggestion) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -355,6 +360,7 @@ private fun AddBikeContent(
                 addressError = state.form.streetError,
                 zipCodeError = state.form.postalCodeError,
                 cityError = state.form.cityError,
+                suggestions = suggestions,
                 onAddressLineChange = {
                     onAction(AddBikeEvent.AddressChanged(it))
                 },
@@ -366,7 +372,8 @@ private fun AddBikeContent(
                 },
                 onCityChange = {
                     onAction(AddBikeEvent.CityChanged(it))
-                }
+                },
+                onSuggestionSelected = onSuggestionSelected
             )
         }
 
@@ -406,7 +413,9 @@ private fun AddBikeContentPreview() {
         AddBikeContent(
             state = AddBikeScreenState(),
             onAction = {},
-            onMovePhoto = { _, _ -> }
+            onMovePhoto = { _, _ -> },
+            suggestions = emptyList(),
+            onSuggestionSelected = {}
         )
     }
 }

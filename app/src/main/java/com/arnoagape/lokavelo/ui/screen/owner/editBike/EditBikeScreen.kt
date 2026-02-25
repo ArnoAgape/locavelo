@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.AlertDialogNonSaved
@@ -163,7 +164,9 @@ fun EditBikeScreen(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
                 onAction = viewModel::onAction,
-                onMovePhoto = viewModel::movePhoto
+                onMovePhoto = viewModel::movePhoto,
+                suggestions = state.suggestions,
+                onSuggestionSelected = viewModel::onSuggestionSelected
             )
 
             // 🎯 OVERLAY LOADING / SUBMIT
@@ -197,7 +200,9 @@ private fun EditBikeContent(
     modifier: Modifier = Modifier,
     state: EditBikeScreenState,
     onMovePhoto: (Int, Int) -> Unit,
-    onAction: (EditBikeEvent) -> Unit
+    onAction: (EditBikeEvent) -> Unit,
+    suggestions: List<AddressSuggestion>,
+    onSuggestionSelected: (AddressSuggestion) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -367,6 +372,7 @@ private fun EditBikeContent(
                 addressError = state.form.streetError,
                 zipCodeError = state.form.postalCodeError,
                 cityError = state.form.cityError,
+                suggestions = suggestions,
                 onAddressLineChange = {
                     onAction(EditBikeEvent.AddressChanged(it))
                 },
@@ -378,7 +384,8 @@ private fun EditBikeContent(
                 },
                 onCityChange = {
                     onAction(EditBikeEvent.CityChanged(it))
-                }
+                },
+                onSuggestionSelected = onSuggestionSelected
             )
         }
 
@@ -418,7 +425,9 @@ private fun EditBikeContentPreview() {
         EditBikeContent(
             state = EditBikeScreenState(),
             onAction = {},
-            onMovePhoto = { _, _ -> }
+            onMovePhoto = { _, _ -> },
+            suggestions = emptyList(),
+            onSuggestionSelected = {}
         )
     }
 }

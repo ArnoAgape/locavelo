@@ -19,7 +19,7 @@
     <string name="subtitle_title_description">Add a title and a description that define well
         your post</string>
     <string name="subtitle_location">The address won’t be visible publicly</string>
-    <string name="subtitle_pricing">Usually between €1 and €20 per day</string>
+    <string name="subtitle_pricing">Usually between €1 and €25 per day</string>
     <string name="subtitle_deposit">This amount will be blocked on the renter’s credit card
         for the entire duration of the rental</string>
 

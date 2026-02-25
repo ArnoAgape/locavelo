@@ -5,16 +5,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.GeocodingRepository
+import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 import com.arnoagape.lokavelo.ui.utils.toPriceString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -24,16 +33,44 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.collections.map
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class AddBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository
+    private val bikeRepository: BikeOwnerRepository,
+    private val geocodingRepository: GeocodingRepository
 ) : ViewModel() {
 
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
+    private val addressQuery = MutableStateFlow("")
+
+    val suggestions: StateFlow<List<AddressSuggestion>> =
+        addressQuery
+            .debounce(400)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                if (query.length < 3) {
+                    flowOf(emptyList())
+                } else {
+                    flowOf(geocodingRepository.search(query))
+                }
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList()
+            )
+
     private val _state = MutableStateFlow(AddBikeScreenState())
-    val state: StateFlow<AddBikeScreenState> = _state
+    val state: StateFlow<AddBikeScreenState> =
+        combine(_state, suggestions) { state, suggestions ->
+            state.copy(suggestions = suggestions)
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AddBikeScreenState()
+        )
 
     val hasUnsavedChanges: StateFlow<Boolean> =
         state.map { current ->
@@ -138,8 +175,10 @@ class AddBikeViewModel @Inject constructor(
                     it.copy(form = it.form.copy(depositText = event.depositText))
                 }
 
-            is AddBikeEvent.AddressChanged ->
+            is AddBikeEvent.AddressChanged -> {
+                addressQuery.value = event.address
                 updateLocation { copy(street = event.address) }
+            }
 
             is AddBikeEvent.Address2Changed ->
                 updateLocation { copy(addressLine2 = event.address2) }
@@ -309,12 +348,33 @@ class AddBikeViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         uiState = AddBikeUiState.Error.Generic(),
-                        isSaving = false)
+                        isSaving = false
+                    )
                 }
 
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
         }
+    }
+
+    fun onSuggestionSelected(suggestion: AddressSuggestion) {
+        _state.update {
+            it.copy(
+                form = it.form.copy(
+                    location = BikeLocation(
+                        street = suggestion.street ?: "",
+                        postalCode = suggestion.postalCode ?: "",
+                        city = suggestion.city ?: "",
+                        country = suggestion.country ?: "",
+                        latitude = suggestion.lat,
+                        longitude = suggestion.lon
+                    )
+                ),
+                suggestions = emptyList()
+            )
+        }
+
+        addressQuery.value = ""
     }
 
     private fun updateLocation(update: BikeLocation.() -> BikeLocation) {
@@ -354,5 +414,6 @@ data class AddBikeScreenState(
     val form: AddBikeFormState = AddBikeFormState(),
     val isValid: Boolean = false,
     val photos: List<PhotoItem> = emptyList(),
-    val isSaving: Boolean = false
+    val isSaving: Boolean = false,
+    val suggestions: List<AddressSuggestion> = emptyList()
 )

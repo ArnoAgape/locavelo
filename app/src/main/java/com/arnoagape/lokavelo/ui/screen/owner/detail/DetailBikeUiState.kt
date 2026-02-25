@@ -9,6 +9,7 @@ import com.arnoagape.lokavelo.domain.model.Bike
  */
 sealed class DetailBikeUiState {
 
+    object Idle : DetailBikeUiState()
     object Loading : DetailBikeUiState()
     data class Success(val bike: Bike) : DetailBikeUiState()
     object Deleting : DetailBikeUiState()

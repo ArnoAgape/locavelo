@@ -67,9 +67,18 @@ dependencies {
     implementation(libs.firebase.appcheck.playintegrity)
     debugImplementation(libs.firebase.appcheck.debug)
 
+    // Moshi JSON Library
+    implementation(libs.moshi)
+
+    // Retrofit for Network Requests
+    implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
+    implementation(libs.converter.moshi)
+
     //DI
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.accompanist.permissions)
 

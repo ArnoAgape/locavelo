@@ -9,3 +9,13 @@ data class BikeLocation(
     val latitude: Double? = null,
     val longitude: Double? = null
 )
+
+data class AddressSuggestion(
+    val displayName: String,
+    val lat: Double,
+    val lon: Double,
+    val street: String?,
+    val city: String?,
+    val postalCode: String?,
+    val country: String?
+)

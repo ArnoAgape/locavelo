@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -19,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 
 @Composable
 fun LocationSection(
@@ -29,10 +34,12 @@ fun LocationSection(
     addressError: Boolean,
     zipCodeError: Boolean,
     cityError: Boolean,
+    suggestions: List<AddressSuggestion>,
     onAddressLineChange: (String) -> Unit,
     onAddressLine2Change: (String) -> Unit,
     onZipCodeChange: (String) -> Unit,
-    onCityChange: (String) -> Unit
+    onCityChange: (String) -> Unit,
+    onSuggestionSelected: (AddressSuggestion) -> Unit
 ) {
     SectionCard(
         title = stringResource(R.string.location),
@@ -44,7 +51,9 @@ fun LocationSection(
             AddressLineField(
                 value = addressLine,
                 addressError = addressError,
-                onValueChange = onAddressLineChange
+                suggestions = suggestions,
+                onValueChange = onAddressLineChange,
+                onSuggestionSelected = onSuggestionSelected
             )
 
             AddressLine2Field(
@@ -75,39 +84,69 @@ fun LocationSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressLineField(
     value: String,
+    suggestions: List<AddressSuggestion>,
     addressError: Boolean,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onSuggestionSelected: (AddressSuggestion) -> Unit
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        isError = addressError,
-        supportingText = {
-            if (addressError) {
-                Text(stringResource(R.string.required))
+
+    val expanded = suggestions.isNotEmpty()
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { }
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(
+                    type = ExposedDropdownMenuAnchorType.PrimaryEditable,
+                    enabled = true
+                ),
+            isError = addressError,
+            supportingText = {
+                if (addressError) {
+                    Text(stringResource(R.string.required))
+                }
+            },
+            label = {
+                Text(
+                    text = stringResource(R.string.address_line)
+                )
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Next
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null
+                )
             }
-        },
-        label = {
-            Text(
-                text = stringResource(R.string.address_line)
-            )
-        },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Next
-        ),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = null
-            )
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { }
+        ) {
+            suggestions.forEach { suggestion ->
+                DropdownMenuItem(
+                    text = { Text(suggestion.displayName) },
+                    onClick = {
+                        onSuggestionSelected(suggestion)
+                    }
+                )
+            }
         }
-    )
+    }
 }
 
 @Composable

@@ -145,14 +145,17 @@ class FirebaseBikeApi @Inject constructor(
      *
      * Data collection and mapping are executed on an IO thread.
      */
-    override fun getBikeById(bikeId: String, userId: String): Flow<Bike> {
+    override fun getBikeById(
+        bikeId: String,
+        userId: String
+    ): Flow<Bike?> {
+
         return bikesCollectionForUser(userId)
             .document(bikeId)
             .snapshots()
             .map { snapshot ->
                 snapshot.toObject(BikeDto::class.java)
                     ?.let { Bike.fromDto(it) }
-                    ?: throw NoSuchElementException("Bike $bikeId not found")
             }
             .flowOn(Dispatchers.IO)
     }

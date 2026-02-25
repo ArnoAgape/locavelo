@@ -12,6 +12,7 @@ composeBom = "2026.02.00"
 assertk = "0.28.1"
 desugar_jdk_libs = "2.1.5"
 ksp = "2.3.5"
+moshiKotlinCodegen = "1.15.2"
 navigationCompose = "2.9.7"
 playServicesAuth = "21.5.1"
 reorderable = "3.0.0"
@@ -26,6 +27,9 @@ firebaseUiAuth = "9.1.1"
 firebaseUiStorage = "9.1.1"
 accompanistPermissions = "0.37.3"
 foundationLayout = "1.10.3"
+retrofit = "3.0.0"
+moshi = "1.15.2"
+loggingInterceptor = "5.3.2"
 
 [libraries]
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
@@ -61,12 +65,17 @@ hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", ve
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+moshi = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

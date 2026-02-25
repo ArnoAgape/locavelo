@@ -152,7 +152,7 @@ fun DetailBikeScreen(
 
             when (state.bikeState) {
 
-                is DetailBikeUiState.Success -> {
+                is DetailBikeUiState.Success, DetailBikeUiState.Idle -> {
                     DetailBikeContent(
                         modifier = Modifier.fillMaxSize(),
                         state = state
