@@ -19,8 +19,7 @@
     <string name="subtitle_title_description">Ajoute un titre et une description qui définissent
         bien ton annonce</string>
     <string name="subtitle_location">L’adresse ne sera pas visible publiquement</string>
-    <string name="subtitle_pricing">Tu peux aussi ajouter un tarif à la demi-journée,
-        à la semaine ou au mois</string>
+    <string name="subtitle_pricing">Généralement entre 1 € et 20 € par jour</string>
     <string name="subtitle_deposit">Ce montant sera bloqué sur la carte bancaire du locataire
         pendant toute la durée de la location</string>
 
@@ -39,10 +38,10 @@
     <string name="pricing_half_day_amount">Tarif demi-journée (€)</string>
     <string name="pricing_week_amount">Tarif semaine (€)</string>
     <string name="pricing_month_amount">Tarif mois (€)</string>
-    <string name="pricing_day">Tarif par jour</string>
-    <string name="pricing_half_day">Tarif demi-journée</string>
-    <string name="pricing_week">Tarif semaine</string>
-    <string name="pricing_month">Tarif mois</string>
+    <string name="pricing_day">1 jour</string>
+    <string name="pricing_half_day">1 demi-journée</string>
+    <string name="pricing_week">1 semaine</string>
+    <string name="pricing_month">1 mois</string>
     <string name="discount">Réduction : %1$d %%</string>
     <string name="deposit">Caution</string>
     <string name="deposit_amount">Montant de la caution (€)</string>

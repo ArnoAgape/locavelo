@@ -19,7 +19,7 @@
     <string name="subtitle_title_description">Add a title and a description that define well
         your post</string>
     <string name="subtitle_location">The address won’t be visible publicly</string>
-    <string name="subtitle_pricing">You can also add a half-day, weekly, or monthly rate</string>
+    <string name="subtitle_pricing">Usually between €1 and €20 per day</string>
     <string name="subtitle_deposit">This amount will be blocked on the renter’s credit card
         for the entire duration of the rental</string>
 
@@ -38,10 +38,10 @@
     <string name="pricing_half_day_amount">Price for half a day (€)</string>
     <string name="pricing_week_amount">Price for a week (€)</string>
     <string name="pricing_month_amount">Price for a month (€)</string>
-    <string name="pricing_day">Daily rate</string>
-    <string name="pricing_half_day">Price for half a day</string>
-    <string name="pricing_week">Price for a week</string>
-    <string name="pricing_month">Price for a month</string>
+    <string name="pricing_day">1 day</string>
+    <string name="pricing_half_day">1 half day</string>
+    <string name="pricing_week">1 week</string>
+    <string name="pricing_month">1 month</string>
     <string name="discount">Discount: %1$d%%</string>
     <string name="deposit">Deposit</string>
     <string name="deposit_amount">Deposit amount (€)</string>
