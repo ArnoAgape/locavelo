@@ -31,9 +31,11 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -97,10 +99,15 @@ fun EditBikeScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
-                snackbarHostState.showSnackbar(
+                val result = snackbarHostState.showSnackbar(
                     message = resources.getString(event.message),
+                    actionLabel = resources.getString(R.string.try_again),
+                    withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.onAction(EditBikeEvent.Submit)
+                }
             }
 
             is Event.ShowSuccessMessage -> {
@@ -115,7 +122,17 @@ fun EditBikeScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    actionColor = MaterialTheme.colorScheme.error,
+                    dismissActionContentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        },
 
         topBar = {
             TopAppBar(

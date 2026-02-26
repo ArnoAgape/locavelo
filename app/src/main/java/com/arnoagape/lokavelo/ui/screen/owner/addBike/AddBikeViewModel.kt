@@ -10,6 +10,7 @@ import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
+import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 import com.arnoagape.lokavelo.ui.utils.toPriceString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +44,8 @@ import kotlin.collections.map
 @HiltViewModel
 class AddBikeViewModel @Inject constructor(
     private val bikeRepository: BikeOwnerRepository,
-    private val geocodingRepository: GeocodingRepository
+    private val geocodingRepository: GeocodingRepository,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     private val _events = Channel<Event>()
@@ -307,7 +309,17 @@ class AddBikeViewModel @Inject constructor(
             return
         }
 
-        addBike()
+        viewModelScope.launch {
+
+            if (!networkUtils.isNetworkAvailable()) {
+                _events.send(
+                    Event.ShowMessage(R.string.error_no_network)
+                )
+                return@launch
+            }
+
+            addBike()
+        }
     }
 
     /**

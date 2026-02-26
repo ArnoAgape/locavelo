@@ -11,6 +11,7 @@ import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
+import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 import com.arnoagape.lokavelo.ui.utils.toPriceString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +48,8 @@ import kotlin.collections.toMutableList
 @HiltViewModel
 class EditBikeViewModel @Inject constructor(
     private val bikeRepository: BikeOwnerRepository,
-    private val geocodingRepository: GeocodingRepository
+    private val geocodingRepository: GeocodingRepository,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     private val _events = Channel<Event>(Channel.BUFFERED)
@@ -93,7 +95,12 @@ class EditBikeViewModel @Inject constructor(
             EditBikeScreenState()
         )
 
+    private var hasLoaded = false
+
     fun setBikeId(id: String) {
+        if (hasLoaded) return
+
+        hasLoaded = true
         bikeId.value = id
         observeBike()
     }
@@ -348,14 +355,27 @@ class EditBikeViewModel @Inject constructor(
     }
 
     private fun onPublishClicked() {
+
         if (!validateForm()) {
             viewModelScope.launch {
-                _events.send(Event.ShowMessage(R.string.error_invalid_form))
+                _events.send(
+                    Event.ShowMessage(R.string.error_invalid_form)
+                )
             }
             return
         }
 
-        editBike()
+        viewModelScope.launch {
+
+            if (!networkUtils.isNetworkAvailable()) {
+                _events.send(
+                    Event.ShowMessage(R.string.error_no_network)
+                )
+                return@launch
+            }
+
+            editBike()
+        }
     }
 
     private fun editBike() {
@@ -459,6 +479,17 @@ class EditBikeViewModel @Inject constructor(
         val month = (dayPriceCents * 30 * 50) / 100 // -50%
 
         return Triple(half, week, month)
+    }
+
+    fun onSaveButton(onAllowed: () -> Unit) {
+        viewModelScope.launch {
+            if (!networkUtils.isNetworkAvailable()) {
+                _events.trySend(Event.ShowMessage(R.string.error_no_network))
+                return@launch
+            }
+
+            onAllowed()
+        }
     }
 }
 

@@ -323,12 +323,15 @@ fun PhotoEditorDialog(
     // 🔄 Téléchargement si nécessaire
     LaunchedEffect(uri) {
         withContext(Dispatchers.IO) {
-            localUri = when (uri.scheme) {
-                "http", "https" -> downloadImageToCache(context, uri)
-                else -> uri
+            try {
+                localUri = ensureLocalImage(context, uri)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                localUri = null
+            } finally {
+                isLoading = false
             }
         }
-        isLoading = false
     }
 
     Dialog(
@@ -721,27 +724,33 @@ fun ZoomableImageViewer(
     }
 }
 
-suspend fun downloadImageToCache(
+suspend fun ensureLocalImage(
     context: Context,
     uri: Uri
 ): Uri = withContext(Dispatchers.IO) {
 
-    val url = URL(uri.toString())
-    val connection = url.openConnection()
-    connection.connect()
+    val inputStream = when (uri.scheme) {
+        "http", "https" -> {
+            val url = URL(uri.toString())
+            url.openStream()
+        }
 
-    val input = connection.getInputStream()
+        else -> {
+            context.contentResolver.openInputStream(uri)
+                ?: throw IllegalStateException("Cannot open input stream")
+        }
+    }
 
     val file = File(
         context.cacheDir,
-        "temp_${System.currentTimeMillis()}.jpg"
+        "local_${System.currentTimeMillis()}.jpg"
     )
 
-    FileOutputStream(file).use { output ->
-        input.copyTo(output)
+    inputStream.use { input ->
+        FileOutputStream(file).use { output ->
+            input?.copyTo(output)
+        }
     }
-
-    input.close()
 
     file.toUri()
 }

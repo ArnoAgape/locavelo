@@ -75,7 +75,7 @@
     <string name="success_bike_deleted">Vélo supprimé avec succès :)</string>
 
     // ERROR
-    <string name="error_no_network">Connecte-toi à internet</string>
+    <string name="error_no_network">Aucune connexion internet</string>
     <string name="error_generic">Une erreur est survenue</string>
     <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_bike_found">Aucun vélo trouvé</string>
