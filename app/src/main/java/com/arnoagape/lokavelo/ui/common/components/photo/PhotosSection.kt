@@ -294,6 +294,7 @@ fun PhotoEditorDialog(
     var isLoading by remember { mutableStateOf(true) }
     var isCropping by remember { mutableStateOf(false) }
     var containerWidthPx by remember { mutableFloatStateOf(0f) }
+    var containerHeightPx by remember { mutableFloatStateOf(0f) }
 
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -345,6 +346,7 @@ fun PhotoEditorDialog(
                 .background(Color.Black)
                 .onGloballyPositioned { coordinates ->
                     containerWidthPx = coordinates.size.width.toFloat()
+                    containerHeightPx = coordinates.size.height.toFloat()
                 }
         ) {
 
@@ -463,7 +465,8 @@ fun PhotoEditorDialog(
                                             scale,
                                             offset,
                                             rotation,
-                                            containerWidthPx = containerWidthPx,
+                                            containerWidthPx,
+                                            containerHeightPx
                                         )
                                     }
 
@@ -761,7 +764,8 @@ fun cropAndRotateImage(
     scale: Float,
     offset: Offset,
     rotation: Float,
-    containerWidthPx: Float
+    containerWidthPx: Float,
+    containerHeightPx: Float
 ): Uri {
 
     val original = context.contentResolver.openInputStream(uri)?.use {
@@ -819,7 +823,7 @@ fun cropAndRotateImage(
 
     val baseScale = minOf(
         containerWidthPx / bitmapWidth,
-        containerWidthPx / bitmapHeight
+        containerHeightPx / bitmapHeight
     )
 
     val effectiveScale = baseScale * scale
