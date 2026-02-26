@@ -18,10 +18,13 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -42,7 +45,6 @@ import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
 import com.arnoagape.lokavelo.domain.model.labelRes
-import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
@@ -84,14 +86,19 @@ fun DetailBikeScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
 
-            is Event.ShowMessage -> {
-                snackbarHostState.showSnackbar(
+            is DetailBikeEvent.ShowMessage -> {
+                val result = snackbarHostState.showSnackbar(
                     message = resources.getString(event.message),
+                    actionLabel = resources.getString(R.string.try_again),
+                    withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.onEditClicked(bikeId)
+                }
             }
 
-            is Event.ShowSuccessMessage -> {
+            is DetailBikeEvent.ShowSuccessMessage -> {
                 Toast.makeText(
                     context,
                     event.message,
@@ -99,13 +106,27 @@ fun DetailBikeScreen(
                 ).show()
                 onBikeDeleted()
             }
+
+            is DetailBikeEvent.NavigateToEdit -> {
+                onEditClick(event.bikeId)
+            }
         }
     }
 
     val bike = (state.bikeState as? DetailBikeUiState.Success)?.bike
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    actionColor = MaterialTheme.colorScheme.error,
+                    dismissActionContentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        },
 
         topBar = {
             TopAppBar(
@@ -118,15 +139,21 @@ fun DetailBikeScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            stringResource(R.string.cd_go_back)
+                        )
                     }
                 },
                 actions = {
                     bike?.let {
                         IconButton(
-                            onClick = { onEditClick(it.id) }
+                            onClick = { viewModel.onEditClicked(it.id) }
                         ) {
-                            Icon(Icons.Default.Edit, null)
+                            Icon(
+                                Icons.Default.Edit,
+                                stringResource(R.string.cd_edit_bike)
+                            )
                         }
 
                         IconButton(
@@ -134,7 +161,12 @@ fun DetailBikeScreen(
                                 viewModel.requestDeleteConfirmation()
                             }
                         ) {
-                            Icon(Icons.Default.Delete, null)
+                            Icon(
+                                Icons.Default.Delete,
+                                stringResource(
+                                    R.string.cd_button_delete_the_bike
+                                )
+                            )
                         }
                     }
                 }

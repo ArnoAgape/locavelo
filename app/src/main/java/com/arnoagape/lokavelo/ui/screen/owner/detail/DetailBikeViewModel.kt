@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
-import com.arnoagape.lokavelo.ui.common.Event
+import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -29,10 +29,11 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository
+    private val bikeRepository: BikeOwnerRepository,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
-    private val _events = Channel<Event>()
+    private val _events = Channel<DetailBikeEvent>()
     val eventsFlow = _events.receiveAsFlow()
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
@@ -94,7 +95,7 @@ class DetailBikeViewModel @Inject constructor(
         val bike = (bikeState.value as? DetailBikeUiState.Success)?.bike
 
         if (bike == null) {
-            _events.trySend(Event.ShowMessage(R.string.error_editing_bike))
+            _events.trySend(DetailBikeEvent.ShowMessage(R.string.error_editing_bike))
             return@launch
         }
 
@@ -103,10 +104,21 @@ class DetailBikeViewModel @Inject constructor(
         val result = bikeRepository.deleteBikes(setOf(bike.id))
 
         if (result.isSuccess) {
-            _events.trySend(Event.ShowSuccessMessage(R.string.success_bike_deleted))
+            _events.trySend(DetailBikeEvent.ShowSuccessMessage(R.string.success_bike_deleted))
         } else {
             _isDeleting.value = false
-            _events.trySend(Event.ShowMessage(R.string.error_delete_bike))
+            _events.trySend(DetailBikeEvent.ShowMessage(R.string.error_delete_bike))
+        }
+    }
+
+    fun onEditClicked(bikeId: String) {
+        viewModelScope.launch {
+            if (!networkUtils.isNetworkAvailable()) {
+                _events.send(DetailBikeEvent.ShowMessage(R.string.error_no_network))
+                return@launch
+            }
+
+            _events.send(DetailBikeEvent.NavigateToEdit(bikeId))
         }
     }
 }

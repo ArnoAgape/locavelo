@@ -134,6 +134,7 @@
     <string name="cd_remove">Clique ici pour effacer</string>
     <string name="cd_bike_preview">Aperçu du vélo</string>
     <string name="cd_go_back">Retour arrière</string>
+    <string name="cd_edit_bike">Modifier le vélo</string>
     <string name="cd_previous_picture">Photo précédente</string>
     <string name="cd_next_picture">Photo suivante</string>
     <string name="cd_close">Fermer</string>
@@ -141,6 +142,7 @@
     <string name="cd_button_add_bike">Clique ici pour ajouter un vélo à louer</string>
     <string name="cd_button_delete">Supprimer les vélos sélectionnés</string>
     <string name="cd_button_delete_bike">Supprimer un vélo</string>
+    <string name="cd_button_delete_the_bike">Supprimer le vélo</string>
 
     // CATEGORY
     <string name="bike_category_road">Vélo de route</string>

@@ -136,6 +136,7 @@
     <string name="cd_remove">Click here to erase</string>
     <string name="cd_bike_preview">Bike preview</string>
     <string name="cd_go_back">Go back</string>
+    <string name="cd_edit_bike">Edit the bike</string>
     <string name="cd_previous_picture">Previous picture</string>
     <string name="cd_next_picture">Next picture</string>
     <string name="cd_close">Close</string>
@@ -143,6 +144,7 @@
     <string name="cd_button_add_bike">Add a new bike</string>
     <string name="cd_button_delete">Delete the selected elements</string>
     <string name="cd_button_delete_bike">Delete a bike</string>
+    <string name="cd_button_delete_the_bike">Delete the bike</string>
 
     // CATEGORY
     <string name="bike_category_road">Racing bike</string>
