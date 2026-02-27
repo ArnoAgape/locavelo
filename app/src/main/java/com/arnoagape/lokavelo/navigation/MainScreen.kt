@@ -29,6 +29,7 @@ import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.main.contact.ContactScreen
 import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeScreen
 import com.arnoagape.lokavelo.ui.screen.main.home.HomeScreen
+import com.arnoagape.lokavelo.ui.screen.main.home.HomeScreenViewModel
 import com.arnoagape.lokavelo.ui.screen.main.profile.PublicProfileScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.detail.MessagingDetailScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
@@ -146,7 +147,11 @@ fun MainScreen(
             // ---------------- MAIN ----------------
 
             composable(Screen.Main.Home.route) {
-                HomeScreen()
+
+                val vm: HomeScreenViewModel = hiltViewModel()
+                HomeScreen(
+                    viewModel = vm
+                )
             }
 
             composable(Screen.Main.Contact.route) {
@@ -169,12 +174,6 @@ fun MainScreen(
 
             composable(Screen.Messaging.MessagingDetail.route) {
                 MessagingDetailScreen()
-            }
-
-            // ---------------- RENT ----------------
-
-            composable(Screen.Rent.route) {
-                RentScreen()
             }
         }
 

@@ -16,5 +16,6 @@ sealed class HomeBikeUiState {
         data class NotFound(
             @param:StringRes val messageRes: Int = R.string.error_no_bike_found
         ) : HomeBikeUiState()
+        data class Network(@param:StringRes val messageRes: Int = R.string.error_no_network): Error()
     }
 }

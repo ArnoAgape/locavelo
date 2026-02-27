@@ -188,8 +188,8 @@ class AddBikeViewModel @Inject constructor(
                 updateLocation {
                     copy(
                         street = event.address,
-                        latitude = null,
-                        longitude = null
+                        latitude = 0.0,
+                        longitude = 0.0
                     )
                 }
             }

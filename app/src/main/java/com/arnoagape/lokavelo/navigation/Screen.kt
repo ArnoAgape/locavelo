@@ -107,9 +107,4 @@ sealed interface Screen {
                 "owner_edit/$bikeId"
         }
     }
-
-    // ---------------- RENT ----------------
-    data object Rent : Screen {
-        override val route = "rent"
-    }
 }

@@ -25,7 +25,7 @@ data class BikeDto(
     val priceWeekInCents: Long? = null,
     val priceMonthInCents: Long? = null,
     val depositInCents: Long? = null,
-    val location: BikeLocation = BikeLocation(),
+    val location: BikeLocation? = null,
     val available: Boolean = true,
     val rentalStart: Instant? = null,
     val rentalEnd: Instant? = null

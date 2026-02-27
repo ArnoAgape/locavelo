@@ -164,11 +164,11 @@ fun LokaveloApp() {
 fun screenFromRoute(route: String?): Screen? {
     return when (route?.substringBefore("/")) {
 
-        Screen.Rent.route -> Screen.Rent
         Screen.Owner.HomeBike.route -> Screen.Owner.HomeBike
         Screen.Account.AccountHome.route -> Screen.Account.AccountHome
         Screen.Messaging.MessagingHome.route -> Screen.Messaging.MessagingHome
         Screen.Login.route -> Screen.Login
+        Screen.Main.Home.route -> Screen.Main.Home
 
         Screen.Owner.AddBike.route -> Screen.Owner.AddBike
 
