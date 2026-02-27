@@ -68,6 +68,8 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.TitleDescriptionS
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.lokavelo.ui.utils.createImageUri
+import com.arnoagape.lokavelo.ui.utils.vibrateError
+import com.arnoagape.lokavelo.ui.utils.vibrateSuccess
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,6 +101,7 @@ fun EditBikeScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
+                context.vibrateError()
                 val result = snackbarHostState.showSnackbar(
                     message = resources.getString(event.message),
                     actionLabel = resources.getString(R.string.try_again),
@@ -111,6 +114,7 @@ fun EditBikeScreen(
             }
 
             is Event.ShowSuccessMessage -> {
+                context.vibrateSuccess()
                 Toast.makeText(
                     context,
                     R.string.success_bike_edited,
