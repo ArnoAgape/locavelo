@@ -2,6 +2,7 @@ package com.arnoagape.lokavelo.ui.screen.main.home
 
 import android.location.Location
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -24,9 +24,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.screen.main.home.components.OSMMap
@@ -42,10 +47,14 @@ fun HomeScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
+    val userLocation by viewModel.userLocation.collectAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val context = LocalContext.current
-    val userLocation by viewModel.userLocation.collectAsState()
+
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var showAddressSheet by remember { mutableStateOf(false) }
 
@@ -78,43 +87,60 @@ fun HomeScreen(
     }
 
     if (showAddressSheet) {
+
         ModalBottomSheet(
             onDismissRequest = { showAddressSheet = false }
         ) {
-            var text by remember { mutableStateOf(state.filters.addressQuery ?: "") }
+
+            var text by remember { mutableStateOf("") }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+                keyboardController?.show()
+            }
 
             Column(Modifier.padding(16.dp)) {
 
                 OutlinedTextField(
                     value = text,
-                    onValueChange = { text = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Adresse") }
+                    onValueChange = {
+                        text = it
+                        viewModel.onAddressQueryChange(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(stringResource(R.string.city)) },
+                    singleLine = true
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
 
-                Button(
-                    onClick = {
-                        viewModel.updateAddress(text)
-                        showAddressSheet = false
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Valider")
+                state.suggestions.forEach { suggestion ->
+
+                    Text(
+                        text = suggestion.displayName,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.updateAddressFromSuggestion(suggestion)
+                                keyboardController?.hide()
+                                showAddressSheet = false
+                            }
+                            .padding(vertical = 14.dp)
+                    )
                 }
             }
         }
     }
-
-
 
     Box(Modifier.fillMaxSize()) {
 
         // 🗺 Carte
         MapContent(
             userLocation = userLocation,
-            bikes = state.filteredBikes
+            bikes = state.filteredBikes,
+            state = state
         )
 
         // 🔎 Barre + Dates
@@ -132,43 +158,13 @@ fun HomeScreen(
             )
         }
     }
-
-    // 📍 BottomSheet Adresse
-    if (showAddressSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showAddressSheet = false }
-        ) {
-            var text by remember { mutableStateOf(state.filters.addressQuery ?: "") }
-
-            Column(Modifier.padding(16.dp)) {
-
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Adresse") }
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        viewModel.updateAddress(text)
-                        showAddressSheet = false
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Valider")
-                }
-            }
-        }
-    }
 }
 
 @Composable
 fun MapContent(
     userLocation: Location?,
-    bikes: List<Bike>
+    bikes: List<Bike>,
+    state: HomeScreenState
 ) {
 
     val geoPoint = userLocation?.let {
@@ -177,7 +173,8 @@ fun MapContent(
 
     OSMMap(
         userLocation = geoPoint,
-        bikes = bikes
+        bikes = bikes,
+        filters = state.filters
     )
 
 }

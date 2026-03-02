@@ -331,10 +331,7 @@ class EditBikeViewModel @Inject constructor(
         val price = current.priceText.toCentsOrNull()
         val priceError = price == null || price <= 0
 
-        val streetError =
-            current.location.street.isBlank() ||
-                    current.location.latitude == null ||
-                    current.location.longitude == null
+        val streetError = current.location.street.isBlank()
         val postalCodeError = current.location.postalCode.isBlank()
         val cityError = current.location.city.isBlank()
 

@@ -8,19 +8,7 @@ fun isBikeMatchingFilters(
     filters: SearchFilters
 ): Boolean {
 
-    // 🔎 1. Filtre texte adresse
-    filters.addressQuery?.let { query ->
-        val normalizedQuery = query.lowercase()
-
-        val matchesAddress =
-            bike.location.street.lowercase().contains(normalizedQuery) ||
-                    bike.location.city.lowercase().contains(normalizedQuery) ||
-                    bike.title.lowercase().contains(normalizedQuery)
-
-        if (!matchesAddress) return false
-    }
-
-    // 📍 2. Filtre distance
+    // 📍 Filtre distance uniquement si activé
     if (filters.center != null && filters.maxDistanceKm != null) {
 
         val results = FloatArray(1)
