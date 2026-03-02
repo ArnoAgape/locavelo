@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.main.home
+package com.arnoagape.lokavelo.ui.screen.main.home.components
 
 import android.graphics.Paint
 import androidx.preference.PreferenceManager
@@ -94,7 +94,7 @@ fun OSMMap(
 
                 mapView.overlays.add(circle)
             }
-            println("Bikes size = ${bikes.size}")
+
             // 🚲 Vélos
             bikes.forEach { bike ->
                 val marker = Marker(mapView)
