@@ -14,3 +14,33 @@ fun calculateDiscountPercent(
         .toInt()
         .coerceIn(0, 100)
 }
+
+fun calculateTotalPrice(
+    days: Int,
+    dayPrice: Long,
+    weekPrice: Long?,
+    monthPrice: Long?
+): Long {
+
+    var remainingDays = days
+    var total = 0L
+
+    // Mois
+    if (monthPrice != null && remainingDays >= 30) {
+        val months = remainingDays / 30
+        total += months * monthPrice
+        remainingDays %= 30
+    }
+
+    // Semaines
+    if (weekPrice != null && remainingDays >= 7) {
+        val weeks = remainingDays / 7
+        total += weeks * weekPrice
+        remainingDays %= 7
+    }
+
+    // Jours restants
+    total += remainingDays * dayPrice
+
+    return total
+}
