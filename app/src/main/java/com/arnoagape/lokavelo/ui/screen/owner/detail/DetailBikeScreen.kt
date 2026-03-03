@@ -182,7 +182,7 @@ fun DetailBikeScreen(
                 .fillMaxSize()
         ) {
 
-            when (state.bikeState) {
+            when (val ui = state.bikeState) {
 
                 is DetailBikeUiState.Success, DetailBikeUiState.Idle -> {
                     DetailBikeContent(
@@ -203,9 +203,24 @@ fun DetailBikeScreen(
                     )
                 }
 
-                is DetailBikeUiState.Error -> {
+                is DetailBikeUiState.Error.Network -> {
                     ErrorOverlay(
-                        message = stringResource(R.string.error_generic)
+                        isNetworkError = ui.isNetworkError,
+                        onRetry = { viewModel.setBikeId(bikeId) }
+                    )
+                }
+
+                is DetailBikeUiState.Error.Generic -> {
+                    ErrorOverlay(
+                        isNetworkError = false,
+                        onRetry = { viewModel.setBikeId(bikeId) }
+                    )
+                }
+
+                is DetailBikeUiState.Error.NoAccount -> {
+                    ErrorOverlay(
+                        isNetworkError = false,
+                        onRetry = { viewModel.setBikeId(bikeId) }
                     )
                 }
             }

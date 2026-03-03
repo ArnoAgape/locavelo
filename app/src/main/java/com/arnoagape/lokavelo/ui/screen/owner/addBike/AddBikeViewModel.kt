@@ -96,6 +96,30 @@ class AddBikeViewModel @Inject constructor(
             false
         )
 
+    init {
+        checkInitialState()
+    }
+
+    private fun checkInitialState() {
+        viewModelScope.launch {
+
+            if (!networkUtils.isNetworkAvailable()) {
+                _state.update {
+                    it.copy(
+                        uiState = AddBikeUiState.Error.Initial(
+                            isNetworkError = true
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun retryInitialCheck() {
+        _state.update { it.copy(uiState = AddBikeUiState.Idle) }
+        checkInitialState()
+    }
+
     /**
      * Handles user actions modifying the bike or selected URIs.
      */

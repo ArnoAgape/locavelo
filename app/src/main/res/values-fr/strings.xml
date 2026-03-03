@@ -108,6 +108,7 @@
     <string name="edit">Modifier</string>
     <string name="save">Sauvegarder</string>
     <string name="validate">Valider</string>
+    <string name="retry">Réessayer</string>
     <string name="or">ou</string>
     <string name="try_again">Réessayer</string>
     <string name="publishing">Publication en cours…</string>

@@ -107,7 +107,28 @@ class EditBikeViewModel @Inject constructor(
 
     private fun observeBike() {
         viewModelScope.launch {
-            bikeFlow.firstOrNull()?.let { bike ->
+
+            _state.update {
+                it.copy(uiState = EditBikeUiState.Loading)
+            }
+
+            runCatching {
+                bikeFlow.firstOrNull()
+            }.onSuccess { bike ->
+
+                if (bike == null) {
+
+                    _state.update {
+                        it.copy(
+                            uiState = EditBikeUiState.Error.Initial(
+                                isNetworkError = !networkUtils.isNetworkAvailable()
+                            )
+                        )
+                    }
+
+                    return@onSuccess
+                }
+
                 _state.update {
                     it.copy(
                         uiState = EditBikeUiState.Loaded(bike),
@@ -116,6 +137,16 @@ class EditBikeViewModel @Inject constructor(
                             PhotoItem.Remote(id = url, url = url)
                         },
                         isFormInitialized = true
+                    )
+                }
+
+            }.onFailure {
+
+                _state.update {
+                    it.copy(
+                        uiState = EditBikeUiState.Error.Initial(
+                            isNetworkError = !networkUtils.isNetworkAvailable()
+                        )
                     )
                 }
             }

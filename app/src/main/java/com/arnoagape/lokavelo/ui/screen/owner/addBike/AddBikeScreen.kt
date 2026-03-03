@@ -152,14 +152,18 @@ fun AddBikeScreen(
         },
 
         bottomBar = {
-            PublishButton(
-                enabled = true,
-                onClick = {
-                    viewModel.onAction(AddBikeEvent.Submit)
-                },
-                isLoading = state.isSaving,
-                submitText = stringResource(R.string.add_bike_button)
-            )
+            if (state.uiState !is AddBikeUiState.Error.Initial &&
+                state.uiState !is AddBikeUiState.Loading
+            ) {
+                PublishButton(
+                    enabled = true,
+                    onClick = {
+                        viewModel.onAction(AddBikeEvent.Submit)
+                    },
+                    isLoading = state.isSaving,
+                    submitText = stringResource(R.string.add_bike_button)
+                )
+            }
         }
 
     ) { padding ->
@@ -170,27 +174,28 @@ fun AddBikeScreen(
                 .consumeWindowInsets(padding)
                 .fillMaxSize()
         ) {
+            when (val ui = state.uiState) {
 
-            // 🎯 CONTENU PRINCIPAL
-            AddBikeContent(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                onAction = viewModel::onAction,
-                onMovePhoto = viewModel::movePhoto,
-                suggestions = state.suggestions,
-                onSuggestionSelected = viewModel::onSuggestionSelected
-            )
+                is AddBikeUiState.Error.Initial -> {
+                    ErrorOverlay(
+                        isNetworkError = ui.isNetworkError,
+                        onRetry = { viewModel.retryInitialCheck() }
+                    )
+                }
 
-            // 🎯 OVERLAY LOADING / SUBMIT
-            if (state.uiState is AddBikeUiState.Loading) {
-                LoadingOverlay(text = stringResource(R.string.loading))
-            }
+                is AddBikeUiState.Loading -> {
+                    LoadingOverlay(text = stringResource(R.string.loading))
+                }
 
-            // 🎯 ERREUR PLEIN ÉCRAN
-            if (state.uiState is AddBikeUiState.Error) {
-                ErrorOverlay(
-                    message = stringResource(R.string.error_generic)
-                )
+                else ->
+                    AddBikeContent(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state,
+                        onAction = viewModel::onAction,
+                        onMovePhoto = viewModel::movePhoto,
+                        suggestions = state.suggestions,
+                        onSuggestionSelected = viewModel::onSuggestionSelected
+                    )
             }
         }
 

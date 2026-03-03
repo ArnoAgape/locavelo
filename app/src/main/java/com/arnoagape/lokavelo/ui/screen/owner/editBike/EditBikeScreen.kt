@@ -56,7 +56,6 @@ import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.AlertDialogNonSaved
-import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.CharacteristicsSection
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.DepositSection
@@ -161,14 +160,18 @@ fun EditBikeScreen(
         },
 
         bottomBar = {
-            PublishButton(
-                enabled = !state.isSaving,
-                onClick = {
-                    viewModel.onAction(EditBikeEvent.Submit)
-                },
-                isLoading = state.isSaving,
-                submitText = stringResource(R.string.edit_bike_button)
-            )
+            if (state.uiState !is EditBikeUiState.Error.Initial &&
+                state.uiState !is EditBikeUiState.Loading
+            ) {
+                PublishButton(
+                    enabled = !state.isSaving,
+                    onClick = {
+                        viewModel.onAction(EditBikeEvent.Submit)
+                    },
+                    isLoading = state.isSaving,
+                    submitText = stringResource(R.string.edit_bike_button)
+                )
+            }
         }
 
     ) { padding ->
@@ -180,26 +183,24 @@ fun EditBikeScreen(
                 .fillMaxSize()
         ) {
 
-            // 🎯 CONTENU PRINCIPAL
-            EditBikeContent(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                onAction = viewModel::onAction,
-                onMovePhoto = viewModel::movePhoto,
-                suggestions = state.suggestions,
-                onSuggestionSelected = viewModel::onSuggestionSelected
-            )
+            when (state.uiState) {
 
-            // 🎯 OVERLAY LOADING / SUBMIT
-            if (state.uiState is EditBikeUiState.Loading) {
-                LoadingOverlay(text = stringResource(R.string.loading))
-            }
+                is EditBikeUiState.Loaded -> {
+                    EditBikeContent(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state,
+                        onAction = viewModel::onAction,
+                        onMovePhoto = viewModel::movePhoto,
+                        suggestions = state.suggestions,
+                        onSuggestionSelected = viewModel::onSuggestionSelected
+                    )
+                }
 
-            // 🎯 ERREUR PLEIN ÉCRAN
-            if (state.uiState is EditBikeUiState.Error) {
-                ErrorOverlay(
-                    message = stringResource(R.string.error_generic)
-                )
+                is EditBikeUiState.Loading -> {
+                    LoadingOverlay(text = stringResource(R.string.loading))
+                }
+
+                else -> Unit
             }
         }
 

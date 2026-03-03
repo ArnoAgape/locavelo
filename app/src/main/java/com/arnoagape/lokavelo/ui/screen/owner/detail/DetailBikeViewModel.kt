@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
-import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -29,8 +28,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository,
-    private val networkUtils: NetworkUtils
+    private val bikeRepository: BikeOwnerRepository
 ) : ViewModel() {
 
     private val _events = Channel<DetailBikeEvent>()
@@ -113,11 +111,6 @@ class DetailBikeViewModel @Inject constructor(
 
     fun onEditClicked(bikeId: String) {
         viewModelScope.launch {
-            if (!networkUtils.isNetworkAvailable()) {
-                _events.send(DetailBikeEvent.ShowMessage(R.string.error_no_network))
-                return@launch
-            }
-
             _events.send(DetailBikeEvent.NavigateToEdit(bikeId))
         }
     }

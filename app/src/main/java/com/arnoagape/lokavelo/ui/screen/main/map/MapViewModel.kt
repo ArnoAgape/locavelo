@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class MapViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val geocodingRepository: GeocodingRepository,
     bikeRepository: BikeOwnerRepository,

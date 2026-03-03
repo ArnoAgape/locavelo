@@ -50,8 +50,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen(
-    viewModel: HomeScreenViewModel
+fun MapScreen(
+    viewModel: MapViewModel
 ) {
 
     val state by viewModel.state.collectAsState()
