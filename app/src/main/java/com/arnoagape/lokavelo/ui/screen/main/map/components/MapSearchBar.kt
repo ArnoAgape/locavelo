@@ -46,6 +46,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -233,11 +234,13 @@ fun SearchBar(
                     showModeToggle = false,
                     title = {},
                     headline = {
+
                         val startMillis = datePickerState.selectedStartDateMillis
                         val endMillis = datePickerState.selectedEndDateMillis
 
                         val headerText =
                             if (startMillis != null && endMillis != null) {
+
                                 val start = Instant.ofEpochMilli(startMillis)
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
@@ -246,10 +249,15 @@ fun SearchBar(
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
 
-                                "${start.format(DateTimeFormatter.ofPattern("d MMM"))} - " +
-                                        end.format(DateTimeFormatter.ofPattern("d MMM"))
+                                val days = ChronoUnit.DAYS
+                                    .between(start, end)
+                                    .toInt()
+                                    .coerceAtLeast(1)
+
+                                "$days ${if (days == 1) "jour" else "jours"}"
+
                             } else {
-                                stringResource(R.string.pick_dates)
+                                stringResource(R.string.period)
                             }
 
                         Text(

@@ -34,6 +34,7 @@
     <string name="description">Description</string>
     <string name="location">Location</string>
     <string name="pricing">Pricing</string>
+    <string name="price_per_day">%1$s / day</string>
     <string name="pricing_day_amount">Daily rate (€)</string>
     <string name="pricing_half_day_amount">Price for half a day (€)</string>
     <string name="pricing_week_amount">Price for a week (€)</string>
@@ -42,6 +43,7 @@
     <string name="pricing_half_day">1 half day</string>
     <string name="pricing_week">1 week</string>
     <string name="pricing_month">1 month</string>
+    <string name="price_total">%1$s total</string>
     <string name="discount">Discount: %1$d%%</string>
     <string name="deposit">Deposit</string>
     <string name="deposit_amount">Deposit amount (€)</string>
@@ -117,7 +119,6 @@
     <string name="add_picture">Add picture</string>
     <string name="remove_picture">Remove picture</string>
     <string name="press_again_exit">Press again to exit the app</string>
-    <string name="pick_dates">When are you cycling?</string>
 
     // CONFIRM ACTIONS
     <string name="action_delete_account">Delete account</string>

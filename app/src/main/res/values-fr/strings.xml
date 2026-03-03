@@ -34,6 +34,7 @@
     <string name="description">Description</string>
     <string name="location">Adresse</string>
     <string name="pricing">Tarifs</string>
+    <string name="price_per_day">%1$s / jour</string>
     <string name="pricing_day_amount">Tarif par jour (€)</string>
     <string name="pricing_half_day_amount">Tarif demi-journée (€)</string>
     <string name="pricing_week_amount">Tarif semaine (€)</string>
@@ -42,6 +43,7 @@
     <string name="pricing_half_day">1 demi-journée</string>
     <string name="pricing_week">1 semaine</string>
     <string name="pricing_month">1 mois</string>
+    <string name="price_total">%1$s au total</string>
     <string name="discount">Réduction : %1$d %%</string>
     <string name="deposit">Caution</string>
     <string name="deposit_amount">Montant de la caution (€)</string>
@@ -117,7 +119,6 @@
     <string name="add_picture">Ajouter une photo</string>
     <string name="remove_picture">Supprimer</string>
     <string name="press_again_exit">Appuie à nouveau pour quitter</string>
-    <string name="pick_dates">Tu veux pédaler de quand à quand ?</string>
 
     // CONFIRM ACTIONS
     <string name="action_delete_account">Supprimer le compte</string>

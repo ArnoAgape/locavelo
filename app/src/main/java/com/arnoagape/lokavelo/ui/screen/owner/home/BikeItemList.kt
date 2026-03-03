@@ -124,7 +124,10 @@ fun BikeItemRow(
             }
 
             Text(
-                text = formattedPrice,
+                text = stringResource(
+                    R.string.price_per_day,
+                    formattedPrice
+                ),
                 style = MaterialTheme.typography.bodyMedium
             )
 
