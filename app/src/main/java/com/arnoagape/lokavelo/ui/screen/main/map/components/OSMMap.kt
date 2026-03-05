@@ -231,6 +231,8 @@ fun OSMMap(
 
                     bikeMarkers = newMarkers
                     lastBikes = bikes
+
+                    mapView.invalidate()
                 }
             }
         )

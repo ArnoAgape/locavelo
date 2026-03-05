@@ -161,7 +161,7 @@ fun AddBikeScreen(
                         viewModel.onAction(AddBikeEvent.Submit)
                     },
                     isLoading = state.isSaving,
-                    submitText = stringResource(R.string.add_bike_button)
+                    submitText = stringResource(R.string.button_add_bike)
                 )
             }
         }

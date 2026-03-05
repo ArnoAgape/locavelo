@@ -169,7 +169,7 @@ fun EditBikeScreen(
                         viewModel.onAction(EditBikeEvent.Submit)
                     },
                     isLoading = state.isSaving,
-                    submitText = stringResource(R.string.edit_bike_button)
+                    submitText = stringResource(R.string.button_edit_bike)
                 )
             }
         }

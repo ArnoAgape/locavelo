@@ -10,8 +10,9 @@
     <string name="account">Compte</string>
 
     // BOTTOM BAR
-    <string name="add_bike_button">Ajouter</string>
-    <string name="edit_bike_button">Sauvegarder</string>
+    <string name="button_add_bike">Ajouter</string>
+    <string name="button_edit_bike">Sauvegarder</string>
+    <string name="button_contact">Contacter</string>
 
     // SUBTITLE
     <string name="subtitle_add_3_pictures">Ajoute jusqu’à 3 photos</string>
@@ -33,16 +34,19 @@
     <string name="title">Titre</string>
     <string name="description">Description</string>
     <string name="location">Adresse</string>
+    <string name="service_fee_percent">Frais de service (%1$s %%)</string>
+    <string name="total_price_ttc">Montant total TTC</string>
+    <string name="price_details">Détail du prix</string>
     <string name="pricing">Tarifs</string>
     <string name="price_per_day">%1$s / jour</string>
     <string name="pricing_day_amount">Tarif par jour (€)</string>
     <string name="pricing_half_day_amount">Tarif demi-journée (€)</string>
     <string name="pricing_week_amount">Tarif semaine (€)</string>
     <string name="pricing_month_amount">Tarif mois (€)</string>
-    <string name="pricing_day">1 jour</string>
-    <string name="pricing_half_day">1 demi-journée</string>
-    <string name="pricing_week">1 semaine</string>
-    <string name="pricing_month">1 mois</string>
+    <string name="pricing_day">Journée</string>
+    <string name="pricing_half_day">Demi-journée</string>
+    <string name="pricing_week">Semaine</string>
+    <string name="pricing_month">Mois</string>
     <string name="price_total">%1$s au total</string>
     <string name="discount">Réduction : %1$d %%</string>
     <string name="deposit">Caution</string>
@@ -109,6 +113,7 @@
     <string name="delete">Supprimer</string>
     <string name="edit">Modifier</string>
     <string name="save">Sauvegarder</string>
+    <string name="contact">Contacter</string>
     <string name="validate">Valider</string>
     <string name="retry">Réessayer</string>
     <string name="or">ou</string>
@@ -119,6 +124,7 @@
     <string name="add_picture">Ajouter une photo</string>
     <string name="remove_picture">Supprimer</string>
     <string name="press_again_exit">Appuie à nouveau pour quitter</string>
+    <string name="select_dates">Choisis les dates</string>
 
     // CONFIRM ACTIONS
     <string name="action_delete_account">Supprimer le compte</string>

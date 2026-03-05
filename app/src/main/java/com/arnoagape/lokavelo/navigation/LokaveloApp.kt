@@ -30,6 +30,8 @@ import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeViewModel
+import java.time.Instant
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,17 +160,46 @@ fun LokaveloApp() {
         composable(
             route = Screen.Main.DetailPublicBike.route,
             arguments = listOf(
-                navArgument("bikeId") { type = NavType.StringType }
+                navArgument("bikeId") { type = NavType.StringType },
+                navArgument("start") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                },
+                navArgument("end") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
             )
         ) { backStackEntry ->
 
             val bikeId = backStackEntry.arguments?.getString("bikeId")!!
+
+            val startMillis = backStackEntry.arguments?.getLong("start") ?: -1L
+            val endMillis = backStackEntry.arguments?.getLong("end") ?: -1L
+
+            val startDate =
+                startMillis.takeIf { it > 0 }?.let {
+                    Instant.ofEpochMilli(it)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                }
+
+            val endDate =
+                endMillis.takeIf { it > 0 }?.let {
+                    Instant.ofEpochMilli(it)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                }
+
             val vm: DetailPublicBikeViewModel = hiltViewModel()
 
             DetailPublicBikeScreen(
                 bikeId = bikeId,
                 viewModel = vm,
-                onBack = { navController.popBackStack() }
+                startDate = startDate,
+                endDate = endDate,
+                onBack = { navController.popBackStack() },
+                onContactClick = { /* TODO */ }
             )
         }
 

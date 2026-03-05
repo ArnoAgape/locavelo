@@ -51,10 +51,19 @@ sealed interface Screen {
         }
 
         data object DetailPublicBike : Main {
-            override val route = "main_detail_public/{bikeId}"
+            override val route =
+                "main_detail_public/{bikeId}?start={start}&end={end}"
 
-            fun createRoute(bikeId: String): String =
-                "main_detail_public/$bikeId"
+            fun createRoute(
+                bikeId: String,
+                start: Long?,
+                end: Long?
+            ): String {
+                val startParam = start ?: -1
+                val endParam = end ?: -1
+
+                return "main_detail_public/$bikeId?start=$startParam&end=$endParam"
+            }
         }
 
         data object PublicProfile : Main {

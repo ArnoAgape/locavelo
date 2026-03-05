@@ -10,8 +10,9 @@
     <string name="account">Account</string>
 
     // BOTTOM BAR
-    <string name="add_bike_button">Add</string>
-    <string name="edit_bike_button">Save</string>
+    <string name="button_add_bike">Add</string>
+    <string name="button_edit_bike">Save</string>
+    <string name="button_contact">Contact</string>
 
     // SUBTITLE
     <string name="subtitle_add_3_pictures">Add up to 3 pictures</string>
@@ -33,16 +34,19 @@
     <string name="title">Title</string>
     <string name="description">Description</string>
     <string name="location">Location</string>
+    <string name="service_fee_percent">Service fees (%1$s %%)</string>
+    <string name="total_price_ttc">Total price incl. tax</string>
+    <string name="price_details">Price details</string>
     <string name="pricing">Pricing</string>
     <string name="price_per_day">%1$s / day</string>
     <string name="pricing_day_amount">Daily rate (€)</string>
     <string name="pricing_half_day_amount">Price for half a day (€)</string>
     <string name="pricing_week_amount">Price for a week (€)</string>
     <string name="pricing_month_amount">Price for a month (€)</string>
-    <string name="pricing_day">1 day</string>
-    <string name="pricing_half_day">1 half day</string>
-    <string name="pricing_week">1 week</string>
-    <string name="pricing_month">1 month</string>
+    <string name="pricing_day">Day</string>
+    <string name="pricing_half_day">Half day</string>
+    <string name="pricing_week">Week</string>
+    <string name="pricing_month">Month</string>
     <string name="price_total">%1$s total</string>
     <string name="discount">Discount: %1$d%%</string>
     <string name="deposit">Deposit</string>
@@ -109,6 +113,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="save">Save</string>
+    <string name="contact">Contact</string>
     <string name="validate">Validate</string>
     <string name="retry">Retry</string>
     <string name="or">or</string>
@@ -119,6 +124,7 @@
     <string name="add_picture">Add picture</string>
     <string name="remove_picture">Remove picture</string>
     <string name="press_again_exit">Press again to exit the app</string>
+    <string name="select_dates">Select dates</string>
 
     // CONFIRM ACTIONS
     <string name="action_delete_account">Delete account</string>

@@ -39,7 +39,7 @@ fun PublishButton(
         } else {
             Text(
                 text = submitText,
-                fontSize = 15.sp
+                fontSize = 20.sp
             )
         }
     }

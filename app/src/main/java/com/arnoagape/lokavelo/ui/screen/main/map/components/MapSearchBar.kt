@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arnoagape.lokavelo.R
+import com.arnoagape.lokavelo.ui.common.components.DateRangePickerDialog
 import com.arnoagape.lokavelo.ui.screen.main.map.SearchFilters
 import java.time.Instant
 import java.time.LocalDate
@@ -118,8 +119,8 @@ fun SearchBar(
 
                 if (filters.startDate != null && filters.endDate != null) {
 
-                    val start = filters.startDate.toLocalDate()
-                    val end = filters.endDate.toLocalDate()
+                    val start = filters.startDate
+                    val end = filters.endDate
 
                     Column {
 
@@ -177,105 +178,12 @@ fun SearchBar(
 
     if (showDatePicker) {
 
-        val todayUtcMillis = LocalDate.now()
-            .atStartOfDay(ZoneId.of("UTC"))
-            .toInstant()
-            .toEpochMilli()
-
-        val datePickerState = rememberDateRangePickerState(
-            selectableDates = object : SelectableDates {
-
-                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return utcTimeMillis >= todayUtcMillis
-                }
+        DateRangePickerDialog(
+            onDismiss = { showDatePicker = false },
+            onDatesSelected = { start, end ->
+                onDatesSelected(start, end)
+                showDatePicker = false
             }
         )
-
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val startMillis = datePickerState.selectedStartDateMillis
-                        val endMillis = datePickerState.selectedEndDateMillis
-
-                        if (startMillis != null && endMillis != null) {
-
-                            val start = Instant.ofEpochMilli(startMillis)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-
-                            val end = Instant.ofEpochMilli(endMillis)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-
-                            onDatesSelected(start, end)
-                        }
-
-                        showDatePicker = false
-                    }
-                ) {
-                    Text(stringResource(R.string.validate))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showDatePicker = false }
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        ) {
-
-            Column {
-
-                DateRangePicker(
-                    state = datePickerState,
-                    showModeToggle = false,
-                    title = {},
-                    headline = {
-
-                        val startMillis = datePickerState.selectedStartDateMillis
-                        val endMillis = datePickerState.selectedEndDateMillis
-
-                        val headerText =
-                            if (startMillis != null && endMillis != null) {
-
-                                val start = Instant.ofEpochMilli(startMillis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-
-                                val end = Instant.ofEpochMilli(endMillis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-
-                                val days = ChronoUnit.DAYS
-                                    .between(start, end)
-                                    .toInt()
-                                    .coerceAtLeast(1)
-
-                                "$days ${if (days == 1) "jour" else "jours"}"
-
-                            } else {
-                                stringResource(R.string.period)
-                            }
-
-                        Text(
-                            text = headerText,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1
-                        )
-                    },
-                    colors = DatePickerDefaults.colors(
-                        selectedDayContainerColor =
-                            MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-        }
     }
 }

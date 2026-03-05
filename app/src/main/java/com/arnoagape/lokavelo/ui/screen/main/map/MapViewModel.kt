@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import org.osmdroid.util.GeoPoint
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -95,8 +95,8 @@ class MapViewModel @Inject constructor(
                     maxOf(
                         1,
                         ChronoUnit.DAYS.between(
-                            filters.startDate.toLocalDate(),
-                            filters.endDate.toLocalDate()
+                            filters.startDate,
+                            filters.endDate
                         )
                     )
                 } else {
@@ -151,7 +151,7 @@ class MapViewModel @Inject constructor(
         _addressQuery.value = ""
     }
 
-    fun updateDates(start: LocalDateTime?, end: LocalDateTime?) {
+    fun updateDates(start: LocalDate, end: LocalDate) {
         _filters.value = _filters.value.copy(
             startDate = start,
             endDate = end
@@ -170,8 +170,8 @@ data class SearchFilters(
     val addressQuery: String? = null,
     val center: GeoPoint? = null,
     val maxDistanceKm: Double? = null,
-    val startDate: LocalDateTime? = null,
-    val endDate: LocalDateTime? = null
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null
 )
 
 data class HomeScreenState(

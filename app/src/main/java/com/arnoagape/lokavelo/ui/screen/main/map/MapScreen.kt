@@ -47,12 +47,13 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.AddressLineField
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    onBikeClick: (String) -> Unit
+    onBikeClick: (String, LocalDate?, LocalDate?) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -191,10 +192,7 @@ fun MapScreen(
                 filters = state.filters,
                 onAddressClick = { showAddressSheet = true },
                 onDatesSelected = { start, end ->
-                    viewModel.updateDates(
-                        start.atStartOfDay(),
-                        end.atStartOfDay()
-                    )
+                    viewModel.updateDates(start, end)
                 }
             )
 
@@ -228,7 +226,11 @@ fun MapScreen(
                 bike = bike,
                 filters = state.filters,
                 onBikeClick = {
-                    onBikeClick(bike.id)
+                    onBikeClick(
+                        bike.id,
+                        state.filters.startDate,
+                        state.filters.endDate
+                    )
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

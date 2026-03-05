@@ -1,35 +1,33 @@
 package com.arnoagape.lokavelo.ui.screen.main.detail
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,34 +39,44 @@ import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
+import com.arnoagape.lokavelo.domain.model.User
+import com.arnoagape.lokavelo.domain.model.labelRes
+import com.arnoagape.lokavelo.ui.common.components.DateRangePickerDialog
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
-import com.arnoagape.lokavelo.ui.screen.main.detail.sections.BikeSpecsCard
-import com.arnoagape.lokavelo.ui.screen.main.detail.sections.DescriptionCard
 import com.arnoagape.lokavelo.ui.screen.main.detail.sections.OwnerCard
-import com.arnoagape.lokavelo.ui.screen.main.detail.sections.PriceTableCard
+import com.arnoagape.lokavelo.ui.screen.main.detail.sections.PriceBreakdownCard
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
+import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.AccessoriesRow
+import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailCard
+import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailRow
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
-import com.arnoagape.lokavelo.ui.utils.toPriceString
+import com.arnoagape.lokavelo.ui.utils.toEuroString
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailPublicBikeScreen(
     bikeId: String,
     viewModel: DetailPublicBikeViewModel,
-    onBack: () -> Unit
+    startDate: LocalDate?,
+    endDate: LocalDate?,
+    onBack: () -> Unit,
+    onContactClick: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(bikeId) {
         viewModel.setBikeId(bikeId)
+        viewModel.setInitialDates(startDate, endDate)
+        Log.d("DETAIL_STATE", "stateStart=${state.startDate} stateEnd=${state.endDate}")
     }
 
     Scaffold(
-
         topBar = {
             TopAppBar(
                 title = {
@@ -90,31 +98,12 @@ fun DetailPublicBikeScreen(
         },
 
         bottomBar = {
-
-            Surface(
-                tonalElevation = 4.dp
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        text = state.bike?.priceInCents?.toPriceString() ?: "",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Button(
-                        onClick = { /* contacter */ }
-                    ) {
-                        Text("Contacter")
-                    }
-                }
-            }
+            PublishButton(
+                enabled = true,
+                onClick = onContactClick,
+                isLoading = false,
+                submitText = stringResource(R.string.button_contact)
+            )
         }
 
     ) { padding ->
@@ -143,6 +132,9 @@ fun DetailPublicBikeScreen(
                 else -> {
                     DetailPublicBikeContent(
                         modifier = Modifier.fillMaxSize(),
+                        onDatesSelected = { start, end ->
+                            viewModel.updateDates(start, end)
+                        },
                         state = state
                     )
                 }
@@ -154,10 +146,23 @@ fun DetailPublicBikeScreen(
 @Composable
 fun DetailPublicBikeContent(
     modifier: Modifier = Modifier,
+    onDatesSelected: (LocalDate, LocalDate) -> Unit,
     state: DetailPublicBikeState
 ) {
 
     val spacing = LocalSpacing.current
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+
+        DateRangePickerDialog(
+            onDismiss = { showDatePicker = false },
+            onDatesSelected = { start, end ->
+                onDatesSelected(start, end)
+                showDatePicker = false
+            }
+        )
+    }
 
     LazyColumn(
         modifier = modifier
@@ -169,81 +174,184 @@ fun DetailPublicBikeContent(
         ),
         verticalArrangement = Arrangement.spacedBy(spacing.large)
     ) {
+        item { Spacer(modifier = Modifier.height(spacing.extraSmall)) }
 
-        // Images
-        item {
-
-            PhotosContent(
-                photos = state.bike?.photoUrls?.map { url ->
-                    PhotoItem.Remote(
-                        id = url,
-                        url = url
+        state.bike?.let { bike ->
+            // Images
+            item {
+                DetailCard(title = stringResource(R.string.pictures)) {
+                    PhotosContent(
+                        photos = state.bike.photoUrls.map { url ->
+                            PhotoItem.Remote(
+                                id = url,
+                                url = url
+                            )
+                        },
+                        onAddPhotoClick = {},
+                        onRemovePhoto = {},
+                        onPhotoEdited = { _, _ -> },
+                        onMovePhoto = { _, _ -> },
+                        isEditable = false
                     )
-                } ?: emptyList(),
-                onAddPhotoClick = {},
-                onRemovePhoto = {},
-                onPhotoEdited = { _, _ -> },
-                onMovePhoto = { _, _ -> },
-                isEditable = false
-            )
-        }
+                }
+            }
 
-        // Title / Price / City
-        item {
-
-            Card(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            ) {
-
-                Column(
-                    Modifier.padding(16.dp)
-                ) {
+            // Title / Price / City
+            item {
+                DetailCard {
 
                     Text(
-                        state.bike?.title ?: "",
+                        bike.title,
                         style = MaterialTheme.typography.titleLarge
                     )
 
-                    Spacer(Modifier.height(8.dp))
-
                     Text(
-                        "${state.bike?.location?.city} ${state.bike?.location?.postalCode}",
+                        "${state.bike.location.city} ${bike.location.postalCode}",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(2.dp))
 
                     Text(
-                        "${state.bike?.priceInCents} / jour",
-                        style = MaterialTheme.typography.titleMedium,
+                        stringResource(
+                            R.string.price_per_day,
+                            bike.priceInCents.toEuroString()
+                        ),
+                        style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
-        }
 
-        // Owner
-        item {
-            state.owner?.let {
-                OwnerCard(it)
+            // Description
+            item {
+                DetailCard(stringResource(R.string.description)) {
+                    Text(
+                        text = bike.description,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
-        }
 
-        // Characteristics
-        item {
-            BikeSpecsCard(state.bike!!)
-        }
+            // Owner
+            item {
+                DetailCard {
+                    state.owner?.let {
+                        OwnerCard(it)
+                    }
+                }
+            }
 
-        // Description
-        item {
-            DescriptionCard(state.bike?.description ?: "")
-        }
+            // Characteristics
+            item {
+                DetailCard(title = stringResource(R.string.characteristics)) {
 
-        // Pricing
-        item {
-            PriceTableCard(state.bike!!)
+                    // Category
+                    DetailRow(
+                        label = stringResource(R.string.category),
+                        value = bike.category?.let { stringResource(it.labelRes()) } ?: ""
+                    )
+
+                    // Electric
+                    DetailRow(
+                        label = stringResource(R.string.electric_bike),
+                        value = if (bike.electric)
+                            stringResource(R.string.yes)
+                        else
+                            stringResource(R.string.no)
+                    )
+
+                    // Brand
+                    DetailRow(
+                        label = stringResource(R.string.brand),
+                        value = bike.brand
+                    )
+
+                    // Condition
+                    DetailRow(
+                        label = stringResource(R.string.condition),
+                        value = bike.condition?.let { stringResource(it.labelRes()) } ?: ""
+                    )
+
+                    // Accessories
+                    if (bike.accessories.isNotEmpty()) {
+                        AccessoriesRow(
+                            label = stringResource(R.string.accessories),
+                            accessories = bike.accessories
+                        )
+                    }
+                }
+            }
+
+            // Address
+            item {
+                DetailCard(title = stringResource(R.string.location)) {
+                    DetailRow(stringResource(R.string.address_line), bike.location.street)
+                    DetailRow(stringResource(R.string.zip_code), bike.location.postalCode)
+                    DetailRow(stringResource(R.string.city), bike.location.city)
+                }
+            }
+
+            item {
+                // Dates
+                DetailCard(title = stringResource(R.string.period)) {
+
+                    if (state.startDate != null && state.endDate != null) {
+
+                        DetailRow(
+                            label = stringResource(R.string.period),
+                            value = "${state.startDate} - ${state.endDate}"
+                        )
+
+                    } else {
+
+                        Text(
+                            text = stringResource(R.string.period),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                showDatePicker = true
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Pricing
+            item {
+                DetailCard(title = stringResource(R.string.pricing)) {
+
+                    Text(
+                        text = stringResource(
+                            R.string.price_per_day,
+                            bike.priceInCents.toEuroString()
+                        ),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    if (state.startDate != null && state.endDate != null) {
+
+                        PriceBreakdownCard(
+                            pricePerDayInCents = bike.priceInCents,
+                            startDate = state.startDate,
+                            endDate = state.endDate
+                        )
+
+                    } else {
+
+                        Text(
+                            (stringResource(R.string.select_dates)),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                showDatePicker = true
+                            }
+                        )
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(spacing.extraSmall)) }
         }
     }
 }
@@ -277,11 +385,16 @@ private fun DetailPublicBikeScreenPreview() {
             )
 
         val previewState = DetailPublicBikeState(
-            bike = fakeBike
+            bike = fakeBike,
+            owner = User(
+                displayName = "John Doe",
+                bio = "I love cycling :)"
+            )
         )
 
         DetailPublicBikeContent(
-            state = previewState
+            state = previewState,
+            onDatesSelected = { _, _ -> }
         )
     }
 }

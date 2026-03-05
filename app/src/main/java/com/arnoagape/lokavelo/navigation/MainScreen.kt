@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -32,6 +33,7 @@ import com.arnoagape.lokavelo.ui.screen.messaging.detail.MessagingDetailScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
+import java.time.ZoneId
 
 @Composable
 fun MainScreen(
@@ -146,13 +148,30 @@ fun MainScreen(
             composable(Screen.Main.Map.route) {
 
                 val vm: MapViewModel = hiltViewModel()
+                val state by vm.state.collectAsState()
+
                 MapScreen(
                     viewModel = vm,
-                    onBikeClick = { bikeId ->
+                    onBikeClick = { bikeId, startDate, endDate ->
+
+                        val start = startDate
+                            ?.atStartOfDay(ZoneId.systemDefault())
+                            ?.toInstant()
+                            ?.toEpochMilli()
+
+                        val end = endDate
+                            ?.atStartOfDay(ZoneId.systemDefault())
+                            ?.toInstant()
+                            ?.toEpochMilli()
+
                         rootNavController.navigate(
-                            Screen.Main.DetailPublicBike.createRoute(bikeId)
+                            Screen.Main.DetailPublicBike.createRoute(
+                                bikeId,
+                                start,
+                                end
+                            )
                         )
-                    },
+                    }
                 )
             }
 

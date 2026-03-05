@@ -47,8 +47,8 @@ fun BikePreviewCard(
 
     } else {
 
-        val start = filters.startDate.toLocalDate()
-        val end = filters.endDate.toLocalDate()
+        val start = filters.startDate
+        val end = filters.endDate
         val days = ChronoUnit.DAYS
             .between(start, end)
             .toInt()
