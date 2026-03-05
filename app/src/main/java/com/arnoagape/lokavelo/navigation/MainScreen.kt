@@ -25,7 +25,6 @@ import com.arnoagape.lokavelo.ui.screen.account.settings.payment.PaymentSettings
 import com.arnoagape.lokavelo.ui.screen.account.settings.version.VersionSettingsScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.main.contact.ContactScreen
-import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeScreen
 import com.arnoagape.lokavelo.ui.screen.main.map.MapScreen
 import com.arnoagape.lokavelo.ui.screen.main.map.MapViewModel
 import com.arnoagape.lokavelo.ui.screen.main.profile.PublicProfileScreen
@@ -148,16 +147,17 @@ fun MainScreen(
 
                 val vm: MapViewModel = hiltViewModel()
                 MapScreen(
-                    viewModel = vm
+                    viewModel = vm,
+                    onBikeClick = { bikeId ->
+                        rootNavController.navigate(
+                            Screen.Main.DetailPublicBike.createRoute(bikeId)
+                        )
+                    },
                 )
             }
 
             composable(Screen.Main.Contact.route) {
                 ContactScreen()
-            }
-
-            composable(Screen.Main.DetailPublicBike.route) {
-                DetailPublicBikeScreen()
             }
 
             composable(Screen.Main.PublicProfile.route) {

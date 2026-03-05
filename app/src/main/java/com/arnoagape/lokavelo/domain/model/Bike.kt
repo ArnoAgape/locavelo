@@ -24,7 +24,9 @@ data class Bike(
     val location: BikeLocation = BikeLocation(),
     val available: Boolean = true,
     val rentalStart: Instant? = null,
-    val rentalEnd: Instant? = null
+    val rentalEnd: Instant? = null,
+    val viewCount: Int = 0,
+    val favoriteCount: Int = 0
 ) {
 
     fun toDto(): BikeDto {

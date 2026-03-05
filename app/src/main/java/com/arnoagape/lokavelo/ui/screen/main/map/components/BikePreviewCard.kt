@@ -32,6 +32,7 @@ import java.time.temporal.ChronoUnit
 fun BikePreviewCard(
     bike: Bike,
     filters: SearchFilters,
+    onBikeClick: (Bike) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -67,6 +68,7 @@ fun BikePreviewCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
+        onClick = { onBikeClick(bike) },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(

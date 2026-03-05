@@ -12,6 +12,7 @@ interface UserApi {
 
     suspend fun getCurrentUser(): User?
     fun observeCurrentUser(): Flow<User?>
+    fun observeUser(userId: String): Flow<User?>
     suspend fun updateUser(user: User): Result<Unit>
     suspend fun ensureUserInFirestore(): Result<Unit>
     fun signOut(): Result<Unit>

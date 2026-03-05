@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
  */
 @Singleton
 class UserRepository @Inject constructor(private val userApi: UserApi) {
+    fun observeUser(userId: String): Flow<User?> = userApi.observeUser(userId)
     fun observeCurrentUser(): Flow<User?> = userApi.observeCurrentUser()
     suspend fun updateUser(user: User) = userApi.updateUser(user)
     suspend fun ensureUserInFirestore() = userApi.ensureUserInFirestore()

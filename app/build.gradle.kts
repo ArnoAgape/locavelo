@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.ui)
 
     // Allows API < 26
     coreLibraryDesugaring(libs.desugar.jdk.libs)

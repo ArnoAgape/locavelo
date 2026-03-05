@@ -9,7 +9,9 @@ data class User(
     val phoneNumber: String? = "",
     val email: String? = "",
     val address: String? = "",
-    val bio: String? = ""
+    val bio: String? = "",
+    val rating: Float = 0f,
+    val reviewCount: Float = 0f
 ) {
     fun toDto(): UserDto {
         return UserDto(

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
-import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.GeocodingRepository
 import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.domain.model.Bike
@@ -47,7 +47,7 @@ import kotlin.collections.toMutableList
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class EditBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository,
+    private val bikeRepository: BikeRepository,
     private val geocodingRepository: GeocodingRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
@@ -80,7 +80,7 @@ class EditBikeViewModel @Inject constructor(
         bikeId
             .filterNotNull()
             .flatMapLatest { id ->
-                bikeRepository.observeBike(id)
+                bikeRepository.observeOwnerBike(id)
             }
             .filterNotNull()
 

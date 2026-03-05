@@ -22,12 +22,12 @@ import javax.inject.Singleton
  */
 @Singleton
 @OptIn(ExperimentalCoroutinesApi::class)
-class BikeOwnerRepository @Inject constructor(
+class BikeRepository @Inject constructor(
     private val bikeApi: BikeApi,
     private val userRepository: UserRepository
 ) {
 
-    fun observeBikesForOwner(): Flow<List<Bike>> =
+    fun observeOwnerBikes(): Flow<List<Bike>> =
         userRepository.observeCurrentUser()
             .filterNotNull()
             .map { it.id }
@@ -43,16 +43,16 @@ class BikeOwnerRepository @Inject constructor(
                 throw e
             }
 
-    fun observeAllBikes(): Flow<List<Bike>> = bikeApi.observeAllBikes()
+    fun observePublicBikes(): Flow<List<Bike>> = bikeApi.observeAllBikes()
 
-    fun observeBike(bikeId: String): Flow<Bike?> =
+    fun observeOwnerBike(bikeId: String): Flow<Bike?> =
         userRepository.observeCurrentUser()
             .filterNotNull()
             .map { it.id }
             .distinctUntilChanged()
-            .flatMapLatest { ownerId ->
-                bikeApi.getBikeById(bikeId, ownerId)
-            }
+            .flatMapLatest { bikeApi.getBikeById(bikeId) }
+
+    fun observeBike(bikeId: String): Flow<Bike?> = bikeApi.observeBikeForPublic(bikeId)
 
     suspend fun editBike(localUris: List<Uri>, bike: Bike) = bikeApi.editBike(localUris, bike)
 

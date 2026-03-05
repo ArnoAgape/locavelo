@@ -4,7 +4,7 @@ import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.GeocodingRepository
 import com.arnoagape.lokavelo.data.repository.LocationRepository
 import com.arnoagape.lokavelo.domain.model.AddressSuggestion
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val geocodingRepository: GeocodingRepository,
-    bikeRepository: BikeOwnerRepository,
+    bikeRepository: BikeRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
@@ -55,7 +55,7 @@ class MapViewModel @Inject constructor(
         )
 
     private val bikesFlow: Flow<List<Bike>> =
-        bikeRepository.observeAllBikes()
+        bikeRepository.observePublicBikes()
             .map { bikes ->
                 Log.d("MAP", "All bikes size = ${bikes.size}")
                 bikes.filter {

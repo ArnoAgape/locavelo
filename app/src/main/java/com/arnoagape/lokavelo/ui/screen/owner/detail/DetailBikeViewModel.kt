@@ -3,7 +3,7 @@ package com.arnoagape.lokavelo.ui.screen.owner.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
-import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.BikeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository
+    private val bikeRepository: BikeRepository
 ) : ViewModel() {
 
     private val _events = Channel<DetailBikeEvent>()
@@ -54,7 +54,7 @@ class DetailBikeViewModel @Inject constructor(
         _bikeId
             .filterNotNull()
             .flatMapLatest { bikeId ->
-                bikeRepository.observeBike(bikeId)
+                bikeRepository.observeOwnerBike(bikeId)
             }
             .map { bike ->
 

@@ -3,7 +3,7 @@ package com.arnoagape.lokavelo.ui.screen.owner.home
 import  androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
-import com.arnoagape.lokavelo.data.repository.BikeOwnerRepository
+import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.SelectionState
@@ -31,7 +31,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeBikeViewModel @Inject constructor(
-    private val bikeRepository: BikeOwnerRepository,
+    private val bikeRepository: BikeRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
@@ -41,7 +41,7 @@ class HomeBikeViewModel @Inject constructor(
     private val _selection = MutableStateFlow(SelectionState())
     private val _isRefreshing = MutableStateFlow(false)
 
-    private val bikesFlow: Flow<List<Bike>> = bikeRepository.observeBikesForOwner()
+    private val bikesFlow: Flow<List<Bike>> = bikeRepository.observeOwnerBikes()
 
     private val _searchQuery = MutableStateFlow("")
     private val _isSearchActive = MutableStateFlow(false)

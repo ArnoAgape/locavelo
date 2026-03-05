@@ -1,16 +1,19 @@
 package com.arnoagape.lokavelo.data.service.user
 
 import android.util.Log
+import com.arnoagape.lokavelo.data.dto.UserDto
 import com.arnoagape.lokavelo.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -40,6 +43,17 @@ class FirebaseUserApi : UserApi {
      * This is a memory read and does not require a background thread.
      */
     override suspend fun getCurrentUser(): User? = auth.currentUser?.toDomain()
+
+    override fun observeUser(userId: String): Flow<User?> {
+
+        return usersCollection
+            .document(userId)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObject(UserDto::class.java)
+                    ?.let { User.fromDto(it) }
+            }
+    }
 
     /**
      * Observes authentication state changes in real time.

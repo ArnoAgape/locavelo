@@ -51,7 +51,10 @@ sealed interface Screen {
         }
 
         data object DetailPublicBike : Main {
-            override val route = "main_detail_public"
+            override val route = "main_detail_public/{bikeId}"
+
+            fun createRoute(bikeId: String): String =
+                "main_detail_public/$bikeId"
         }
 
         data object PublicProfile : Main {

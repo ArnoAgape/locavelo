@@ -51,7 +51,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel
+    viewModel: MapViewModel,
+    onBikeClick: (String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -136,7 +137,7 @@ fun MapScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // 📍 Position actuelle
+                // 📍 Current position
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -220,12 +221,15 @@ fun MapScreen(
             }
         }
 
-        // Encadré vélo
+        // Cadre velo
         selectedBike?.let { bike ->
 
             BikePreviewCard(
                 bike = bike,
                 filters = state.filters,
+                onBikeClick = {
+                    onBikeClick(bike.id)
+                },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(16.dp)

@@ -22,6 +22,8 @@ import androidx.navigation.navArgument
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.login.LoginViewModel
+import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeScreen
+import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
@@ -82,7 +84,7 @@ fun LokaveloApp() {
         startDestination = "main_graph"
     ) {
 
-        // ---------------- MAIN GRAPH (avec bottom bar) ----------------
+        // ---------------- MAIN GRAPH (with bottom bar) ----------------
 
         composable("main_graph") {
             MainScreen(
@@ -93,7 +95,7 @@ fun LokaveloApp() {
             )
         }
 
-        // ---------------- PLEIN ÉCRAN ----------------
+        // ---------------- OWNER ----------------
 
         composable(Screen.Owner.AddBike.route) {
 
@@ -150,6 +152,27 @@ fun LokaveloApp() {
                 onBack = { navController.popBackStack() }
             )
         }
+
+        // ---------------- MAIN ----------------
+
+        composable(
+            route = Screen.Main.DetailPublicBike.route,
+            arguments = listOf(
+                navArgument("bikeId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val bikeId = backStackEntry.arguments?.getString("bikeId")!!
+            val vm: DetailPublicBikeViewModel = hiltViewModel()
+
+            DetailPublicBikeScreen(
+                bikeId = bikeId,
+                viewModel = vm,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // ---------------- LOGIN ----------------
 
         composable(Screen.Login.route) {
             LoginScreen(

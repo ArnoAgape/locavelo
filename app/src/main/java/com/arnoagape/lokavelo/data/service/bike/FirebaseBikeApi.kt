@@ -50,8 +50,21 @@ class FirebaseBikeApi @Inject constructor(
     override fun observeAllBikes(): Flow<List<Bike>> {
 
         return bikesCollection
+            .whereEqualTo("available", true)
             .dataObjects<BikeDto>()
             .map { it.map(Bike::fromDto) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun observeBikeForPublic(bikeId: String): Flow<Bike?> {
+
+        return bikesCollection
+            .document(bikeId)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObject(BikeDto::class.java)
+                    ?.let { Bike.fromDto(it) }
+            }
             .flowOn(Dispatchers.IO)
     }
 
@@ -150,10 +163,7 @@ class FirebaseBikeApi @Inject constructor(
      *
      * Data collection and mapping are executed on an IO thread.
      */
-    override fun getBikeById(
-        bikeId: String,
-        userId: String
-    ): Flow<Bike?> {
+    override fun getBikeById(bikeId: String): Flow<Bike?> {
 
         return bikesCollection.document(bikeId)
             .snapshots()
