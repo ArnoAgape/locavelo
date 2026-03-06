@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
 @Composable
-fun PublishButton(
+fun SubmitButton(
     isLoading: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
@@ -39,7 +39,7 @@ fun PublishButton(
         } else {
             Text(
                 text = submitText,
-                fontSize = 20.sp
+                fontSize = 16.sp
             )
         }
     }
@@ -47,9 +47,9 @@ fun PublishButton(
 
 @PreviewLightDark
 @Composable
-private fun PublishButtonPreview() {
+private fun SubmitButtonPreview() {
     LokaveloTheme {
-        PublishButton(
+        SubmitButton(
             enabled = true,
             onClick = {},
             isLoading = false,

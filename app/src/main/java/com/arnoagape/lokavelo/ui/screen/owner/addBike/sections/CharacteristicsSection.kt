@@ -76,7 +76,7 @@ fun CharacteristicsSection(
                 isError = categoryError,
                 items = BikeCategory.entries,
                 label = stringResource(R.string.category),
-                itemLabel = { it.name }
+                itemLabel = { stringResource(it.labelRes()) }
             )
 
             Row(

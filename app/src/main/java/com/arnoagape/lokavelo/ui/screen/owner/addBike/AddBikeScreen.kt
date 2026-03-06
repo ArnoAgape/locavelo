@@ -62,7 +62,7 @@ import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.DepositSection
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.LocationSection
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosSection
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PricingSection
-import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.SubmitButton
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.TitleDescriptionSection
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
@@ -155,7 +155,7 @@ fun AddBikeScreen(
             if (state.uiState !is AddBikeUiState.Error.Initial &&
                 state.uiState !is AddBikeUiState.Loading
             ) {
-                PublishButton(
+                SubmitButton(
                     enabled = true,
                     onClick = {
                         viewModel.onAction(AddBikeEvent.Submit)
@@ -373,6 +373,7 @@ private fun AddBikeContent(
                 title = state.form.title,
                 description = state.form.description,
                 titleError = state.form.titleError,
+                descriptionError = state.form.descriptionError,
                 onTitleChange = {
                     onAction(AddBikeEvent.TitleChanged(it))
                 },

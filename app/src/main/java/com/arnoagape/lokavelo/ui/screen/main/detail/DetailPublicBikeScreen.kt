@@ -47,7 +47,7 @@ import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
 import com.arnoagape.lokavelo.ui.screen.main.detail.sections.OwnerCard
 import com.arnoagape.lokavelo.ui.screen.main.detail.sections.PriceBreakdownCard
-import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.PublishButton
+import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.SubmitButton
 import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.AccessoriesRow
 import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailCard
 import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailRow
@@ -97,7 +97,7 @@ fun DetailPublicBikeScreen(
         },
 
         bottomBar = {
-            PublishButton(
+            SubmitButton(
                 enabled = true,
                 onClick = onContactClick,
                 isLoading = false,

@@ -19,6 +19,7 @@ fun TitleDescriptionSection(
     title: String,
     description: String,
     titleError: Boolean,
+    descriptionError: Boolean,
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit
 ) {
@@ -54,7 +55,13 @@ fun TitleDescriptionSection(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next
                 ),
+                isError = descriptionError,
                 modifier = Modifier.fillMaxWidth(),
+                supportingText = {
+                    if (titleError) {
+                        Text(stringResource(R.string.required))
+                    }
+                },
                 minLines = 3
             )
 

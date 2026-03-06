@@ -23,7 +23,9 @@ fun DetailRow(label: String, value: String) {
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.width(120.dp)
+            modifier = Modifier
+                .width(120.dp)
+                .weight(1.5f)
         )
 
         Text(
@@ -31,8 +33,7 @@ fun DetailRow(label: String, value: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.End,
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(3f)
         )
     }
 }
