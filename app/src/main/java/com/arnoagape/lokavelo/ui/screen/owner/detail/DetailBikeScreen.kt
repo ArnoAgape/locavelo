@@ -44,6 +44,7 @@ import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
@@ -319,6 +320,12 @@ fun DetailItem(
                 // Brand
                 DetailRow(stringResource(R.string.brand), bike.brand)
 
+                // Size
+                DetailRow(
+                    stringResource(R.string.size),
+                    bike.size?.name ?: ""
+                )
+
                 // Condition
                 DetailRow(
                     stringResource(R.string.condition),
@@ -406,6 +413,7 @@ private fun DetailBikeScreenPreview() {
                 description = "Vélo en super état avec fourche suspendue",
                 category = BikeCategory.GRAVEL,
                 brand = "Origine",
+                size = BikeSize.M,
                 condition = BikeCondition.LIKE_NEW,
                 accessories = listOf(
                     BikeEquipment.HANDLEBAR_BAG, BikeEquipment.MUDGUARD, BikeEquipment.BELL,

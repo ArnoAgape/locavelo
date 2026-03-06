@@ -4,6 +4,7 @@ import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeLocation
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.google.firebase.Timestamp
 import java.io.Serializable
 import java.time.Instant
@@ -19,6 +20,7 @@ data class BikeDto(
     val brand: String = "",
     val condition: BikeCondition? = null,
     val electric: Boolean = false,
+    val size: BikeSize? = null,
     val accessories: List<BikeEquipment> = emptyList(),
     val priceInCents: Long = 0L,
     val priceHalfDayInCents: Long? = null,

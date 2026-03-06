@@ -54,6 +54,7 @@
     <string name="brand">Brand</string>
     <string name="electric_bike">Electric?</string>
     <string name="condition">Condition</string>
+    <string name="size">Size</string>
     <string name="category">Category</string>
     <string name="accessories">Accessories</string>
     <string name="zip_code">Zip Code</string>

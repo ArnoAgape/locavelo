@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -39,6 +40,7 @@ import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeCondition
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 
@@ -48,13 +50,16 @@ fun CharacteristicsSection(
     brand: String,
     condition: BikeCondition?,
     electric: Boolean,
+    size: BikeSize?,
     accessories: List<BikeEquipment>,
     categoryError: Boolean,
     conditionError: Boolean,
+    sizeError: Boolean,
     onCategoryChange: (BikeCategory) -> Unit,
     onBrandChange: (String) -> Unit,
     onStateChange: (BikeCondition) -> Unit,
     onElectricChange: (Boolean) -> Unit,
+    onSizeChange: (BikeSize) -> Unit,
     onAccessoriesChange: (List<BikeEquipment>) -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -63,14 +68,15 @@ fun CharacteristicsSection(
         title = stringResource(R.string.characteristics),
         subtitle = stringResource(R.string.subtitle_characteristics)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
 
-            CategoryDropdown(
+            Dropdown(
                 selected = category,
                 onSelected = onCategoryChange,
-                isError = categoryError
+                isError = categoryError,
+                items = BikeCategory.entries,
+                label = stringResource(R.string.category),
+                itemLabel = { it.name }
             )
 
             Row(
@@ -98,11 +104,25 @@ fun CharacteristicsSection(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            StateDropdown(
+            Dropdown(
+                selected = size,
+                onSelected = onSizeChange,
+                isError = sizeError,
+                items = BikeSize.entries,
+                label = stringResource(R.string.size),
+                itemLabel = { it.name }
+            )
+
+            Dropdown(
                 selected = condition,
                 onSelected = onStateChange,
-                isError = conditionError
+                isError = conditionError,
+                items = BikeCondition.entries,
+                label = stringResource(R.string.condition),
+                itemLabel = { stringResource(it.labelRes()) }
             )
+
+            Spacer(Modifier.height(spacing.medium))
 
             AccessoriesChips(
                 selected = accessories,
@@ -114,10 +134,13 @@ fun CharacteristicsSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryDropdown(
-    selected: BikeCategory?,
+fun <T>Dropdown(
+    selected: T?,
+    items: List<T>,
+    label: String,
     isError: Boolean,
-    onSelected: (BikeCategory) -> Unit
+    itemLabel: @Composable (T) -> String,
+    onSelected: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -127,73 +150,17 @@ fun CategoryDropdown(
     ) {
 
         OutlinedTextField(
-            value = selected?.let { stringResource(it.labelRes()) } ?: "",
+            value = selected?.let { itemLabel(it) } ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.category)) },
+            label = { Text(label) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
             isError = isError,
-            supportingText = {
-                if (isError) {
-                    Text(stringResource(R.string.required))
-                }
-            },
-            modifier = Modifier
-                .menuAnchor(
-                    type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                    enabled = true
-                )
-                .fillMaxWidth()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ) {
-            BikeCategory.entries.forEach { category ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(category.labelRes())) },
-                    onClick = {
-                        onSelected(category)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun StateDropdown(
-    selected: BikeCondition?,
-    isError: Boolean,
-    onSelected: (BikeCondition) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-
-        OutlinedTextField(
-            value = selected?.let { stringResource(it.labelRes()) } ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.condition)) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            isError = isError,
-            supportingText = {
-                if (isError) {
-                    Text(stringResource(R.string.required))
-                }
-            },
+            supportingText = if (isError) {
+                { Text(stringResource(R.string.required)) }
+            } else null,
             modifier = Modifier
                 .menuAnchor(
                     type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
@@ -206,11 +173,11 @@ fun StateDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            BikeCondition.entries.forEach { condition ->
+            items.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(stringResource(condition.labelRes())) },
+                    text = { Text(itemLabel(item)) },
                     onClick = {
-                        onSelected(condition)
+                        onSelected(item)
                         expanded = false
                     }
                 )

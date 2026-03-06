@@ -5,6 +5,7 @@ import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeCondition
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeLocation
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 import com.arnoagape.lokavelo.ui.utils.toPriceText
 
@@ -18,6 +19,7 @@ data class EditBikeFormState(
     val monthPriceText: String = "",
     val depositText: String = "",
     val electric: Boolean = false,
+    val size: BikeSize? = null,
     val category: BikeCategory? = null,
     val brand: String = "",
     val condition: BikeCondition? = null,
@@ -25,8 +27,10 @@ data class EditBikeFormState(
 
     val photosError: Boolean = false,
     val titleError: Boolean = false,
+    val descriptionError: Boolean = false,
     val categoryError: Boolean = false,
     val conditionError: Boolean = false,
+    val sizeError: Boolean = false,
     val priceError: Boolean = false,
     val streetError: Boolean = false,
     val postalCodeError: Boolean = false,
@@ -67,6 +71,7 @@ data class EditBikeFormState(
             priceMonthInCents = month,
             depositInCents = deposit,
             electric = electric,
+            size = size,
             category = category,
             brand = brand,
             condition = condition,

@@ -4,6 +4,7 @@ import android.net.Uri
 import com.arnoagape.lokavelo.domain.model.BikeCategory
 import com.arnoagape.lokavelo.domain.model.BikeEquipment
 import com.arnoagape.lokavelo.domain.model.BikeCondition
+import com.arnoagape.lokavelo.domain.model.BikeSize
 
 /**
  * A sealed class representing different events that can occur on a form.
@@ -21,6 +22,7 @@ sealed interface AddBikeEvent {
     data class MonthPriceChanged(val value: String) : AddBikeEvent
     data class DepositChanged(val depositText: String) : AddBikeEvent
     data class ElectricChanged(val electric: Boolean) : AddBikeEvent
+    data class SizeChanged(val size: BikeSize) : AddBikeEvent
     data class CategoryChanged(val category: BikeCategory) : AddBikeEvent
     data class BrandChanged(val brand: String) : AddBikeEvent
     data class StateChanged(val state: BikeCondition) : AddBikeEvent

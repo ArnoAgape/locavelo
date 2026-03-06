@@ -360,14 +360,17 @@ private fun EditBikeContent(
                 brand = state.form.brand,
                 condition = state.form.condition,
                 electric = state.form.electric,
+                size = state.form.size,
                 accessories = state.form.accessories,
                 categoryError = state.form.categoryError,
                 conditionError = state.form.conditionError,
+                sizeError = state.form.sizeError,
                 onCategoryChange = { onAction(EditBikeEvent.CategoryChanged(it)) },
                 onBrandChange = { onAction(EditBikeEvent.BrandChanged(it)) },
                 onStateChange = { onAction(EditBikeEvent.StateChanged(it)) },
                 onElectricChange = { onAction(EditBikeEvent.ElectricChanged(it)) },
-                onAccessoriesChange = { onAction(EditBikeEvent.AccessoriesChanged(it)) }
+                onAccessoriesChange = { onAction(EditBikeEvent.AccessoriesChanged(it)) },
+                onSizeChange = { onAction(EditBikeEvent.SizeChanged(it)) }
             )
         }
 

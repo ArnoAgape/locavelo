@@ -354,14 +354,17 @@ private fun AddBikeContent(
                 brand = state.form.brand,
                 condition = state.form.condition,
                 electric = state.form.electric,
+                size = state.form.size,
                 accessories = state.form.accessories,
                 categoryError = state.form.categoryError,
                 conditionError = state.form.conditionError,
+                sizeError = state.form.sizeError,
                 onCategoryChange = { onAction(AddBikeEvent.CategoryChanged(it)) },
                 onBrandChange = { onAction(AddBikeEvent.BrandChanged(it)) },
                 onStateChange = { onAction(AddBikeEvent.StateChanged(it)) },
                 onElectricChange = { onAction(AddBikeEvent.ElectricChanged(it)) },
-                onAccessoriesChange = { onAction(AddBikeEvent.AccessoriesChanged(it)) }
+                onAccessoriesChange = { onAction(AddBikeEvent.AccessoriesChanged(it)) },
+                onSizeChange = { onAction(AddBikeEvent.SizeChanged(it)) }
             )
         }
 

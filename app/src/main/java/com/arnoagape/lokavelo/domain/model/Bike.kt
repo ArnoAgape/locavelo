@@ -15,6 +15,7 @@ data class Bike(
     val brand: String = "",
     val condition: BikeCondition? = null,
     val electric: Boolean = false,
+    val size: BikeSize? = null,
     val accessories: List<BikeEquipment> = emptyList(),
     val priceInCents: Long = 0L,
     val priceHalfDayInCents: Long? = null,
@@ -38,6 +39,8 @@ data class Bike(
             category = category,
             brand = brand,
             condition = condition,
+            electric = electric,
+            size = size,
             accessories = accessories,
             priceInCents = priceInCents,
             priceHalfDayInCents = priceHalfDayInCents,
@@ -47,7 +50,6 @@ data class Bike(
             photoUrls = photoUrls,
             location = location,
             ownerId = ownerId,
-            electric = electric,
             available = available,
             rentalStart = rentalStart,
             rentalEnd = rentalEnd
@@ -64,6 +66,8 @@ data class Bike(
                 category = dto.category,
                 brand = dto.brand,
                 condition = dto.condition,
+                electric = dto.electric,
+                size = dto.size,
                 accessories = dto.accessories,
                 priceInCents = dto.priceInCents,
                 priceHalfDayInCents = dto.priceHalfDayInCents,
@@ -79,7 +83,6 @@ data class Bike(
                     longitude = dto.location?.longitude ?: 0.0
                 ),
                 ownerId = dto.ownerId,
-                electric = dto.electric,
                 available = dto.available,
                 rentalStart = dto.rentalStart,
                 rentalEnd = dto.rentalEnd
