@@ -10,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.arnoagape.lokavelo.ui.screen.account.home.AccountHomeScreen
 import com.arnoagape.lokavelo.ui.screen.account.profile.ProfileScreen
 import com.arnoagape.lokavelo.ui.screen.account.settings.help.HelpSettingsScreen
@@ -70,11 +72,28 @@ fun MainScreen(
 
             // ---------------- LOGIN ----------------
 
-            composable(Screen.Login.route) {
+            composable(
+                route = Screen.Login.route,
+                arguments = listOf(
+                    navArgument("redirect") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { entry ->
+
+                val redirect = entry.stringArg("redirect")
+
                 LoginScreen(
                     onLoginSuccess = {
-                        tabNavController.navigate(Screen.Owner.HomeBike.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
+
+                        if (redirect != null) {
+                            rootNavController.navigate(redirect) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        } else {
+                            rootNavController.popBackStack()
                         }
                     }
                 )

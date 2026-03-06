@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
@@ -42,6 +43,7 @@ class DetailPublicBikeViewModel @Inject constructor(
             .flatMapLatest { bike ->
                 userRepository.observeUser(bike.ownerId)
             }
+            .onStart { emit(null) }
 
     val state: StateFlow<DetailPublicBikeState> =
         combine(_uiState, bikeFlow, ownerFlow) { ui, bike, owner ->

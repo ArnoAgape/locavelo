@@ -66,12 +66,19 @@ fun LokaveloApp() {
         }
     }
 
-    fun navigateProtected(screen: Screen) {
+    fun navigateProtected(route: String) {
+
         if (isSignedIn) {
-            navController.navigate(screen)
+            navController.navigate(route)
         } else {
-            navController.navigate(Screen.Login.route)
+            navController.navigate(
+                Screen.Login.createRoute(route)
+            )
         }
+    }
+
+    fun navigateProtected(screen: Screen) {
+        navigateProtected(screen.route)
     }
 
     NavHost(
@@ -176,7 +183,8 @@ fun LokaveloApp() {
                 endDate = end,
                 onBack = { navController.popBackStack() },
                 onContactClick = { bikeId, start, end ->
-                    navController.navigate(
+
+                    navigateProtected(
                         Screen.Main.Contact.createRoute(
                             bikeId,
                             start,

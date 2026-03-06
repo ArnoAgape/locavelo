@@ -82,7 +82,11 @@ sealed interface Screen {
 
     // ---------------- LOGIN ----------------
     data object Login : Screen {
-        override val route = "login"
+
+        override val route = "login?redirect={redirect}"
+
+        fun createRoute(redirect: String) =
+            "login?redirect=$redirect"
     }
 
     // ---------------- MESSAGING ----------------
