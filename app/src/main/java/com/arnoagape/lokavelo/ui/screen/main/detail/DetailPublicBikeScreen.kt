@@ -319,7 +319,7 @@ fun DetailPublicBikeContent(
                 DetailCard(title = stringResource(R.string.price_details)) {
 
                     PriceBreakdownCard(
-                        pricePerDayInCents = bike.priceInCents,
+                        bike = bike,
                         startDate = state.startDate,
                         endDate = state.endDate
                     )
@@ -349,7 +349,7 @@ private fun DetailPublicBikeScreenPreview() {
                     BikeEquipment.REFLECTIVE_VEST
                 ),
                 priceInCents = 2500,
-                priceHalfDayInCents = 1250,
+                priceTwoDaysInCents = 1250,
                 priceWeekInCents = 10000,
                 priceMonthInCents = 25000,
                 depositInCents = 50000,

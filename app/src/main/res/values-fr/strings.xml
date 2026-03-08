@@ -42,11 +42,11 @@
     <string name="pricing">Tarif</string>
     <string name="price_per_day">%1$s / jour</string>
     <string name="pricing_day_amount">Tarif par jour (€)</string>
-    <string name="pricing_half_day_amount">Tarif demi-journée (€)</string>
+    <string name="pricing_two_days_amount">Tarif deux jours (€)</string>
     <string name="pricing_week_amount">Tarif semaine (€)</string>
     <string name="pricing_month_amount">Tarif mois (€)</string>
     <string name="pricing_day">Journée</string>
-    <string name="pricing_half_day">Demi-journée</string>
+    <string name="pricing_two_days">Deux jours</string>
     <string name="pricing_week">Semaine</string>
     <string name="pricing_month">Mois</string>
     <string name="price_total">%1$s au total</string>
@@ -54,6 +54,7 @@
         <item quantity="one">%1$s × %2$d jour</item>
         <item quantity="other">%1$s × %2$d jours</item>
     </plurals>
+    <string name="discount_pricing">Réduction</string>
     <string name="discount">Réduction : %1$d %%</string>
     <string name="deposit">Caution</string>
     <string name="deposit_amount">Montant de la caution (€)</string>
@@ -209,7 +210,7 @@
     <string name="bike_state_like_new">Comme neuf</string>
     <string name="bike_state_excellent">Excellent</string>
     <string name="bike_state_good">Bon</string>
-    <string name="bike_state_used">Passable</string>
+    <string name="bike_state_used">Satisfaisant</string>
 
     // COMING SOON…
     <string name="coming_soon_pricing">Les tarifs demi-journée, semaine et mois seront disponibles

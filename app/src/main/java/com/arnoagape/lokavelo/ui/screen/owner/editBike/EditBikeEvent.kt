@@ -17,7 +17,7 @@ sealed interface EditBikeEvent {
     data class ZipChanged(val zipCode: String) : EditBikeEvent
     data class CityChanged(val city: String) : EditBikeEvent
     data class PriceChanged(val value: String) : EditBikeEvent
-    data class HalfDayPriceChanged(val value: String) : EditBikeEvent
+    data class TwoDaysPriceChanged(val value: String) : EditBikeEvent
     data class WeekPriceChanged(val value: String) : EditBikeEvent
     data class MonthPriceChanged(val value: String) : EditBikeEvent
     data class DepositChanged(val depositText: String) : EditBikeEvent

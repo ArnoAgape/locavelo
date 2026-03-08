@@ -15,32 +15,40 @@ fun calculateDiscountPercent(
         .coerceIn(0, 100)
 }
 
-fun calculateTotalPrice(
-    days: Int,
+fun calculateRentalPrice(
     dayPrice: Long,
+    twoDaysPrice: Long?,
     weekPrice: Long?,
-    monthPrice: Long?
+    monthPrice: Long?,
+    days: Int
 ): Long {
 
-    var remainingDays = days
+    var remaining = days
     var total = 0L
 
-    // Mois
-    if (monthPrice != null && remainingDays >= 30) {
-        val months = remainingDays / 30
+    // mois
+    if (monthPrice != null && monthPrice > 0) {
+        val months = remaining / 30
         total += months * monthPrice
-        remainingDays %= 30
+        remaining %= 30
     }
 
-    // Semaines
-    if (weekPrice != null && remainingDays >= 7) {
-        val weeks = remainingDays / 7
+    // semaine
+    if (weekPrice != null && weekPrice > 0) {
+        val weeks = remaining / 7
         total += weeks * weekPrice
-        remainingDays %= 7
+        remaining %= 7
     }
 
-    // Jours restants
-    total += remainingDays * dayPrice
+    // bloc 2 jours
+    if (twoDaysPrice != null && twoDaysPrice > 0) {
+        val blocks = remaining / 2
+        total += blocks * twoDaysPrice
+        remaining %= 2
+    }
+
+    // jours restants
+    total += remaining * dayPrice
 
     return total
 }

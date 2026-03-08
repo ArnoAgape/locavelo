@@ -371,10 +371,10 @@ fun DetailItem(
                         DetailRow(stringResource(R.string.pricing_day), it)
                     }
 
-                bike.priceHalfDayInCents
+                bike.priceTwoDaysInCents
                     ?.toEuroString()
                     ?.let {
-                        DetailRow(stringResource(R.string.pricing_half_day), it)
+                        DetailRow(stringResource(R.string.pricing_two_days), it)
                     }
 
                 bike.priceWeekInCents
@@ -420,7 +420,7 @@ private fun DetailBikeScreenPreview() {
                     BikeEquipment.REFLECTIVE_VEST
                 ),
                 priceInCents = 2500,
-                priceHalfDayInCents = 1250,
+                priceTwoDaysInCents = 1250,
                 priceWeekInCents = 10000,
                 priceMonthInCents = 25000,
                 depositInCents = 50000,

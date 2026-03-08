@@ -51,8 +51,7 @@ fun OSMMap(
     var cityCircle by remember { mutableStateOf<Polygon?>(null) }
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
 
-    val primaryColor =
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f).toArgb()
+    val primaryColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f).toArgb()
 
     val tileSource = XYTileSource(
         "CartoVoyager",
@@ -123,6 +122,13 @@ fun OSMMap(
 
                     lastCentered = userLocation
                     onRecenterHandled()
+                }
+
+                // 📍 Premier centrage automatique sur la position
+                if (userLocation != null && lastCentered == null) {
+                    mapView.controller.setZoom(16.0)
+                    mapView.controller.setCenter(userLocation)
+                    lastCentered = userLocation
                 }
 
                 // 🔥 Recentrage nouvelle ville

@@ -144,17 +144,17 @@ class AddBikeViewModel @Inject constructor(
 
                     if (cents != null) {
 
-                        val (half, week, month) = calculateDerivedPrices(cents)
+                        val (twoDays, week, month) = calculateDerivedPrices(cents)
 
                         current.copy(
                             form = current.form.copy(
                                 priceText = event.value,
 
-                                isHalfDayManuallyEdited = false,
+                                isTwoDaysManuallyEdited = false,
                                 isWeekManuallyEdited = false,
                                 isMonthManuallyEdited = false,
 
-                                halfDayPriceText = half.toPriceString(),
+                                twoDaysPriceText = twoDays.toPriceString(),
                                 weekPriceText = week.toPriceString(),
                                 monthPriceText = month.toPriceString()
                             )
@@ -163,7 +163,7 @@ class AddBikeViewModel @Inject constructor(
                         current.copy(
                             form = current.form.copy(
                                 priceText = event.value,
-                                halfDayPriceText = "",
+                                twoDaysPriceText = "",
                                 weekPriceText = "",
                                 monthPriceText = ""
                             )
@@ -172,12 +172,12 @@ class AddBikeViewModel @Inject constructor(
                 }
             }
 
-            is AddBikeEvent.HalfDayPriceChanged ->
+            is AddBikeEvent.TwoDaysPriceChanged ->
                 _state.update {
                     it.copy(
                         form = it.form.copy(
-                            halfDayPriceText = event.value,
-                            isHalfDayManuallyEdited = true
+                            twoDaysPriceText = event.value,
+                            isTwoDaysManuallyEdited = true
                         )
                     )
                 }
@@ -449,12 +449,11 @@ class AddBikeViewModel @Inject constructor(
 
     private fun calculateDerivedPrices(dayPriceCents: Long): Triple<Long, Long, Long> {
 
-        val half = dayPriceCents / 2
+        val twoDays = (dayPriceCents * 2 * 90) / 100   // -10%
+        val week = (dayPriceCents * 7 * 70) / 100      // -30%
+        val month = (dayPriceCents * 30 * 50) / 100    // -50%
 
-        val week = (dayPriceCents * 7 * 70) / 100   // -30%
-        val month = (dayPriceCents * 30 * 50) / 100 // -50%
-
-        return Triple(half, week, month)
+        return Triple(twoDays, week, month)
     }
 
 }

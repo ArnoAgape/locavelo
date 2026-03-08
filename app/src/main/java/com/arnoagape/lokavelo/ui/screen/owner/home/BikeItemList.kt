@@ -38,9 +38,11 @@ import com.arnoagape.lokavelo.ui.theme.lightBlue
 import com.arnoagape.lokavelo.ui.theme.lightBlueText
 import com.arnoagape.lokavelo.ui.theme.lightGreen
 import com.arnoagape.lokavelo.ui.theme.lightGreenText
+import com.arnoagape.lokavelo.ui.utils.calculateRentalPrice
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
@@ -119,6 +121,21 @@ fun BikeItemRow(
                 if (showStatus) StatusBadge(isRented)
             }
 
+            val totalPrice = if (startDate != null && endDate != null) {
+                val days = ChronoUnit.DAYS
+                    .between(startDate, endDate)
+                    .toInt()
+                    .coerceAtLeast(1)
+
+                calculateRentalPrice(
+                    dayPrice = bike.priceInCents,
+                    days = days,
+                    twoDaysPrice = bike.priceTwoDaysInCents,
+                    weekPrice = bike.priceWeekInCents,
+                    monthPrice = bike.priceMonthInCents
+                )
+            } else null
+
             // 💰 Prix
             val formattedPrice = remember(bike.priceInCents) {
                 val priceInEuros = bike.priceInCents / 100.0
@@ -127,13 +144,28 @@ fun BikeItemRow(
                     .format(priceInEuros)
             }
 
-            Text(
-                text = stringResource(
-                    R.string.price_per_day,
-                    formattedPrice
-                ),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (totalPrice != null) {
+
+                val formattedTotal = remember(totalPrice) {
+                    val euros = totalPrice / 100.0 * 1.1
+                    NumberFormat.getCurrencyInstance(Locale.FRANCE).format(euros)
+                }
+
+                Text(
+                    text = formattedTotal,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+            } else {
+
+                Text(
+                    text = stringResource(
+                        R.string.price_per_day,
+                        formattedPrice
+                    ),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             // 📅 Dates si location active
             if (startDate != null && endDate != null) {

@@ -24,7 +24,7 @@ import coil.compose.AsyncImage
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.screen.main.map.SearchFilters
-import com.arnoagape.lokavelo.ui.utils.calculateTotalPrice
+import com.arnoagape.lokavelo.ui.utils.calculateRentalPrice
 import com.arnoagape.lokavelo.ui.utils.toEuroString
 import java.time.temporal.ChronoUnit
 
@@ -49,13 +49,16 @@ fun BikePreviewCard(
 
         val start = filters.startDate
         val end = filters.endDate
+
         val days = ChronoUnit.DAYS
             .between(start, end)
             .toInt()
+            .coerceAtLeast(1)
 
-        val total = calculateTotalPrice(
-            days = days,
+        val total = calculateRentalPrice(
             dayPrice = bike.priceInCents,
+            days = days,
+            twoDaysPrice = bike.priceTwoDaysInCents,
             weekPrice = bike.priceWeekInCents,
             monthPrice = bike.priceMonthInCents
         )
@@ -75,6 +78,7 @@ fun BikePreviewCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
+
         Row(Modifier.padding(12.dp)) {
 
             AsyncImage(

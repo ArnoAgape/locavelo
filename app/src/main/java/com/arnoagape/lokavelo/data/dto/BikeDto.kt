@@ -23,7 +23,7 @@ data class BikeDto(
     val size: BikeSize? = null,
     val accessories: List<BikeEquipment> = emptyList(),
     val priceInCents: Long = 0L,
-    val priceHalfDayInCents: Long? = null,
+    val priceTwoDaysInCents: Long? = null,
     val priceWeekInCents: Long? = null,
     val priceMonthInCents: Long? = null,
     val depositInCents: Long? = null,

@@ -137,7 +137,7 @@ class FirebaseBikeApi @Inject constructor(
                     "description" to bike.description,
                     "location" to bike.location,
                     "priceInCents" to bike.priceInCents,
-                    "priceHalfDayInCents" to bike.priceHalfDayInCents,
+                    "priceTwoDaysInCents" to bike.priceTwoDaysInCents,
                     "priceWeekInCents" to bike.priceWeekInCents,
                     "priceMonthInCents" to bike.priceMonthInCents,
                     "depositInCents" to bike.depositInCents,

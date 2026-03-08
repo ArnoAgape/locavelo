@@ -208,11 +208,11 @@ class EditBikeViewModel @Inject constructor(
                             form = current.form.copy(
                                 priceText = event.value,
 
-                                isHalfDayManuallyEdited = false,
+                                isTwoDaysManuallyEdited = false,
                                 isWeekManuallyEdited = false,
                                 isMonthManuallyEdited = false,
 
-                                halfDayPriceText = half.toPriceString(),
+                                twoDaysPriceText = half.toPriceString(),
                                 weekPriceText = week.toPriceString(),
                                 monthPriceText = month.toPriceString()
                             )
@@ -221,7 +221,7 @@ class EditBikeViewModel @Inject constructor(
                         current.copy(
                             form = current.form.copy(
                                 priceText = event.value,
-                                halfDayPriceText = "",
+                                twoDaysPriceText = "",
                                 weekPriceText = "",
                                 monthPriceText = ""
                             )
@@ -230,12 +230,12 @@ class EditBikeViewModel @Inject constructor(
                 }
             }
 
-            is EditBikeEvent.HalfDayPriceChanged ->
+            is EditBikeEvent.TwoDaysPriceChanged ->
                 _state.update {
                     it.copy(
                         form = it.form.copy(
-                            halfDayPriceText = event.value,
-                            isHalfDayManuallyEdited = true
+                            twoDaysPriceText = event.value,
+                            isTwoDaysManuallyEdited = true
                         )
                     )
                 }
@@ -515,12 +515,11 @@ class EditBikeViewModel @Inject constructor(
 
     private fun calculateDerivedPrices(dayPriceCents: Long): Triple<Long, Long, Long> {
 
-        val half = dayPriceCents / 2
+        val twoDays = (dayPriceCents * 2 * 90) / 100   // -10%
+        val week = (dayPriceCents * 7 * 70) / 100      // -30%
+        val month = (dayPriceCents * 30 * 50) / 100    // -50%
 
-        val week = (dayPriceCents * 7 * 70) / 100   // -30%
-        val month = (dayPriceCents * 30 * 50) / 100 // -50%
-
-        return Triple(half, week, month)
+        return Triple(twoDays, week, month)
     }
 
 }

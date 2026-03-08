@@ -14,7 +14,7 @@ data class EditBikeFormState(
     val description: String = "",
     val location: BikeLocation = BikeLocation(),
     val priceText: String = "",
-    val halfDayPriceText: String = "",
+    val twoDaysPriceText: String = "",
     val weekPriceText: String = "",
     val monthPriceText: String = "",
     val depositText: String = "",
@@ -36,7 +36,7 @@ data class EditBikeFormState(
     val postalCodeError: Boolean = false,
     val cityError: Boolean = false,
 
-    val isHalfDayManuallyEdited: Boolean = false,
+    val isTwoDaysManuallyEdited: Boolean = false,
     val isWeekManuallyEdited: Boolean = false,
     val isMonthManuallyEdited: Boolean = false
 ) {
@@ -45,8 +45,8 @@ data class EditBikeFormState(
 
         val price = priceText.toCentsOrNull() ?: return null
 
-        val halfDay = halfDayPriceText.toCentsOrNull()
-            ?: (price / 2)
+        val twoDays = twoDaysPriceText.toCentsOrNull()
+            ?: (price * 2 * 90 / 100)
         val week = weekPriceText.toCentsOrNull()
             ?: (price * 7 * 70 / 100)
 
@@ -66,7 +66,7 @@ data class EditBikeFormState(
             description = description,
             location = location,
             priceInCents = price,
-            priceHalfDayInCents = halfDay,
+            priceTwoDaysInCents = twoDays,
             priceWeekInCents = week,
             priceMonthInCents = month,
             depositInCents = deposit,
@@ -86,7 +86,7 @@ data class EditBikeFormState(
                 description = bike.description,
                 location = bike.location,
                 priceText = bike.priceInCents.toPriceText(),
-                halfDayPriceText = bike.priceHalfDayInCents.toPriceText(),
+                twoDaysPriceText = bike.priceTwoDaysInCents.toPriceText(),
                 weekPriceText = bike.priceWeekInCents.toPriceText(),
                 monthPriceText = bike.priceMonthInCents.toPriceText(),
                 depositText = bike.depositInCents.toPriceText(),

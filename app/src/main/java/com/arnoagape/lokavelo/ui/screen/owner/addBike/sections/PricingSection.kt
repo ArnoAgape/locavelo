@@ -22,11 +22,11 @@ import com.arnoagape.lokavelo.ui.utils.toCentsOrNull
 fun PricingSection(
     price: String,
     monthPrice: String,
-    halfDayPrice: String,
+    twoDaysPrice: String,
     weekPrice: String,
     priceError: Boolean,
     onPriceChange: (String) -> Unit,
-    onHalfDayChange: (String) -> Unit,
+    onTwoDaysChange: (String) -> Unit,
     onWeekChange: (String) -> Unit,
     onMonthChange: (String) -> Unit
 ) {
@@ -58,14 +58,21 @@ fun PricingSection(
             if (!price.isBlank()) {
 
                 OutlinedTextField(
-                    value = halfDayPrice,
-                    onValueChange = onHalfDayChange,
+                    value = twoDaysPrice,
+                    onValueChange = onTwoDaysChange,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Next
                     ),
-                    label = { Text(stringResource(R.string.pricing_half_day_amount)) },
-                    modifier = Modifier.fillMaxWidth()
+                    label = { Text(stringResource(R.string.pricing_two_days_amount)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    supportingText = {
+                        val twoDaysCents = twoDaysPrice.toCentsOrNull()
+                        if (dayPriceCents != null && twoDaysCents != null) {
+                            val discount = calculateDiscountPercent(dayPriceCents, twoDaysCents, 2)
+                            Text(stringResource(R.string.discount, discount))
+                        }
+                    }
                 )
 
                 OutlinedTextField(
@@ -115,11 +122,11 @@ private fun PricingSectionPreview() {
         PricingSection(
             price = "20",
             monthPrice = "300",
-            halfDayPrice = "10",
+            twoDaysPrice = "10",
             weekPrice = "98",
             priceError = false,
             onPriceChange = {},
-            onHalfDayChange = {},
+            onTwoDaysChange = {},
             onWeekChange = {},
             onMonthChange = {}
         )

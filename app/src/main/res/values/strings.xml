@@ -42,11 +42,11 @@
     <string name="pricing">Pricing</string>
     <string name="price_per_day">%1$s / day</string>
     <string name="pricing_day_amount">Daily rate (€)</string>
-    <string name="pricing_half_day_amount">Price for half a day (€)</string>
+    <string name="pricing_two_days_amount">Price for two days (€)</string>
     <string name="pricing_week_amount">Price for a week (€)</string>
     <string name="pricing_month_amount">Price for a month (€)</string>
     <string name="pricing_day">Day</string>
-    <string name="pricing_half_day">Half day</string>
+    <string name="pricing_two_days">Two days</string>
     <string name="pricing_week">Week</string>
     <string name="pricing_month">Month</string>
     <string name="price_total">%1$s total</string>
@@ -54,6 +54,7 @@
         <item quantity="one">%1$s × %2$d jour</item>
         <item quantity="other">%1$s × %2$d jours</item>
     </plurals>
+    <string name="discount_pricing">Discount</string>
     <string name="discount">Discount: %1$d%%</string>
     <string name="deposit">Deposit</string>
     <string name="deposit_amount">Deposit amount (€)</string>
