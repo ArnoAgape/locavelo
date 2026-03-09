@@ -166,6 +166,7 @@ fun SearchBar(
                                 )
                             )
                         },
+                        border = null,
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
@@ -251,6 +252,7 @@ fun SearchBar(
                                 }
                             )
                         },
+                        border = null,
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer

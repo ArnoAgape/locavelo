@@ -91,6 +91,7 @@ data class EditBikeFormState(
                 monthPriceText = bike.priceMonthInCents.toPriceText(),
                 depositText = bike.depositInCents.toPriceText(),
                 electric = bike.electric,
+                size = bike.size,
                 category = bike.category,
                 brand = bike.brand,
                 condition = bike.condition,

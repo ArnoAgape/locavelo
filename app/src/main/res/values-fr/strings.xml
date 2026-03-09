@@ -35,7 +35,7 @@
     <string name="title_description">Titre &amp; Description</string>
     <string name="title">Titre</string>
     <string name="description">Description</string>
-    <string name="location">Adresse</string>
+    <string name="location">Localisation</string>
     <string name="service_fee_percent">Frais de service (%1$s %%)</string>
     <string name="total_price_ttc">Montant total TTC</string>
     <string name="price_details">Détail du prix</string>
