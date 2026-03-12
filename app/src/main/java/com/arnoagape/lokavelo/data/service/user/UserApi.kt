@@ -18,4 +18,5 @@ interface UserApi {
     fun signOut(): Result<Unit>
     fun isUserSignedIn(): Flow<Boolean>
     suspend fun deleteUser(): Result<Unit>
+    suspend fun saveFcmToken(): Result<Unit>
 }

@@ -9,6 +9,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.snapshots
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,26 @@ class FirebaseUserApi : UserApi {
         email = email,
         phoneNumber = phoneNumber
     )
+
+    override suspend fun saveFcmToken(): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+
+            val currentUser = auth.currentUser
+                ?: return@withContext Result.failure(Exception("User not signed in"))
+
+            val token = FirebaseMessaging.getInstance().token.await()
+
+            usersCollection
+                .document(currentUser.uid)
+                .set(mapOf("fcmToken" to token), SetOptions.merge())
+                .await()
+
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     /**
      * Returns the currently authenticated user if available.

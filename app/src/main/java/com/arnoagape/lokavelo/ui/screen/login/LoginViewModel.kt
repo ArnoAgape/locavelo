@@ -51,6 +51,7 @@ class LoginViewModel @Inject constructor(
     fun syncUserWithFirestore() {
         viewModelScope.launch {
             userRepository.ensureUserInFirestore()
+            userRepository.saveFcmToken()
         }
     }
 

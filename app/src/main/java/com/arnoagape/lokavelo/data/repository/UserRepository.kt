@@ -21,4 +21,5 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
     fun signOut() = userApi.signOut()
     fun isUserSignedIn(): Flow<Boolean> = userApi.isUserSignedIn()
     suspend fun deleteUser() = userApi.deleteUser()
+    suspend fun saveFcmToken() = userApi.saveFcmToken()
 }

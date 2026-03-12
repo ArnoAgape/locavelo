@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.ui)
+    implementation(libs.firebase.messaging.ktx)
 
     // Allows API < 26
     coreLibraryDesugaring(libs.desugar.jdk.libs)
