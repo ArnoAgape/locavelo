@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -46,7 +47,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -67,9 +70,7 @@ fun MessagingDetailScreen(
 ) {
 
     val viewModel: MessagingDetailViewModel = hiltViewModel()
-
     val messages by viewModel.messages.collectAsStateWithLifecycle()
-
     val listState = rememberLazyListState()
 
     LaunchedEffect(conversationId) {
@@ -204,6 +205,9 @@ fun MessageInputBar(
 
     var text by remember { mutableStateOf("") }
 
+    val focusManager = LocalFocusManager.current
+    val isEnabled = text.isNotBlank()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,6 +216,14 @@ fun MessageInputBar(
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
+        fun sendMessage() {
+            if (text.isNotBlank()) {
+                onSend(text)
+                text = ""
+                focusManager.clearFocus()
+            }
+        }
 
         OutlinedTextField(
             value = text,
@@ -224,7 +236,11 @@ fun MessageInputBar(
                 )
             },
             keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Send
+            ),
+            keyboardActions = KeyboardActions(
+                onSend = { sendMessage() }
             ),
             shape = RoundedCornerShape(24.dp)
         )
@@ -232,18 +248,17 @@ fun MessageInputBar(
         Spacer(Modifier.width(8.dp))
 
         IconButton(
-            onClick = {
-                if (text.isNotBlank()) {
-                    onSend(text)
-                    text = ""
-                }
-            },
+            onClick = { sendMessage() },
             modifier = Modifier
                 .size(48.dp)
                 .background(
-                    MaterialTheme.colorScheme.primary,
+                    if (isEnabled)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant,
                     CircleShape
-                )
+                ),
+            enabled = isEnabled
         ) {
 
             Icon(
