@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,9 @@ fun LokaveloApp() {
     val context = LocalContext.current
     val resources = LocalResources.current
 
+    val activity = context as Activity
+    val conversationId = activity.intent?.getStringExtra("conversationId")
+
     BackHandler {
 
         val isOnRoot = navController.previousBackStackEntry == null
@@ -64,6 +68,17 @@ fun LokaveloApp() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
+    }
+
+    LaunchedEffect(conversationId) {
+        conversationId?.let {
+
+            navController.navigate(
+                Screen.Messaging.Detail.createRoute(it)
+            )
+
+            activity.intent.removeExtra("conversationId")
         }
     }
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Badge
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -87,6 +89,7 @@ fun MessagingHomeContent(
                     conversation = item.conversation,
                     bike = item.bike,
                     displayName = item.displayName,
+                    unreadCount = item.unreadCount,
                     onClick = { onConversationClick(item.conversation.id) }
                 )
             }
@@ -99,6 +102,7 @@ fun ConversationItem(
     conversation: Conversation,
     bike: Bike?,
     displayName: String?,
+    unreadCount: Int,
     onClick: () -> Unit
 ) {
 
@@ -132,10 +136,21 @@ fun ConversationItem(
                     color = MaterialTheme.colorScheme.primary
                 )
 
+                val isUnread = unreadCount > 0
+
                 Text(
                     text = conversation.lastMessage,
                     maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style =
+                        if (isUnread)
+                            MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        else
+                            MaterialTheme.typography.bodyMedium,
+                    color =
+                        if (isUnread)
+                            MaterialTheme.colorScheme.onSurface
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -147,10 +162,27 @@ fun ConversationItem(
                 )
             }
 
-            Text(
-                text = conversation.lastMessageTime.toDayLabel(),
-                style = MaterialTheme.typography.labelSmall
-            )
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+
+                Text(
+                    text = conversation.lastMessageTime.toDayLabel(),
+                    style = MaterialTheme.typography.labelSmall
+                )
+
+                if (unreadCount > 0) {
+
+                    Spacer(Modifier.height(6.dp))
+
+                    Badge {
+                        Text(
+                            if (unreadCount > 9) "9+"
+                            else unreadCount.toString()
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -166,7 +198,8 @@ private fun MessagingHomeContentPreview() {
             displayName = PreviewData.user.displayName,
             lastMessage = PreviewData.conversation.lastMessage,
             lastMessageTime = PreviewData.conversation.lastMessageTime,
-            isOwner = false
+            isOwner = false,
+            unreadCount = 8
         )
     )
 

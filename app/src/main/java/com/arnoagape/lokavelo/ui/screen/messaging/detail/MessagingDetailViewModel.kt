@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.ConversationRepository
 import com.arnoagape.lokavelo.domain.model.Bike
+import com.arnoagape.lokavelo.domain.model.Conversation
 import com.arnoagape.lokavelo.domain.model.Message
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,8 +42,35 @@ class MessagingDetailViewModel @Inject constructor(
 
     private val _conversationId = MutableStateFlow<String?>(null)
 
-    val currentUserId = auth.currentUser?.uid
-    val currentUserName = auth.currentUser?.displayName
+    val conversation: StateFlow<Conversation?> =
+        _conversationId
+            .filterNotNull()
+            .flatMapLatest {
+                conversationRepository.observeConversation(it)
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null
+            )
+
+    val currentUserId = requireNotNull(auth.currentUser?.uid)
+    val otherUserName: StateFlow<String?> =
+        conversation
+            .map { conv ->
+
+                if (conv == null) return@map null
+
+                if (conv.ownerId == currentUserId)
+                    conv.renterName
+                else
+                    conv.ownerName
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null
+            )
 
     val messages = _conversationId
         .filterNotNull()
@@ -74,6 +103,24 @@ class MessagingDetailViewModel @Inject constructor(
                     createdAt = System.currentTimeMillis()
                 )
             )
+        }
+    }
+
+    fun markConversationAsRead(conversationId: String) {
+        viewModelScope.launch {
+            conversationRepository.markConversationAsRead(conversationId, currentUserId)
+        }
+    }
+
+    fun setConversationActive(conversationId: String) {
+        viewModelScope.launch {
+            conversationRepository.setConversationActive(conversationId, currentUserId)
+        }
+    }
+
+    fun clearConversationActive() {
+        viewModelScope.launch {
+            conversationRepository.clearConversationActive(currentUserId)
         }
     }
 }

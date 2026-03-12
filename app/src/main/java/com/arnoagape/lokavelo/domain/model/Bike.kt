@@ -8,6 +8,7 @@ data class Bike(
     val id: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val ownerId: String = "",
+    val ownerName: String = "",
     val photoUrls: List<String> = emptyList(),
     val title: String = "",
     val description: String = "",
@@ -50,6 +51,7 @@ data class Bike(
             photoUrls = photoUrls,
             location = location,
             ownerId = ownerId,
+            ownerName = ownerName,
             available = available,
             rentalStart = rentalStart,
             rentalEnd = rentalEnd
@@ -83,6 +85,7 @@ data class Bike(
                     longitude = dto.location?.longitude ?: 0.0
                 ),
                 ownerId = dto.ownerId,
+                ownerName = dto.ownerName,
                 available = dto.available,
                 rentalStart = dto.rentalStart,
                 rentalEnd = dto.rentalEnd

@@ -6,6 +6,7 @@ import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.ConversationRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.Conversation
+import com.arnoagape.lokavelo.ui.preview.PreviewData.conversation
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,11 +24,16 @@ import javax.inject.Inject
 class MessagingHomeViewModel @Inject constructor(
     conversationRepository: ConversationRepository,
     private val bikeRepository: BikeRepository,
-    private val auth: FirebaseAuth
+    auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val currentUserId = auth.currentUser?.uid ?: ""
-    val currentUserName = auth.currentUser?.displayName
+    private val currentUserId = requireNotNull(auth.currentUser?.uid)
+
+    val otherUserName =
+        if (conversation.ownerId == currentUserId)
+            conversation.renterName
+        else
+            conversation.ownerName
 
     val conversationsScreen: StateFlow<List<ConversationItemScreen>> =
         conversationRepository
@@ -47,10 +53,11 @@ class MessagingHomeViewModel @Inject constructor(
                                 ConversationItemScreen(
                                     conversation = conversation,
                                     bike = bike,
-                                    displayName = currentUserName,
+                                    displayName = otherUserName,
                                     lastMessage = conversation.lastMessage,
                                     lastMessageTime = conversation.lastMessageTime,
-                                    isOwner = conversation.ownerId == currentUserId
+                                    isOwner = conversation.ownerId == currentUserId,
+                                    unreadCount = conversation.unreadCount[currentUserId] ?: 0
                                 )
                             }
                     }
@@ -61,6 +68,15 @@ class MessagingHomeViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 emptyList()
             )
+
+    val unreadCount: StateFlow<Int> =
+        conversationRepository
+            .observeUnreadCount(currentUserId)
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                0
+            )
 }
 
 data class ConversationItemScreen(
@@ -69,5 +85,6 @@ data class ConversationItemScreen(
     val displayName: String?,
     val lastMessage: String,
     val lastMessageTime: Long,
-    val isOwner: Boolean
+    val isOwner: Boolean,
+    val unreadCount: Int
 )

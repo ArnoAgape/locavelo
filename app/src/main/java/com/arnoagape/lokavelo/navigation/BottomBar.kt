@@ -5,6 +5,8 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -19,6 +21,7 @@ import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 @Composable
 fun BottomBar(
     currentScreen: Screen,
+    unreadMessages: Int,
     onItemSelected: (Screen) -> Unit
 ) {
     NavigationBar(
@@ -42,7 +45,19 @@ fun BottomBar(
         NavigationBarItem(
             selected = currentScreen is Screen.Messaging.Home,
             onClick = { onItemSelected(Screen.Messaging.Home) },
-            icon = { Icon(Icons.AutoMirrored.Filled.Message, null) },
+            icon = {
+                BadgedBox(
+                    badge = {
+                        if (unreadMessages > 0) {
+                            Badge {
+                                Text(unreadMessages.toString())
+                            }
+                        }
+                    }
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Message, null)
+                }
+            },
             label = { Text(stringResource(R.string.messaging)) }
         )
 
@@ -61,6 +76,7 @@ private fun BottomBarPreview() {
     LokaveloTheme{
         BottomBar(
             currentScreen = Screen.Owner.HomeBike,
+            unreadMessages = 3,
             onItemSelected = {}
         )
     }

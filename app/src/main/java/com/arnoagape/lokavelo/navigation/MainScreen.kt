@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,6 +30,7 @@ import com.arnoagape.lokavelo.ui.screen.login.LoginScreen
 import com.arnoagape.lokavelo.ui.screen.main.map.MapScreen
 import com.arnoagape.lokavelo.ui.screen.main.map.MapViewModel
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
+import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
 import java.time.ZoneId
@@ -42,11 +45,16 @@ fun MainScreen(
     val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val currentRoute = tabNavController.currentBackStackEntryAsState().value?.destination?.route
 
+    val messagingViewModel: MessagingHomeViewModel = hiltViewModel()
+
+    val unreadMessages by messagingViewModel.unreadCount.collectAsStateWithLifecycle()
+
     Scaffold(
         bottomBar = {
             if (!isKeyboardVisible) {
                 BottomBar(
                     currentScreen = screenFromRoute(currentRoute) ?: Screen.Main.Map,
+                    unreadMessages = unreadMessages,
                     onItemSelected = { screen ->
                         tabNavController.navigate(screen.route) {
                             popUpTo(tabNavController.graph.startDestinationId) {

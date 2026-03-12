@@ -28,12 +28,26 @@ exports.sendMessageNotification = onDocumentCreated(
     // trouver le destinataire
     const receiverId = participants.find(id => id !== senderId);
 
-    const userDoc = await admin.firestore()
+    const senderDoc = await admin.firestore()
       .collection("users")
       .doc(receiverId)
       .get();
 
-    const token = userDoc.data()?.fcmToken;
+    const senderName = senderDoc.data()?.displayName ?? "Utilisateur";
+
+    const receiverDoc = await admin.firestore()
+          .collection("users")
+          .doc(receiverId)
+          .get();
+
+    const token = receiverDoc.data()?.fcmToken;
+
+    const activeConversation = receiver?.activeConversationId;
+
+    if (activeConversation === conversationId) {
+      console.log("User already in conversation, skip notification");
+      return;
+    }
 
     if (!token) {
       console.log("No FCM token for user");
@@ -42,7 +56,7 @@ exports.sendMessageNotification = onDocumentCreated(
 
     const payload = {
       notification: {
-        title: "Nouveau message",
+        title: senderName,
         body: message.text
       },
       data: {

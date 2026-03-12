@@ -4,14 +4,17 @@ data class Conversation(
     val id: String = "",
     val bikeId: String = "",
     val ownerId: String = "",
+    val ownerName: String = "",
     val renterId: String = "",
+    val renterName: String = "",
     val startDateEpochDay: Long = 0,
     val endDateEpochDay: Long = 0,
     val participants: List<String> = emptyList(),
     val lastMessage: String = "",
     val lastMessageTime: Long = 0,
     val lastSenderId: String = "",
-    val createdAt: Long = 0
+    val createdAt: Long = 0,
+    val unreadCount: Map<String, Int> = emptyMap()
 )
 
 data class Message(

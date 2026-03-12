@@ -3,6 +3,7 @@ package com.arnoagape.lokavelo.data.service.conversation
 import com.arnoagape.lokavelo.domain.model.Conversation
 import com.arnoagape.lokavelo.domain.model.Message
 import com.arnoagape.lokavelo.domain.utils.ConversationIdBuilder
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
@@ -20,7 +21,9 @@ class FirebaseConversationApi : ConversationApi {
     override suspend fun getOrCreateConversation(
         bikeId: String,
         ownerId: String,
+        ownerName: String,
         renterId: String,
+        renterName: String,
         startDate: LocalDate,
         endDate: LocalDate
     ): Conversation {
@@ -28,7 +31,9 @@ class FirebaseConversationApi : ConversationApi {
         val conversationId = ConversationIdBuilder.build(
             bikeId,
             ownerId,
+            ownerName,
             renterId,
+            renterName,
             startDate.toEpochDay(),
             endDate.toEpochDay()
         )
@@ -47,7 +52,9 @@ class FirebaseConversationApi : ConversationApi {
             id = conversationId,
             bikeId = bikeId,
             ownerId = ownerId,
+            ownerName = ownerName,
             renterId = renterId,
+            renterName = renterName,
             startDateEpochDay = startDate.toEpochDay(),
             endDateEpochDay = endDate.toEpochDay(),
             participants = listOf(ownerId, renterId),
@@ -57,6 +64,14 @@ class FirebaseConversationApi : ConversationApi {
         ref.set(conversation).await()
 
         return conversation
+    }
+
+    override fun observeConversation(conversationId: String): Flow<Conversation?> {
+        return firestore
+            .collection("conversations")
+            .document(conversationId)
+            .snapshots()
+            .map { it.toObject(Conversation::class.java) }
     }
 
     override fun observeMessages(conversationId: String): Flow<List<Message>> {
@@ -88,6 +103,12 @@ class FirebaseConversationApi : ConversationApi {
 
         val msg = message.copy(id = messageRef.id)
 
+        val conversationSnapshot = conversationRef.get().await()
+        val conversation = conversationSnapshot.toObject(Conversation::class.java)
+            ?: error("Conversation not found")
+
+        val receiverId = conversation.participants.firstOrNull { it != msg.senderId } ?: return
+
         firestore.runBatch { batch ->
 
             batch.set(messageRef, msg)
@@ -97,7 +118,8 @@ class FirebaseConversationApi : ConversationApi {
                 mapOf(
                     "lastMessage" to msg.text,
                     "lastMessageTime" to msg.createdAt,
-                    "lastSenderId" to msg.senderId
+                    "lastSenderId" to msg.senderId,
+                    "unread_$receiverId" to FieldValue.increment(1)
                 )
             )
         }.await()
@@ -111,5 +133,37 @@ class FirebaseConversationApi : ConversationApi {
             .orderBy("lastMessageTime", Query.Direction.DESCENDING)
             .snapshots()
             .map { it.toObjects(Conversation::class.java) }
+    }
+
+    override fun observeUnreadCount(userId: String): Flow<Int> {
+
+        return firestore.collection("conversations")
+            .whereArrayContains("participants", userId)
+            .snapshots()
+            .map { snapshot ->
+
+                snapshot.documents.sumOf { doc ->
+                    doc.getLong("unread_$userId")?.toInt() ?: 0
+                }
+            }
+    }
+
+    override suspend fun markConversationAsRead(conversationId: String, userId: String) {
+        firestore.collection("conversations")
+            .document(conversationId)
+            .update("unread_$userId", 0)
+            .await()
+    }
+
+    override suspend fun setConversationActive(conversationId: String, userId: String) {
+            firestore.collection("users")
+                .document(userId)
+                .update("activeConversationId", conversationId)
+    }
+
+    override suspend fun clearConversationActive(userId: String) {
+            firestore.collection("users")
+                .document(userId)
+                .update("activeConversationId", FieldValue.delete())
     }
 }

@@ -135,6 +135,8 @@ class FirebaseBikeApi @Inject constructor(
                 mapOf(
                     "title" to bike.title,
                     "description" to bike.description,
+                    "ownerName" to bike.ownerName,
+                    "ownerId" to bike.ownerId,
                     "location" to bike.location,
                     "priceInCents" to bike.priceInCents,
                     "priceTwoDaysInCents" to bike.priceTwoDaysInCents,
@@ -144,6 +146,7 @@ class FirebaseBikeApi @Inject constructor(
                     "electric" to bike.electric,
                     "category" to bike.category,
                     "brand" to bike.brand,
+                    "size" to bike.size,
                     "condition" to bike.condition,
                     "accessories" to bike.accessories,
                     "photoUrls" to finalUrls

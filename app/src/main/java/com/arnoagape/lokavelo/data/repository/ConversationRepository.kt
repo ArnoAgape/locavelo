@@ -21,14 +21,20 @@ class ConversationRepository @Inject constructor(
 ) {
 
     suspend fun getOrCreateConversation(
-        bikeId: String, ownerId: String, renterId: String, startDate: LocalDate, endDate: LocalDate
+        bikeId: String, ownerId: String, ownerName: String, renterId: String, renterName: String,
+        startDate: LocalDate, endDate: LocalDate
     ) = conversationApi.getOrCreateConversation(
         bikeId,
         ownerId,
+        ownerName,
         renterId,
+        renterName,
         startDate,
         endDate
     )
+
+    fun observeConversation(conversationId: String): Flow<Conversation?> =
+        conversationApi.observeConversation(conversationId)
 
     fun observeMessages(conversationId: String): Flow<List<Message>> =
         conversationApi.observeMessages(conversationId)
@@ -38,4 +44,15 @@ class ConversationRepository @Inject constructor(
 
     fun observeUserConversations(userId: String): Flow<List<Conversation>> =
         conversationApi.observeUserConversations(userId)
+
+    fun observeUnreadCount(userId: String): Flow<Int> = conversationApi.observeUnreadCount(userId)
+
+    suspend fun markConversationAsRead(conversationId: String, userId: String) =
+        conversationApi.markConversationAsRead(conversationId, userId)
+
+    suspend fun setConversationActive(conversationId: String, userId: String) =
+        conversationApi.setConversationActive(conversationId, userId)
+
+    suspend fun clearConversationActive(userId: String) =
+        conversationApi.clearConversationActive(userId)
 }

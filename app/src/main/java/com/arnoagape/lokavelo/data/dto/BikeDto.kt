@@ -13,6 +13,7 @@ data class BikeDto(
     val id: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val ownerId: String = "",
+    val ownerName: String = "",
     val photoUrls: List<String> = emptyList(),
     val title: String = "",
     val description: String = "",

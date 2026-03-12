@@ -3,15 +3,18 @@ package com.arnoagape.lokavelo.ui.screen.messaging.detail
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -38,6 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -71,10 +76,13 @@ fun MessagingDetailScreen(
 
     val viewModel: MessagingDetailViewModel = hiltViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
+    val otherUserName by viewModel.otherUserName.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
     LaunchedEffect(conversationId) {
+        viewModel.markConversationAsRead(conversationId)
         viewModel.setConversationId(conversationId)
+        viewModel.setConversationActive(conversationId)
     }
 
     // ⭐ Auto scroll au dernier message
@@ -84,10 +92,16 @@ fun MessagingDetailScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.clearConversationActive()
+        }
+    }
+
     MessagingDetailContent(
         messages = messages,
         currentUserId = viewModel.currentUserId,
-        currentUserName = viewModel.currentUserName,
+        otherUserName = otherUserName,
         listState = listState,
         onSend = { viewModel.sendMessage(it) },
         onBack = onBack
@@ -98,18 +112,26 @@ fun MessagingDetailScreen(
 @Composable
 fun MessagingDetailContent(
     messages: List<Message>,
-    currentUserName: String?,
+    otherUserName: String?,
     currentUserId: String?,
     listState: LazyListState,
     onSend: (String) -> Unit,
     onBack: () -> Unit
 ) {
 
+    val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
+    LaunchedEffect(imeVisible, messages.size) {
+        if (imeVisible && messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
+        }
+    }
+
     Scaffold(
 
         topBar = {
             MessagingTopBar(
-                displayName = currentUserName,
+                displayName = otherUserName,
                 onBack = onBack
             )
         },
@@ -291,12 +313,19 @@ fun MessageBubble(
         ) {
 
             Surface(
+                modifier = Modifier.fillMaxWidth(0.8f),
                 shape = RoundedCornerShape(16.dp),
                 color =
                     if (isMine)
                         MaterialTheme.colorScheme.primaryContainer
                     else
-                        MaterialTheme.colorScheme.surfaceVariant
+                        Color.Transparent,
+                border =
+                    if (isMine) null
+                    else BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant
+                    )
             ) {
 
                 Column(
@@ -365,7 +394,7 @@ private fun MessagingContentPreview() {
             listState = rememberLazyListState(),
             onSend = {},
             onBack = {},
-            currentUserName = "Arno"
+            otherUserName = "Arno"
         )
     }
 }
