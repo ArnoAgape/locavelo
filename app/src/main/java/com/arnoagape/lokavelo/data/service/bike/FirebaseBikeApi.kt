@@ -38,6 +38,9 @@ class FirebaseBikeApi @Inject constructor(
     private val firestore = FirebaseFirestore.getInstance()
     private val bikesCollection = firestore.collection("bikes")
 
+    private fun requireUserId(): String =
+        auth.currentUser?.uid ?: throw IllegalStateException("No authenticated user")
+
     override fun observeBikesForOwner(ownerId: String): Flow<List<Bike>> {
         return bikesCollection
             .whereEqualTo("ownerId", ownerId)
@@ -87,6 +90,7 @@ class FirebaseBikeApi @Inject constructor(
         val finalBike = bike.copy(
             id = bikeId,
             ownerId = ownerId,
+            ownerName = auth.currentUser?.displayName ?: "Utilisateur",
             photoUrls = uploadedUrls
         )
         Log.d("SAVE", "Full DTO = $finalBike")
@@ -103,6 +107,8 @@ class FirebaseBikeApi @Inject constructor(
 
         try {
             val ownerId = requireUserId()
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val ownerName = currentUser?.displayName ?: "Utilisateur"
             val bikeId = bike.id
 
             val docRef = bikesCollection.document(bikeId)
@@ -135,7 +141,7 @@ class FirebaseBikeApi @Inject constructor(
                 mapOf(
                     "title" to bike.title,
                     "description" to bike.description,
-                    "ownerName" to bike.ownerName,
+                    "ownerName" to ownerName,
                     "ownerId" to bike.ownerId,
                     "location" to bike.location,
                     "priceInCents" to bike.priceInCents,
@@ -285,9 +291,6 @@ class FirebaseBikeApi @Inject constructor(
             }
         }
     }
-
-    private fun requireUserId(): String =
-        auth.currentUser?.uid ?: throw IllegalStateException("No authenticated user")
 
 }
 

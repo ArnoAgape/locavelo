@@ -28,7 +28,7 @@ import javax.inject.Inject
 class ContactViewModel @Inject constructor(
     private val bikeRepository: BikeRepository,
     private val conversationRepository: ConversationRepository,
-    private val userRepository: UserRepository,
+    userRepository: UserRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 

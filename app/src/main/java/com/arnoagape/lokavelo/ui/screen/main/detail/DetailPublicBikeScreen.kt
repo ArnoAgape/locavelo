@@ -41,6 +41,7 @@ import com.arnoagape.lokavelo.domain.model.User
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.components.DateRangePickerDialog
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
+import com.arnoagape.lokavelo.ui.common.components.ErrorType
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
@@ -117,7 +118,7 @@ fun DetailPublicBikeScreen(
                         end
                     )
                 },
-                isLoading = false,
+                isLoading = state.bike == null,
                 submitText = stringResource(R.string.button_contact)
             )
         }
@@ -133,15 +134,13 @@ fun DetailPublicBikeScreen(
 
             when {
                 state.isLoading -> {
-                    LoadingOverlay(
-                        text = stringResource(R.string.loading)
-                    )
+                    LoadingOverlay()
                 }
 
                 state.error != null -> {
                     ErrorOverlay(
-                        isNetworkError = false,
-                        onRetry = { viewModel.setBikeId(bikeId) }
+                        type = ErrorType.GENERIC,
+                        onRetry = { viewModel.setBikeId(bikeId) },
                     )
                 }
 
@@ -250,10 +249,10 @@ fun DetailPublicBikeContent(
             }
 
             // Owner
-            item {
-                DetailCard {
-                    state.owner?.let {
-                        OwnerCard(it)
+            state.owner?.let { owner ->
+                item {
+                    DetailCard {
+                        OwnerCard(owner)
                     }
                 }
             }

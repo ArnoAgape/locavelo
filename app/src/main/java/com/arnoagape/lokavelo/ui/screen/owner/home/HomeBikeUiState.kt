@@ -13,9 +13,5 @@ sealed class HomeBikeUiState {
 
     sealed class Error : HomeBikeUiState() {
         data class Generic(@param:StringRes val messageRes: Int = R.string.error_generic) : Error()
-        data class NotFound(
-            @param:StringRes val messageRes: Int = R.string.error_no_bike_found
-        ) : HomeBikeUiState()
-        data class Network(@param:StringRes val messageRes: Int = R.string.error_no_network): Error()
     }
 }

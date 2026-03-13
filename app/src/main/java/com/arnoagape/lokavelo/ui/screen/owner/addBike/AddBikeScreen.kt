@@ -56,6 +56,7 @@ import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.AlertDialogNonSaved
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
+import com.arnoagape.lokavelo.ui.common.components.ErrorType
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.CharacteristicsSection
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.DepositSection
@@ -175,17 +176,17 @@ fun AddBikeScreen(
                 .consumeWindowInsets(padding)
                 .fillMaxSize()
         ) {
-            when (val ui = state.uiState) {
+            when (state.uiState) {
 
                 is AddBikeUiState.Error.Initial -> {
                     ErrorOverlay(
-                        isNetworkError = ui.isNetworkError,
+                        type = ErrorType.GENERIC,
                         onRetry = { viewModel.retryInitialCheck() }
                     )
                 }
 
                 is AddBikeUiState.Loading -> {
-                    LoadingOverlay(text = stringResource(R.string.loading))
+                    LoadingOverlay()
                 }
 
                 else ->

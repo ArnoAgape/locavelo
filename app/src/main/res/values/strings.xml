@@ -19,7 +19,7 @@
     <string name="subtitle_characteristics">Fill in the details of your bike</string>
     <string name="subtitle_title_description">Add a title and a description that define well
         your post</string>
-    <string name="subtitle_location">The address won’t be visible publicly</string>
+    <string name="subtitle_location">The exact address won’t be visible publicly</string>
     <string name="subtitle_pricing">Usually between €1 and €25 per day</string>
     <string name="subtitle_deposit">This amount will be blocked on the renter’s credit card
         for the entire duration of the rental</string>
@@ -74,7 +74,8 @@
     <string name="city">City</string>
     <string name="take_picture">Take a picture</string>
     <string name="browse_gallery">Browse gallery</string>
-    <string name="no_bike">To post a new ad, please press the button "+"</string>
+    <string name="no_bike">To rent out your bike, tap the button "+"</string>
+    <string name="empty_messaging">No new messages</string>
     <string name="finished">Finished</string>
     <string name="no_accessories">No accessories</string>
     <string name="no_deposit">No deposit</string>

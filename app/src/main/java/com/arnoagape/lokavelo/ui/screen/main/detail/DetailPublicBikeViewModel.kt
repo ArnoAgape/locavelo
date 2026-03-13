@@ -12,10 +12,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
@@ -32,32 +31,25 @@ class DetailPublicBikeViewModel @Inject constructor(
     private val _bikeId = MutableStateFlow<String?>(null)
     private val _uiState = MutableStateFlow(DetailPublicBikeState())
 
-    private val bikeFlow =
+    val state: StateFlow<DetailPublicBikeState> =
         _bikeId
             .filterNotNull()
-            .flatMapLatest { bikeRepository.observeBike(it) }
-
-    private val ownerFlow =
-        bikeFlow
-            .filterNotNull()
-            .flatMapLatest { bike ->
-                userRepository.observeUser(bike.ownerId)
+            .flatMapLatest { id ->
+                bikeRepository.observeBike(id)
+                    .filterNotNull()
+                    .map { bike ->
+                        val owner = userRepository.getUser(bike.ownerId)
+                        DetailPublicBikeState(
+                            bike = bike,
+                            owner = owner,
+                            isLoading = false
+                        )
+                    }
             }
-            .onStart { emit(null) }
-
-    val state: StateFlow<DetailPublicBikeState> =
-        combine(_uiState, bikeFlow, ownerFlow) { ui, bike, owner ->
-
-            ui.copy(
-                bike = bike,
-                owner = owner,
-                isLoading = false
-            )
-        }.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            DetailPublicBikeState()
-        )
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                DetailPublicBikeState())
 
     fun setBikeId(id: String) {
         _bikeId.value = id

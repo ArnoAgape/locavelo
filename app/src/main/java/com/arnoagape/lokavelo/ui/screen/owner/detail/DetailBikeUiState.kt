@@ -12,7 +12,6 @@ sealed class DetailBikeUiState {
     object Deleting : DetailBikeUiState()
     data class Success(val bike: Bike) : DetailBikeUiState()
     sealed class Error : DetailBikeUiState() {
-        data class NoAccount(val message: String = "No account found") : Error()
         data class Generic(val message: String = "Unknown error") : Error()
         data class Network(val isNetworkError: Boolean) : Error()
     }

@@ -34,6 +34,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.Conversation
+import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
+import com.arnoagape.lokavelo.ui.common.components.ErrorType
+import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.RentalDates
 import com.arnoagape.lokavelo.ui.common.components.RentalDatesLayout
 import com.arnoagape.lokavelo.ui.preview.PreviewData
@@ -48,10 +51,10 @@ fun MessagingHomeScreen(
 ) {
 
     val viewModel: MessagingHomeViewModel = hiltViewModel()
-    val state by viewModel.conversationsScreen.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     MessagingHomeContent(
-        conversations = state,
+        state = state,
         onConversationClick = onConversationClick
     )
 }
@@ -59,7 +62,7 @@ fun MessagingHomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessagingHomeContent(
-    conversations: List<ConversationItemScreen>,
+    state: MessagingHomeUiState,
     onConversationClick: (String) -> Unit
 ) {
 
@@ -73,24 +76,46 @@ fun MessagingHomeContent(
         }
     ) { padding ->
 
-        LazyColumn(
-            contentPadding = PaddingValues(top = 10.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        when (state) {
 
-            items(
-                items = conversations,
-                key = { it.conversation.id }
-            ) { item ->
+            is MessagingHomeUiState.Loading -> {
+                LoadingOverlay()
+            }
 
-                ConversationItem(
-                    conversation = item.conversation,
-                    bike = item.bike,
-                    displayName = item.displayName,
-                    unreadCount = item.unreadCount,
-                    onClick = { onConversationClick(item.conversation.id) }
+            is MessagingHomeUiState.Empty -> {
+                ErrorOverlay(
+                    type = ErrorType.EMPTY_MESSAGE
+                )
+            }
+
+            is MessagingHomeUiState.Success -> {
+                val conversations = state.conversations
+                LazyColumn(
+                    contentPadding = PaddingValues(top = 10.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+
+                    items(
+                        items = conversations,
+                        key = { it.conversation.id }
+                    ) { item ->
+
+                        ConversationItem(
+                            conversation = item.conversation,
+                            bike = item.bike,
+                            displayName = item.displayName,
+                            unreadCount = item.unreadCount,
+                            onClick = { onConversationClick(item.conversation.id) }
+                        )
+                    }
+                }
+            }
+
+            is MessagingHomeUiState.Error -> {
+                ErrorOverlay(
+                    type = ErrorType.GENERIC
                 )
             }
         }
@@ -199,13 +224,13 @@ private fun MessagingHomeContentPreview() {
             lastMessage = PreviewData.conversation.lastMessage,
             lastMessageTime = PreviewData.conversation.lastMessageTime,
             isOwner = false,
-            unreadCount = 8
+            unreadCount = 12
         )
     )
 
     LokaveloTheme {
         MessagingHomeContent(
-            conversations = fakeConversation,
+            state = MessagingHomeUiState.Success(fakeConversation),
             onConversationClick = {}
         )
     }

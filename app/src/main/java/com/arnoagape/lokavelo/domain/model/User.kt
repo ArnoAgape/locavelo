@@ -28,7 +28,7 @@ data class User(
     companion object {
         fun fromDto(dto: UserDto): User {
             return User(
-                id = dto.id,
+                id = dto.id ?: "",
                 displayName = dto.displayName,
                 photoUrl = dto.photoUrl,
                 phoneNumber = dto.phoneNumber,

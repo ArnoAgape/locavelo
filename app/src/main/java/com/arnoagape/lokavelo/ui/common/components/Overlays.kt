@@ -22,7 +22,7 @@ import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
 @Composable
-fun LoadingOverlay(text: String) {
+fun LoadingOverlay() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -32,27 +32,49 @@ fun LoadingOverlay(text: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
             Spacer(Modifier.height(16.dp))
-            Text(text)
+            Text(stringResource(R.string.loading))
+        }
+    }
+}
+
+@Composable
+fun DeletingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Spacer(Modifier.height(16.dp))
+            Text(stringResource(R.string.deleting))
         }
     }
 }
 
 @Composable
 fun ErrorOverlay(
-    isNetworkError: Boolean,
-    onRetry: () -> Unit
+    type: ErrorType,
+    onRetry: () -> Unit = {}
 ) {
 
-    val message = if (isNetworkError) {
-        stringResource(R.string.error_no_network)
-    } else {
-        stringResource(R.string.error_generic)
-    }
+    val (message, imageRes) = when (type) {
 
-    val imageRes = if (isNetworkError) {
-        R.drawable.ic_bike_no_wifi
-    } else {
-        R.drawable.ic_bike_broken
+        ErrorType.NETWORK -> Pair(
+            stringResource(R.string.error_no_network),
+            R.drawable.ic_bike_no_wifi
+        )
+
+        ErrorType.EMPTY_MESSAGE -> Pair(
+            stringResource(R.string.empty_messaging),
+            R.drawable.ic_bike_no_message
+        )
+
+        ErrorType.GENERIC -> Pair(
+            stringResource(R.string.error_generic),
+            R.drawable.ic_bike_broken
+        )
     }
 
     Box(
@@ -78,15 +100,22 @@ fun ErrorOverlay(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Spacer(Modifier.height(12.dp))
+            if (type != ErrorType.EMPTY_MESSAGE) {
 
-            Button(
-                onClick = onRetry
-            ) {
-                Text(stringResource(R.string.retry))
+                Spacer(Modifier.height(12.dp))
+
+                Button(onClick = onRetry) {
+                    Text(stringResource(R.string.retry))
+                }
             }
         }
     }
+}
+
+enum class ErrorType {
+    NETWORK,
+    EMPTY_MESSAGE,
+    GENERIC
 }
 
 @PreviewLightDark
@@ -94,7 +123,7 @@ fun ErrorOverlay(
 private fun ErrorOverlayPreview() {
     LokaveloTheme {
         ErrorOverlay(
-            isNetworkError = true,
+            type = ErrorType.EMPTY_MESSAGE,
             onRetry = {}
         )
     }
@@ -104,8 +133,6 @@ private fun ErrorOverlayPreview() {
 @Composable
 private fun LoadingOverlayPreview() {
     LokaveloTheme {
-        LoadingOverlay(
-            text = "Une erreur inconnue est survenue"
-        )
+        LoadingOverlay()
     }
 }

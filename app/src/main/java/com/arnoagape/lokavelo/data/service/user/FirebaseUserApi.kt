@@ -71,9 +71,24 @@ class FirebaseUserApi : UserApi {
             .document(userId)
             .snapshots()
             .map { snapshot ->
-                snapshot.toObject(UserDto::class.java)
-                    ?.let { User.fromDto(it) }
+
+                if (!snapshot.exists()) return@map null
+
+                val dto = snapshot.toObject(UserDto::class.java)
+
+                dto?.let {
+                    User.fromDto(
+                        it.copy(id = snapshot.id)
+                    )
+                }
             }
+    }
+
+    override suspend fun getUser(userId: String): User? = withContext(Dispatchers.IO) {
+        val snapshot = usersCollection.document(userId).get().await()
+        if (!snapshot.exists()) return@withContext null
+        val dto = snapshot.toObject(UserDto::class.java)
+        dto?.let { User.fromDto(it.copy(id = snapshot.id)) }
     }
 
     /**

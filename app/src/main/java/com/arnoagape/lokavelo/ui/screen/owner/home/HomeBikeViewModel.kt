@@ -62,7 +62,7 @@ class HomeBikeViewModel @Inject constructor(
                 }
             }
             if (filtered.isEmpty()) {
-                HomeBikeUiState.Error.NotFound()
+                HomeBikeUiState.Empty()
             } else {
                 HomeBikeUiState.Success(filtered)
             }
@@ -156,8 +156,6 @@ class HomeBikeViewModel @Inject constructor(
         }
     }
 
-    // 🔄 Refresh
-
     fun refreshBikes() {
         if (!networkUtils.isNetworkAvailable()) {
             _events.trySend(Event.ShowMessage(R.string.error_no_network))
@@ -170,7 +168,6 @@ class HomeBikeViewModel @Inject constructor(
             _isRefreshing.value = false
         }
     }
-
 }
 
 data class HomeBikeScreenState(

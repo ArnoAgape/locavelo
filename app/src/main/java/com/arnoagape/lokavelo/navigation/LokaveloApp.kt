@@ -59,7 +59,7 @@ fun LokaveloApp() {
             val currentTime = System.currentTimeMillis()
 
             if (currentTime - lastBackPressedTime < 2000) {
-                (context as? Activity)?.finish()
+                (context).finish()
             } else {
                 lastBackPressedTime = currentTime
                 Toast.makeText(
@@ -229,10 +229,9 @@ fun LokaveloApp() {
                 startDate = start,
                 endDate = end,
                 onConversationCreated = { conversationId ->
-                    navController.navigate(Screen.Messaging.Detail.createRoute(conversationId))
-                    {
-                        popUpTo(Screen.Main.Contact.route) {
-                            inclusive = true
+                    navController.navigate(Screen.Messaging.Detail.createRoute(conversationId)) {
+                        popUpTo("main_graph") {
+                            inclusive = false
                         }
                     }
                 },

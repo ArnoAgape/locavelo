@@ -198,7 +198,7 @@ fun EditBikeScreen(
                 }
 
                 is EditBikeUiState.Loading -> {
-                    LoadingOverlay(text = stringResource(R.string.loading))
+                    LoadingOverlay()
                 }
 
                 else -> Unit

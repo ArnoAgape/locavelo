@@ -31,9 +31,7 @@ class FirebaseConversationApi : ConversationApi {
         val conversationId = ConversationIdBuilder.build(
             bikeId,
             ownerId,
-            ownerName,
             renterId,
-            renterName,
             startDate.toEpochDay(),
             endDate.toEpochDay()
         )

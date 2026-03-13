@@ -48,7 +48,9 @@ import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
+import com.arnoagape.lokavelo.ui.common.components.DeletingOverlay
 import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
+import com.arnoagape.lokavelo.ui.common.components.ErrorType
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
@@ -183,7 +185,7 @@ fun DetailBikeScreen(
                 .fillMaxSize()
         ) {
 
-            when (val ui = state.bikeState) {
+            when (state.bikeState) {
 
                 is DetailBikeUiState.Success, DetailBikeUiState.Idle -> {
                     DetailBikeContent(
@@ -193,34 +195,23 @@ fun DetailBikeScreen(
                 }
 
                 is DetailBikeUiState.Loading -> {
-                    LoadingOverlay(
-                        text = stringResource(R.string.loading)
-                    )
+                    LoadingOverlay()
                 }
 
                 is DetailBikeUiState.Deleting -> {
-                    LoadingOverlay(
-                        text = stringResource(R.string.deleting)
-                    )
+                    DeletingOverlay()
                 }
 
                 is DetailBikeUiState.Error.Network -> {
                     ErrorOverlay(
-                        isNetworkError = ui.isNetworkError,
+                        type = ErrorType.NETWORK,
                         onRetry = { viewModel.setBikeId(bikeId) }
                     )
                 }
 
                 is DetailBikeUiState.Error.Generic -> {
                     ErrorOverlay(
-                        isNetworkError = false,
-                        onRetry = { viewModel.setBikeId(bikeId) }
-                    )
-                }
-
-                is DetailBikeUiState.Error.NoAccount -> {
-                    ErrorOverlay(
-                        isNetworkError = false,
+                        type = ErrorType.GENERIC,
                         onRetry = { viewModel.setBikeId(bikeId) }
                     )
                 }

@@ -1,21 +1,24 @@
 package com.arnoagape.lokavelo.ui.screen.messaging.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.ConversationRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.Conversation
-import com.arnoagape.lokavelo.ui.preview.PreviewData.conversation
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -28,46 +31,56 @@ class MessagingHomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val currentUserId = requireNotNull(auth.currentUser?.uid)
-
-    val otherUserName =
-        if (conversation.ownerId == currentUserId)
-            conversation.renterName
-        else
-            conversation.ownerName
-
-    val conversationsScreen: StateFlow<List<ConversationItemScreen>> =
+    private val uiState: Flow<MessagingHomeUiState> =
         conversationRepository
             .observeUserConversations(currentUserId)
             .flatMapLatest { conversations ->
 
-                if (conversations.isEmpty())
-                    return@flatMapLatest flowOf(emptyList())
+                if (conversations.isEmpty()) {
+                    flowOf(MessagingHomeUiState.Empty())
+                } else {
 
-                combine(
-                    conversations.map { conversation ->
+                    combine(
+                        conversations.map { conversation ->
 
-                        bikeRepository
-                            .observeBike(conversation.bikeId)
-                            .map { bike ->
+                            bikeRepository
+                                .observeBike(conversation.bikeId)
+                                .map { bike ->
 
-                                ConversationItemScreen(
-                                    conversation = conversation,
-                                    bike = bike,
-                                    displayName = otherUserName,
-                                    lastMessage = conversation.lastMessage,
-                                    lastMessageTime = conversation.lastMessageTime,
-                                    isOwner = conversation.ownerId == currentUserId,
-                                    unreadCount = conversation.unreadCount[currentUserId] ?: 0
-                                )
-                            }
+                                    ConversationItemScreen(
+                                        conversation = conversation,
+                                        bike = bike,
+                                        displayName =
+                                            if (conversation.ownerId == currentUserId)
+                                                conversation.renterName
+                                            else
+                                                conversation.ownerName,
+                                        lastMessage = conversation.lastMessage,
+                                        lastMessageTime = conversation.lastMessageTime,
+                                        isOwner = conversation.ownerId == currentUserId,
+                                        unreadCount = conversation.unreadCount[currentUserId] ?: 0
+                                    )
+                                }
+                        }
+                    ) { list ->
+                        MessagingHomeUiState.Success(list.toList())
                     }
-                ) { it.toList() }
+                }
             }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList()
-            )
+            .onStart {
+                emit(MessagingHomeUiState.Loading)
+            }
+            .catch { e ->
+                Log.e("Messaging", "Firestore error", e)
+                emit(MessagingHomeUiState.Error.Generic())
+            }
+
+    val state: StateFlow<MessagingHomeUiState> =
+        uiState.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            MessagingHomeUiState.Loading
+        )
 
     val unreadCount: StateFlow<Int> =
         conversationRepository

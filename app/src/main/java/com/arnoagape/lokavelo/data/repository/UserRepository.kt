@@ -2,6 +2,7 @@ package com.arnoagape.lokavelo.data.repository
 
 import com.arnoagape.lokavelo.data.service.user.UserApi
 import com.arnoagape.lokavelo.domain.model.User
+import com.arnoagape.lokavelo.ui.preview.PreviewData.user
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 @Singleton
 class UserRepository @Inject constructor(private val userApi: UserApi) {
     fun observeUser(userId: String): Flow<User?> = userApi.observeUser(userId)
+    suspend fun getUser(userId: String): User? = userApi.getUser(userId)
     fun observeCurrentUser(): Flow<User?> = userApi.observeCurrentUser()
     suspend fun updateUser(user: User) = userApi.updateUser(user)
     suspend fun ensureUserInFirestore() = userApi.ensureUserInFirestore()
