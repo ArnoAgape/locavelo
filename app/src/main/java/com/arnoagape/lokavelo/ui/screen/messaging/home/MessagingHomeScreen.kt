@@ -40,7 +40,7 @@ import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.RentalDates
 import com.arnoagape.lokavelo.ui.common.components.RentalDatesLayout
 import com.arnoagape.lokavelo.ui.preview.PreviewData
-import com.arnoagape.lokavelo.ui.screen.owner.home.BikeImage
+import com.arnoagape.lokavelo.ui.screen.owner.homeBike.BikeImage
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.lokavelo.ui.utils.toDayLabel
 import com.arnoagape.lokavelo.ui.utils.toLocalDateFromEpochDay
@@ -84,7 +84,7 @@ fun MessagingHomeContent(
 
             is MessagingHomeUiState.Empty -> {
                 ErrorOverlay(
-                    type = ErrorType.EMPTY_MESSAGE
+                    type = ErrorType.EMPTY_MESSAGES
                 )
             }
 

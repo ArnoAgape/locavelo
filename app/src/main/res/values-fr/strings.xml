@@ -76,6 +76,7 @@
     <string name="browse_gallery">Choisis dans la galerie</string>
     <string name="no_bike">Pour mettre en location ton vélo, appuie sur le bouton "+"</string>
     <string name="empty_messaging">Aucun nouveau message</string>
+    <string name="empty_rentals">Aucune location</string>
     <string name="finished">Terminé</string>
     <string name="no_accessories">Aucun accessoire</string>
     <string name="no_deposit">Aucune caution</string>
@@ -178,6 +179,14 @@
     <string name="bike_availability_yes">Disponible</string>
     <string name="bike_availability_no">Non disponible</string>
     <string name="bike_availability_renting">En location</string>
+
+    // RENTAL STATUS
+    <string name="rental_status_pending">En attente</string>
+    <string name="rental_status_accepted">Acceptée</string>
+    <string name="rental_status_declined">Refusée</string>
+    <string name="rental_status_cancelled">Annulée</string>
+    <string name="rental_status_active">En cours</string>
+    <string name="rental_status_completed">Terminée</string>
 
     // CATEGORY
     <string name="bike_category_road">Vélo de route</string>

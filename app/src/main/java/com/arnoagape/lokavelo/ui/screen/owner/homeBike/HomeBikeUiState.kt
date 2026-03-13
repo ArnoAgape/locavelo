@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.home
+package com.arnoagape.lokavelo.ui.screen.owner.homeBike
 
 import androidx.annotation.StringRes
 import com.arnoagape.lokavelo.R

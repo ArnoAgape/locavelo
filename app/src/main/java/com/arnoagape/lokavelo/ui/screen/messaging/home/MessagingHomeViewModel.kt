@@ -1,6 +1,5 @@
 package com.arnoagape.lokavelo.ui.screen.messaging.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.data.repository.BikeRepository
@@ -71,8 +70,12 @@ class MessagingHomeViewModel @Inject constructor(
                 emit(MessagingHomeUiState.Loading)
             }
             .catch { e ->
-                Log.e("Messaging", "Firestore error", e)
-                emit(MessagingHomeUiState.Error.Generic())
+                if (e is com.google.firebase.firestore.FirebaseFirestoreException
+                    && e.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.FAILED_PRECONDITION) {
+                    emit(MessagingHomeUiState.Empty())
+                } else {
+                    emit(MessagingHomeUiState.Error.Generic())
+                }
             }
 
     val state: StateFlow<MessagingHomeUiState> =

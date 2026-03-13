@@ -31,8 +31,8 @@ import com.arnoagape.lokavelo.ui.screen.main.map.MapScreen
 import com.arnoagape.lokavelo.ui.screen.main.map.MapViewModel
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeScreen
 import com.arnoagape.lokavelo.ui.screen.messaging.home.MessagingHomeViewModel
-import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeScreen
-import com.arnoagape.lokavelo.ui.screen.owner.home.HomeBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.owner.homeBike.HomeBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.homeBike.HomeBikeViewModel
 import java.time.ZoneId
 
 @Composable

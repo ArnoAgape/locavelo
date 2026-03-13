@@ -66,7 +66,12 @@ fun ErrorOverlay(
             R.drawable.ic_bike_no_wifi
         )
 
-        ErrorType.EMPTY_MESSAGE -> Pair(
+        ErrorType.EMPTY_MESSAGES -> Pair(
+            stringResource(R.string.empty_messaging),
+            R.drawable.ic_bike_no_message
+        )
+
+        ErrorType.EMPTY_RENTALS -> Pair(
             stringResource(R.string.empty_messaging),
             R.drawable.ic_bike_no_message
         )
@@ -100,7 +105,7 @@ fun ErrorOverlay(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            if (type != ErrorType.EMPTY_MESSAGE) {
+            if (type != ErrorType.EMPTY_MESSAGES && type != ErrorType.EMPTY_RENTALS) {
 
                 Spacer(Modifier.height(12.dp))
 
@@ -114,7 +119,8 @@ fun ErrorOverlay(
 
 enum class ErrorType {
     NETWORK,
-    EMPTY_MESSAGE,
+    EMPTY_MESSAGES,
+    EMPTY_RENTALS,
     GENERIC
 }
 
@@ -123,7 +129,7 @@ enum class ErrorType {
 private fun ErrorOverlayPreview() {
     LokaveloTheme {
         ErrorOverlay(
-            type = ErrorType.EMPTY_MESSAGE,
+            type = ErrorType.EMPTY_RENTALS,
             onRetry = {}
         )
     }

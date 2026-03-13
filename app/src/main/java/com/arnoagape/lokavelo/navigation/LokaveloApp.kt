@@ -28,8 +28,8 @@ import com.arnoagape.lokavelo.ui.screen.main.detail.DetailPublicBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.messaging.detail.MessagingDetailScreen
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.AddBikeViewModel
-import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeScreen
-import com.arnoagape.lokavelo.ui.screen.owner.detail.DetailBikeViewModel
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.DetailBikeScreen
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.DetailBikeViewModel
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeScreen
 import com.arnoagape.lokavelo.ui.screen.owner.editBike.EditBikeViewModel
 

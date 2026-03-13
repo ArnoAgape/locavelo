@@ -4,6 +4,8 @@ import com.arnoagape.lokavelo.data.service.bike.BikeApi
 import com.arnoagape.lokavelo.data.service.bike.FirebaseBikeApi
 import com.arnoagape.lokavelo.data.service.conversation.ConversationApi
 import com.arnoagape.lokavelo.data.service.conversation.FirebaseConversationApi
+import com.arnoagape.lokavelo.data.service.rental.FirebaseRentalApi
+import com.arnoagape.lokavelo.data.service.rental.RentalApi
 import com.arnoagape.lokavelo.data.service.user.FirebaseUserApi
 import com.arnoagape.lokavelo.data.service.user.UserApi
 import dagger.Module
@@ -32,4 +34,8 @@ class AppModule {
     @Provides
     @Singleton
     fun provideConversationApi(): ConversationApi = FirebaseConversationApi()
+
+    @Provides
+    @Singleton
+    fun provideRentalApi(firebaseRentalApi: FirebaseRentalApi): RentalApi = firebaseRentalApi
 }

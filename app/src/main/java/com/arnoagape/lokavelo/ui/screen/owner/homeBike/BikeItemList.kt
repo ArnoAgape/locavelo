@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.home
+package com.arnoagape.lokavelo.ui.screen.owner.homeBike
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
+import com.arnoagape.lokavelo.domain.model.RentalStatus
+import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.SelectionState
 import com.arnoagape.lokavelo.ui.common.components.RentalDates
 import com.arnoagape.lokavelo.ui.common.components.SelectItemRow
@@ -74,7 +76,12 @@ fun BikeItem(
                 }
             ) {
                 BikeItemRow(
-                    bike = bike
+                    bike = bike,
+                    badge = {
+                        StatusBadge(
+                            isRented = bike.rentalStart != null && bike.rentalEnd != null
+                        )
+                    }
                 )
             }
         }
@@ -87,9 +94,8 @@ fun BikeItemRow(
     modifier: Modifier = Modifier,
     startDate: LocalDate? = null,
     endDate: LocalDate? = null,
-    showStatus: Boolean = true
+    badge: (@Composable () -> Unit)? = null
 ) {
-    val isRented = bike.rentalStart != null && bike.rentalEnd != null
 
     Row(
         modifier = modifier
@@ -98,19 +104,17 @@ fun BikeItemRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        // 📷 Photo
         BikeImage(bike)
 
-        // 📝 Contenu texte
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
-            // Ligne titre + pastille
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = bike.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -119,7 +123,7 @@ fun BikeItemRow(
                     modifier = Modifier.weight(1f)
                 )
 
-                if (showStatus) StatusBadge(isRented)
+                badge?.invoke()
             }
 
             val totalPrice = if (startDate != null && endDate != null) {
@@ -137,7 +141,6 @@ fun BikeItemRow(
                 )
             } else null
 
-            // 💰 Prix
             val formattedPrice = remember(bike.priceInCents) {
                 val priceInEuros = bike.priceInCents / 100.0
                 NumberFormat
@@ -168,9 +171,7 @@ fun BikeItemRow(
                 )
             }
 
-            // 📅 Dates si location active
             if (startDate != null && endDate != null) {
-
                 RentalDates(
                     start = startDate,
                     end = endDate
@@ -205,6 +206,41 @@ fun StatusBadge(isRented: Boolean) {
     ) {
         Text(
             text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = textColor
+        )
+    }
+}
+
+@Composable
+fun RentalStatusBadge(status: RentalStatus) {
+
+    val backgroundColor = when (status) {
+        RentalStatus.PENDING -> MaterialTheme.colorScheme.tertiaryContainer
+        RentalStatus.ACCEPTED -> lightBlue
+        RentalStatus.ACTIVE -> lightBlue
+        RentalStatus.COMPLETED -> lightGreen
+        RentalStatus.DECLINED -> MaterialTheme.colorScheme.errorContainer
+        RentalStatus.CANCELLED -> MaterialTheme.colorScheme.errorContainer
+    }
+
+    val textColor = when (status) {
+        RentalStatus.PENDING -> MaterialTheme.colorScheme.onTertiaryContainer
+        RentalStatus.ACCEPTED -> lightBlueText
+        RentalStatus.ACTIVE -> lightBlueText
+        RentalStatus.COMPLETED -> lightGreenText
+        RentalStatus.DECLINED -> MaterialTheme.colorScheme.onErrorContainer
+        RentalStatus.CANCELLED -> MaterialTheme.colorScheme.onErrorContainer
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .background(backgroundColor, RoundedCornerShape(50))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = stringResource(status.labelRes()),
             style = MaterialTheme.typography.labelSmall,
             color = textColor
         )
@@ -247,7 +283,7 @@ fun BikeItemRowPreview() {
                 rentalStart = Instant.parse("2026-02-21T16:30:00Z"),
                 rentalEnd = Instant.parse("2026-02-28T11:30:00Z")
             ),
-            showStatus = false,
+            badge = {},
             startDate = LocalDate.of(2026, 2, 21),
             endDate = LocalDate.of(2026, 2, 28)
         )

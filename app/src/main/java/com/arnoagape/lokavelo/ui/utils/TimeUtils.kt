@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -24,4 +25,13 @@ fun Long.toDayLabelYear(): String {
 
 fun Long.toLocalDateFromEpochDay(): LocalDate {
     return LocalDate.ofEpochDay(this)
+}
+
+fun Instant.toDateString(): String {
+    val formatter = DateTimeFormatter
+        .ofPattern("dd MMM")
+        .withLocale(Locale.FRANCE)
+        .withZone(ZoneId.systemDefault())
+
+    return formatter.format(this)
 }

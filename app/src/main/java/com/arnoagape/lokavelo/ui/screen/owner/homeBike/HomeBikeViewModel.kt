@@ -1,12 +1,15 @@
-package com.arnoagape.lokavelo.ui.screen.owner.home
+package com.arnoagape.lokavelo.ui.screen.owner.homeBike
 
 import  androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.data.repository.BikeRepository
+import com.arnoagape.lokavelo.data.repository.RentalRepository
 import com.arnoagape.lokavelo.domain.model.Bike
+import com.arnoagape.lokavelo.domain.model.Rental
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.SelectionState
+import com.arnoagape.lokavelo.ui.screen.owner.rental.HomeRentalUiState
 import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import com.arnoagape.lokavelo.ui.utils.normalizeForSearch
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -32,21 +36,66 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeBikeViewModel @Inject constructor(
     private val bikeRepository: BikeRepository,
+    rentalRepository: RentalRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     private val _events = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = _events.receiveAsFlow()
 
+    private val bikesFlow: Flow<List<Bike>> = bikeRepository.observeOwnerBikes()
+
+    private val rentalsFlow: Flow<List<RentalWithBike>> =
+        combine(
+            rentalRepository.observeOwnerRentals(),
+            bikesFlow
+        ) { rentals, bikes ->
+
+            val bikeMap = bikes.associateBy { it.id }
+
+            rentals.mapNotNull { rental ->
+                bikeMap[rental.bikeId]?.let { bike ->
+                    RentalWithBike(rental, bike)
+                }
+            }
+        }
+
     private val _selection = MutableStateFlow(SelectionState())
     private val _isRefreshing = MutableStateFlow(false)
 
-    private val bikesFlow: Flow<List<Bike>> = bikeRepository.observeOwnerBikes()
-
     private val _searchQuery = MutableStateFlow("")
     private val _isSearchActive = MutableStateFlow(false)
+    private val _selectedTab = MutableStateFlow(0) // 0 = Mes vélos, 1 = Mes locations
+    val selectedTab: StateFlow<Int> = _selectedTab
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
+
+    private val rentalUiState: Flow<HomeRentalUiState> =
+        rentalsFlow
+            .map { rentals ->
+                if (rentals.isEmpty()) {
+                    HomeRentalUiState.Empty
+                } else {
+                    HomeRentalUiState.Success(rentals)
+                }
+            }
+            .onStart { emit(HomeRentalUiState.Loading) }
+            .catch { emit(HomeRentalUiState.Error.Generic) }
+
+    val rentalState: StateFlow<HomeRentalScreenState> =
+        combine(
+            rentalUiState,
+            _isRefreshing
+        ) { ui, refreshing ->
+            HomeRentalScreenState(
+                uiState = ui,
+                isRefreshing = refreshing
+            )
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            HomeRentalScreenState()
+        )
 
     private val uiState: Flow<HomeBikeUiState> =
         combine(bikesFlow, _searchQuery) { bikes, query ->
@@ -94,6 +143,11 @@ class HomeBikeViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             HomeBikeScreenState()
         )
+
+    // Rent/Owner Tab
+    fun selectTab(index: Int) {
+        _selectedTab.value = index
+    }
 
     // 🔍 Search
 
@@ -168,6 +222,19 @@ class HomeBikeViewModel @Inject constructor(
             _isRefreshing.value = false
         }
     }
+
+    fun refreshRentals() {
+        if (!networkUtils.isNetworkAvailable()) {
+            _events.trySend(Event.ShowMessage(R.string.error_no_network))
+            return
+        }
+
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            delay(700)
+            _isRefreshing.value = false
+        }
+    }
 }
 
 data class HomeBikeScreenState(
@@ -176,4 +243,14 @@ data class HomeBikeScreenState(
     val selection: SelectionState = SelectionState(),
     val isSearchActive: Boolean = false,
     val searchQuery: String = ""
+)
+
+data class HomeRentalScreenState(
+    val uiState: HomeRentalUiState = HomeRentalUiState.Loading,
+    val isRefreshing: Boolean = false
+)
+
+data class RentalWithBike(
+    val rental: Rental,
+    val bike: Bike
 )

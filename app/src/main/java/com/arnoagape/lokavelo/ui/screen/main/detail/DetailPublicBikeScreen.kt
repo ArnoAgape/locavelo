@@ -48,9 +48,9 @@ import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
 import com.arnoagape.lokavelo.ui.screen.main.detail.sections.OwnerCard
 import com.arnoagape.lokavelo.ui.screen.main.detail.sections.PriceBreakdownCard
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.SubmitButton
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.AccessoriesRow
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailCard
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailRow
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.AccessoriesRow
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.DetailCard
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.DetailRow
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.lokavelo.ui.utils.toEuroString

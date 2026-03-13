@@ -37,7 +37,7 @@ import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.preview.PreviewData
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.SubmitButton
-import com.arnoagape.lokavelo.ui.screen.owner.home.BikeItemRow
+import com.arnoagape.lokavelo.ui.screen.owner.homeBike.BikeItemRow
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import java.time.LocalDate
 
@@ -146,8 +146,7 @@ fun ContactContent(
                         BikeItemRow(
                             bike = it,
                             startDate = startDate,
-                            endDate = endDate,
-                            showStatus = false
+                            endDate = endDate
                         )
                     }
                 }

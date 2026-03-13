@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.detail
+package com.arnoagape.lokavelo.ui.screen.owner.detailBike
 
 import com.arnoagape.lokavelo.domain.model.Bike
 

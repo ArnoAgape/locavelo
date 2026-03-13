@@ -1,8 +1,9 @@
-package com.arnoagape.lokavelo.ui.screen.owner.home
+package com.arnoagape.lokavelo.ui.screen.owner.homeBike
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +19,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -45,6 +48,7 @@ import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
+import com.arnoagape.lokavelo.ui.screen.owner.rental.HomeRentalContent
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +59,9 @@ fun HomeBikeScreen(
     onBikeClick: (Bike) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val rentalState by viewModel.rentalState.collectAsStateWithLifecycle()
+
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val showDeleteDialog by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -91,89 +98,109 @@ fun HomeBikeScreen(
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-
-            if (state.isSearchActive) {
-                EmbeddedSearchBar(
-                    query = state.searchQuery,
-                    onQueryChange = viewModel::onSearchQueryChange,
-                    onClose = viewModel::toggleSearch,
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                        .focusRequester(focusRequester)
-                )
-            } else {
-                TopAppBar(
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    title = { Text(stringResource(R.string.rentals)) },
-                    actions = {
-
-                        if (!state.selection.isSelectionMode) {
-                            IconButton(onClick = viewModel::toggleSearch) {
-                                Icon(Icons.Default.Search, null)
-                            }
-                        }
-
-                        if (state.selection.isSelectionMode) {
-
-                            val hasSelection = state.selection.selectedIds.isNotEmpty()
-
-                            IconButton(
-                                onClick = {
-                                    if (!state.selection.isSelectionMode) {
-                                        viewModel.enterSelectionMode()
-                                    } else if (!hasSelection) {
-                                        viewModel.exitSelectionMode()
-                                    } else {
-                                        viewModel.requestDeleteConfirmation()
+            Column {
+                if (state.isSearchActive) {
+                    EmbeddedSearchBar(
+                        query = state.searchQuery,
+                        onQueryChange = viewModel::onSearchQueryChange,
+                        onClose = viewModel::toggleSearch,
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                            .focusRequester(focusRequester)
+                    )
+                } else {
+                    TopAppBar(
+                        windowInsets = WindowInsets(0, 0, 0, 0),
+                        title = { Text(stringResource(R.string.rentals)) },
+                        actions = {
+                            if (selectedTab == 0) {
+                                if (!state.selection.isSelectionMode) {
+                                    IconButton(onClick = viewModel::toggleSearch) {
+                                        Icon(Icons.Default.Search, null)
                                     }
                                 }
-                            ) {
-                                Icon(
-                                    imageVector =
-                                        if (hasSelection)
-                                            Icons.Default.DeleteForever
-                                        else
-                                            Icons.Default.Delete,
-                                    contentDescription = stringResource(R.string.cd_button_delete_bike),
-                                    tint =
-                                        if (hasSelection)
-                                            MaterialTheme.colorScheme.error
-                                        else
-                                            MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = viewModel::enterSelectionMode) {
-                                Icon(Icons.Default.Delete, null)
+
+                                if (state.selection.isSelectionMode) {
+
+                                    val hasSelection = state.selection.selectedIds.isNotEmpty()
+
+                                    IconButton(
+                                        onClick = {
+                                            if (!state.selection.isSelectionMode) {
+                                                viewModel.enterSelectionMode()
+                                            } else if (!hasSelection) {
+                                                viewModel.exitSelectionMode()
+                                            } else {
+                                                viewModel.requestDeleteConfirmation()
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector =
+                                                if (hasSelection)
+                                                    Icons.Default.DeleteForever
+                                                else
+                                                    Icons.Default.Delete,
+                                            contentDescription = stringResource(R.string.cd_button_delete_bike),
+                                            tint =
+                                                if (hasSelection)
+                                                    MaterialTheme.colorScheme.error
+                                                else
+                                                    MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                } else {
+                                    IconButton(onClick = viewModel::enterSelectionMode) {
+                                        Icon(Icons.Default.Delete, null)
+                                    }
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
+                PrimaryTabRow(selectedTabIndex = selectedTab) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { viewModel.selectTab(0) },
+                        text = { Text("Mes vélos") }
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { viewModel.selectTab(1) },
+                        text = { Text("Mes locations") }
+                    )
+                }
             }
         },
 
         floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                onClick = onAddBikeClick
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    stringResource(R.string.add_bike)
-                )
+            if (selectedTab == 0) {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    onClick = onAddBikeClick
+                ) {
+                    Icon(Icons.Default.Add, stringResource(R.string.add_bike))
+                }
             }
+        },
+
+        ) { padding ->
+        when (selectedTab) {
+            0 -> HomeBikeContent(
+                modifier = Modifier.padding(padding),
+                state = state,
+                onBikeClick = onBikeClick,
+                onRefresh = { viewModel.refreshBikes() },
+                onToggleSelection = { viewModel.toggleSelection(it) },
+                onEnterSelectionMode = { viewModel.enterSelectionMode() }
+            )
+            1 -> HomeRentalContent(
+                modifier = Modifier.padding(padding),
+                state = rentalState,
+                onRefresh = { viewModel.refreshRentals() },
+                onRentalClick = { TODO() },
+            )
         }
-
-    ) { padding ->
-
-        HomeBikeContent(
-            modifier = Modifier.padding(padding),
-            state = state,
-            onBikeClick = onBikeClick,
-            onRefresh = { viewModel.refreshBikes() },
-            onToggleSelection = { viewModel.toggleSelection(it) },
-            onEnterSelectionMode = { viewModel.enterSelectionMode() }
-        )
         val count = state.selection.selectedIds.size
         ConfirmDeleteDialog(
             show = showDeleteDialog,

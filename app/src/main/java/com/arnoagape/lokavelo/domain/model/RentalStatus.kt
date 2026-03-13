@@ -15,10 +15,10 @@ enum class RentalStatus {
 @StringRes
 fun RentalStatus.labelRes(): Int =
     when (this) {
-        RentalStatus.PENDING -> R.string.bike_availability_yes
-        RentalStatus.ACCEPTED -> R.string.bike_availability_renting
-        RentalStatus.DECLINED -> R.string.bike_availability_no
-        RentalStatus.CANCELLED -> R.string.bike_availability_yes
-        RentalStatus.ACTIVE -> R.string.bike_availability_renting
-        RentalStatus.COMPLETED -> R.string.bike_availability_yes
+        RentalStatus.PENDING -> R.string.rental_status_pending
+        RentalStatus.ACCEPTED -> R.string.rental_status_accepted
+        RentalStatus.DECLINED -> R.string.rental_status_declined
+        RentalStatus.CANCELLED -> R.string.rental_status_cancelled
+        RentalStatus.ACTIVE -> R.string.rental_status_active
+        RentalStatus.COMPLETED -> R.string.rental_status_completed
     }

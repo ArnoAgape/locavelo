@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.detail
+package com.arnoagape.lokavelo.ui.screen.owner.detailBike
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -54,9 +54,9 @@ import com.arnoagape.lokavelo.ui.common.components.ErrorType
 import com.arnoagape.lokavelo.ui.common.components.LoadingOverlay
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotoItem
 import com.arnoagape.lokavelo.ui.common.components.photo.PhotosContent
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.AccessoriesRow
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailCard
-import com.arnoagape.lokavelo.ui.screen.owner.detail.sections.DetailRow
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.AccessoriesRow
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.DetailCard
+import com.arnoagape.lokavelo.ui.screen.owner.detailBike.sections.DetailRow
 import com.arnoagape.lokavelo.ui.theme.LocalSpacing
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 import com.arnoagape.lokavelo.ui.utils.toEuroString

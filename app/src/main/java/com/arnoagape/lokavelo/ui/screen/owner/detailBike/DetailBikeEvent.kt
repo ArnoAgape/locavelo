@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.detail
+package com.arnoagape.lokavelo.ui.screen.owner.detailBike
 
 /**
  * Represents one-time UI events sent from ViewModels to the UI layer.

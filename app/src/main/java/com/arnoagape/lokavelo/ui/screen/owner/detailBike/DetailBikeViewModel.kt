@@ -1,4 +1,4 @@
-package com.arnoagape.lokavelo.ui.screen.owner.detail
+package com.arnoagape.lokavelo.ui.screen.owner.detailBike
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
