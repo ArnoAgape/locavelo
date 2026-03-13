@@ -18,6 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -27,6 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -35,10 +41,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.Bike
+import com.arnoagape.lokavelo.ui.common.Event
+import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.preview.PreviewData
 import com.arnoagape.lokavelo.ui.screen.owner.addBike.sections.SubmitButton
 import com.arnoagape.lokavelo.ui.screen.owner.homeBike.BikeItemRow
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
+import com.arnoagape.lokavelo.ui.utils.vibrateError
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +63,25 @@ fun ContactScreen(
     val viewModel: ContactViewModel = hiltViewModel()
     val bike by viewModel.bike.collectAsStateWithLifecycle()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+    val context = LocalContext.current
+
+    EventsEffect(viewModel.eventsFlow) { event ->
+        when (event) {
+            is Event.ShowMessage -> {
+                context.vibrateError()
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(event.message),
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Short
+                )
+            }
+
+            else -> {}
+        }
+    }
+
     LaunchedEffect(bikeId) {
         viewModel.setBikeId(bikeId)
     }
@@ -67,6 +95,7 @@ fun ContactScreen(
     var message by remember { mutableStateOf("") }
 
     ContactContent(
+        snackbarHostState = snackbarHostState,
         bike = bike,
         startDate = startDate,
         endDate = endDate,
@@ -87,6 +116,7 @@ fun ContactScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactContent(
+    snackbarHostState: SnackbarHostState,
     bike: Bike?,
     startDate: LocalDate,
     endDate: LocalDate,
@@ -98,7 +128,17 @@ fun ContactContent(
 ) {
 
     Scaffold(
-
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    actionColor = MaterialTheme.colorScheme.error,
+                    dismissActionContentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.send_message)) },
@@ -180,6 +220,7 @@ private fun ContactContentPreview() {
     LokaveloTheme {
 
         ContactContent(
+            snackbarHostState = SnackbarHostState(),
             bike = PreviewData.bike,
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusDays(3),
