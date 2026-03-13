@@ -6,9 +6,11 @@ import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.Rental
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.snapshots
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class FirebaseRentalApi @Inject constructor(
     private val compressor: ImageCompressor,
@@ -20,6 +22,18 @@ class FirebaseRentalApi @Inject constructor(
     private val bikesCollection = firestore.collection("bikes")
 
     override fun observeOwnerRentals(): Flow<List<Rental>> {
-        return TODO("Provide the return value")
+
+        val userId = auth.currentUser?.uid
+            ?: throw IllegalStateException("User not authenticated")
+
+        return firestore
+            .collection("rentals")
+            .whereEqualTo("ownerId", userId)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Rental::class.java)?.copy(id = doc.id)
+                }
+            }
     }
 }

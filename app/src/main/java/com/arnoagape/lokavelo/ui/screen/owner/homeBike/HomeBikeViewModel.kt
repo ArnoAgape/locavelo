@@ -7,6 +7,7 @@ import com.arnoagape.lokavelo.data.repository.BikeRepository
 import com.arnoagape.lokavelo.data.repository.RentalRepository
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.Rental
+import com.arnoagape.lokavelo.domain.model.RentalStatus
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.SelectionState
 import com.arnoagape.lokavelo.ui.screen.owner.rental.HomeRentalUiState
@@ -50,9 +51,7 @@ class HomeBikeViewModel @Inject constructor(
             rentalRepository.observeOwnerRentals(),
             bikesFlow
         ) { rentals, bikes ->
-
             val bikeMap = bikes.associateBy { it.id }
-
             rentals.mapNotNull { rental ->
                 bikeMap[rental.bikeId]?.let { bike ->
                     RentalWithBike(rental, bike)
@@ -73,10 +72,30 @@ class HomeBikeViewModel @Inject constructor(
     private val rentalUiState: Flow<HomeRentalUiState> =
         rentalsFlow
             .map { rentals ->
-                if (rentals.isEmpty()) {
+
+                val pending = rentals.filter {
+                    it.rental.status == RentalStatus.PENDING
+                }
+
+                val active = rentals.filter {
+                    it.rental.status == RentalStatus.ACCEPTED ||
+                            it.rental.status == RentalStatus.ACTIVE
+                }
+
+                val history = rentals.filter {
+                    it.rental.status == RentalStatus.COMPLETED ||
+                            it.rental.status == RentalStatus.DECLINED ||
+                            it.rental.status == RentalStatus.CANCELLED
+                }
+
+                if (pending.isEmpty() && active.isEmpty() && history.isEmpty()) {
                     HomeRentalUiState.Empty
                 } else {
-                    HomeRentalUiState.Success(rentals)
+                    HomeRentalUiState.Success(
+                        pending = pending,
+                        active = active,
+                        history = history
+                    )
                 }
             }
             .onStart { emit(HomeRentalUiState.Loading) }

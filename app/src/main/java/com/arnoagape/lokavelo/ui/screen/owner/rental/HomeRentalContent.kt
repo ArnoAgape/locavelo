@@ -40,24 +40,21 @@ fun HomeRentalContent(
     when (val ui = state.uiState) {
 
         is HomeRentalUiState.Success -> {
-
             PullToRefreshBox(
                 modifier = modifier.fillMaxSize(),
                 state = refreshState,
                 isRefreshing = state.isRefreshing,
                 onRefresh = onRefresh
             ) {
-
                 LazyColumn {
-                    items(
-                        items = ui.rentals,
-                        key = { it.rental.id }
-                    ) { rentalWithBike ->
-
-                        RentalItem(
-                            rentalWithBike = rentalWithBike,
-                            onClick = { onRentalClick(rentalWithBike.rental) }
-                        )
+                    items(ui.pending, key = { it.rental.id }) { rentalWithBike ->
+                        RentalItem(rentalWithBike = rentalWithBike, onClick = { onRentalClick(rentalWithBike.rental) })
+                    }
+                    items(ui.active, key = { it.rental.id }) { rentalWithBike ->
+                        RentalItem(rentalWithBike = rentalWithBike, onClick = { onRentalClick(rentalWithBike.rental) })
+                    }
+                    items(ui.history, key = { it.rental.id }) { rentalWithBike ->
+                        RentalItem(rentalWithBike = rentalWithBike, onClick = { onRentalClick(rentalWithBike.rental) })
                     }
                 }
             }
@@ -148,7 +145,11 @@ fun HomeRentalPreview() {
     LokaveloTheme {
         HomeRentalContent(
             state = HomeRentalScreenState(
-                uiState = HomeRentalUiState.Success(rentals)
+                uiState = HomeRentalUiState.Success(
+                    pending = rentals,
+                    active = emptyList(),
+                    history = emptyList()
+                )
             )
         )
     }

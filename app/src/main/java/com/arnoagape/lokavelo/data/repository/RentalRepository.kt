@@ -18,6 +18,5 @@ class RentalRepository @Inject constructor(
     private val rentalApi: RentalApi,
     private val userRepository: UserRepository
 ) {
-
     fun observeOwnerRentals(): Flow<List<Rental>> = rentalApi.observeOwnerRentals()
 }
