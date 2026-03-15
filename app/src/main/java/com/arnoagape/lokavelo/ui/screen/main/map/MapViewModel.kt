@@ -10,6 +10,8 @@ import com.arnoagape.lokavelo.data.repository.LocationRepository
 import com.arnoagape.lokavelo.domain.model.AddressSuggestion
 import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.domain.model.BikeCategory
+import com.arnoagape.lokavelo.domain.model.BikeEquipment
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.ui.utils.NetworkUtils
 import com.arnoagape.lokavelo.ui.utils.isBikeMatchingFilters
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import org.osmdroid.util.GeoPoint
@@ -64,6 +67,24 @@ class MapViewModel @Inject constructor(
                             it.location.longitude != null
                 }
             }
+
+    val maxBikePrice: StateFlow<Float> =
+        bikesFlow
+            .map { bikes ->
+                bikes.maxOfOrNull { it.priceInCents }
+                    ?.let { it / 100f }
+                    ?: 100f
+            }
+            .onEach { maxPrice ->
+                if (_filters.value.maxPrice == 100f) {
+                    _filters.value = _filters.value.copy(maxPrice = maxPrice)
+                }
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                200f
+            )
 
     private val _filters = MutableStateFlow(SearchFilters())
 
@@ -125,13 +146,15 @@ class MapViewModel @Inject constructor(
             filteredBikes,
             selectedDays,
             _filters,
-            suggestions
-        ) { bikes, days, filters, suggestions ->
+            suggestions,
+            maxBikePrice
+        ) { bikes, days, filters, suggestions, maxPrice ->
             HomeScreenState(
                 filteredBikes = bikes,
                 selectedDays = days,
                 filters = filters,
-                suggestions = suggestions
+                suggestions = suggestions,
+                maxBikePrice = maxPrice
             )
         }.stateIn(
             viewModelScope,
@@ -171,6 +194,15 @@ class MapViewModel @Inject constructor(
         )
     }
 
+    fun updateFilters(bikeSize: BikeSize?, accessories: Set<BikeEquipment>, minPrice: Float, maxPrice: Float) {
+        _filters.value = _filters.value.copy(
+            bikeSize = bikeSize,
+            accessories = accessories,
+            minPrice = minPrice,
+            maxPrice = maxPrice
+        )
+    }
+
     fun clearLocationFilter() {
         _filters.value = _filters.value.copy(
             center = null,
@@ -186,12 +218,17 @@ data class SearchFilters(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val bikeCategory: BikeCategory? = null,
-    val electricOnly: Boolean? = null
+    val electricOnly: Boolean? = null,
+    val bikeSize: BikeSize? = null,
+    val accessories: Set<BikeEquipment> = emptySet(),
+    val minPrice: Float = 0f,
+    val maxPrice: Float = 100f,
 )
 
 data class HomeScreenState(
     val filters: SearchFilters = SearchFilters(),
     val filteredBikes: List<Bike> = emptyList(),
     val selectedDays: Long = 1L,
-    val suggestions: List<AddressSuggestion> = emptyList()
+    val suggestions: List<AddressSuggestion> = emptyList(),
+    val maxBikePrice: Float = 200f
 )

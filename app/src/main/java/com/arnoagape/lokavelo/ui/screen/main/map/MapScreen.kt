@@ -228,6 +228,7 @@ fun MapScreen(
 
             SearchBar(
                 filters = state.filters,
+                maxBikePrice = state.maxBikePrice,
                 onAddressClick = { showAddressSheet = true },
                 onDatesSelected = { start, end ->
                     viewModel.updateDates(start, end)
@@ -237,6 +238,9 @@ fun MapScreen(
                 },
                 onElectricSelected = { isElectric ->
                     viewModel.updateElectricFilter(isElectric)
+                },
+                onFiltersSelected = { size, accessories, minPrice, maxPrice ->
+                    viewModel.updateFilters(size, accessories, minPrice, maxPrice)
                 }
             )
 

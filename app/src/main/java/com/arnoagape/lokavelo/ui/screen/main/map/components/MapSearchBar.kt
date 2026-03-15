@@ -11,23 +11,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arnoagape.lokavelo.R
 import com.arnoagape.lokavelo.domain.model.BikeCategory
+import com.arnoagape.lokavelo.domain.model.BikeEquipment
+import com.arnoagape.lokavelo.domain.model.BikeSize
 import com.arnoagape.lokavelo.domain.model.labelRes
 import com.arnoagape.lokavelo.ui.common.components.DateRangePickerDialog
 import com.arnoagape.lokavelo.ui.common.components.RentalDates
@@ -53,10 +63,12 @@ import java.time.LocalDate
 @Composable
 fun SearchBar(
     filters: SearchFilters,
+    maxBikePrice: Float,
     onAddressClick: () -> Unit,
     onCategorySelected: (BikeCategory?) -> Unit,
     onElectricSelected: (Boolean?) -> Unit,
-    onDatesSelected: (LocalDate, LocalDate) -> Unit
+    onDatesSelected: (LocalDate, LocalDate) -> Unit,
+    onFiltersSelected: (BikeSize?, Set<BikeEquipment>, Float, Float) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -168,10 +180,11 @@ fun SearchBar(
                         },
                         border = null,
                         colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            labelColor = MaterialTheme.colorScheme.onSurface
                         ),
-                        trailingIcon = {
+                        leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null
@@ -235,92 +248,246 @@ fun SearchBar(
             }
 
             item {
+                FilterChip(
+                    selected = filters.electricOnly == true,
+                    onClick = {
+                        onElectricSelected(if (filters.electricOnly == true) null else true)
+                    },
+                    label = { Text(stringResource(R.string.electric)) },
+                    border = null,
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    leadingIcon = {
+                        Text("⚡")
+                    }
+                )
+            }
 
-                var showElectricSheet by remember { mutableStateOf(false) }
+            item {
+                FilterChip(
+                    selected = filters.electricOnly == false,
+                    onClick = {
+                        onElectricSelected(if (filters.electricOnly == false) null else false)
+                    },
+                    label = { Text(stringResource(R.string.muscular)) },
+                    border = null,
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    leadingIcon = {
+                        Text("🚴")
+                    }
+                )
+            }
+
+            item {
+                var showFiltersSheet by remember { mutableStateOf(false) }
+                val sheetState = rememberModalBottomSheetState()
+
+                val hasActiveFilters = filters.bikeSize != null
+                        || filters.accessories.isNotEmpty()
+                        || filters.minPrice > 0f
+                        || filters.maxPrice < 200f
 
                 Box {
 
                     FilterChip(
-                        selected = filters.electricOnly != null,
-                        onClick = { showElectricSheet = true },
-                        label = {
-                            Text(
-                                when (filters.electricOnly) {
-                                    true -> "Électrique"
-                                    false -> "Musculaire"
-                                    null -> "Motorisation"
-                                }
-                            )
-                        },
+                        selected = hasActiveFilters,
+                        onClick = { showFiltersSheet = true },
+                        label = { Text(stringResource(R.string.filters)) },
                         border = null,
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onSurface,
+                            iconColor = MaterialTheme.colorScheme.onSurface
                         ),
-                        trailingIcon = {
+                        leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = stringResource(R.string.filters)
                             )
                         }
                     )
 
-                    if (showElectricSheet) {
-
+                    if (showFiltersSheet) {
                         ModalBottomSheet(
-                            onDismissRequest = { showElectricSheet = false }
+                            onDismissRequest = { showFiltersSheet = false },
+                            sheetState = sheetState
                         ) {
-
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .navigationBarsPadding()
+                                    .padding(bottom = 16.dp)
                             ) {
 
-                                Text(
-                                    text = stringResource(R.string.motorization),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-
-                                Spacer(Modifier.height(16.dp))
-
-                                FlowRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                // ── Titre + Réinitialiser ──────────────────────
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, fill = false)
+                                        .verticalScroll(rememberScrollState())
+                                        .padding(horizontal = 16.dp)
                                 ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.filters),
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                        TextButton(
+                                            onClick = {
+                                                onFiltersSelected(
+                                                    null,
+                                                    emptySet(),
+                                                    0f,
+                                                    maxBikePrice
+                                                )
+                                            }
+                                        ) {
+                                            Text(stringResource(R.string.reset))
+                                        }
+                                    }
 
-                                    // Tous
-                                    FilterChip(
-                                        selected = filters.electricOnly == null,
-                                        onClick = {
-                                            onElectricSelected(null)
-                                            showElectricSheet = false
-                                        },
-                                        label = { Text(stringResource(R.string.all)) }
+                                    Spacer(Modifier.height(16.dp))
+
+                                    // ── Taille ─────────────────────────────────────
+                                    Text(
+                                        text = stringResource(R.string.size),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
 
-                                    // Électrique
-                                    FilterChip(
-                                        selected = filters.electricOnly == true,
-                                        onClick = {
-                                            onElectricSelected(true)
-                                            showElectricSheet = false
-                                        },
-                                        label = { Text(stringResource(R.string.electric)) }
+                                    Spacer(Modifier.height(8.dp))
+
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        FilterChip(
+                                            selected = filters.bikeSize == null,
+                                            onClick = {
+                                                onFiltersSelected(
+                                                    null,
+                                                    filters.accessories,
+                                                    filters.minPrice,
+                                                    filters.maxPrice
+                                                )
+                                            },
+                                            label = { Text(stringResource(R.string.all)) }
+                                        )
+                                        BikeSize.entries.forEach { size ->
+                                            FilterChip(
+                                                selected = filters.bikeSize == size,
+                                                onClick = {
+                                                    onFiltersSelected(
+                                                        size,
+                                                        filters.accessories,
+                                                        filters.minPrice,
+                                                        filters.maxPrice
+                                                    )
+                                                },
+                                                label = { Text(size.name) }
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.height(24.dp))
+
+                                    // ── Accessoires ────────────────────────────────
+                                    Text(
+                                        text = stringResource(R.string.accessories),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
 
-                                    // Musculaire
-                                    FilterChip(
-                                        selected = filters.electricOnly == false,
-                                        onClick = {
-                                            onElectricSelected(false)
-                                            showElectricSheet = false
-                                        },
-                                        label = { Text(stringResource(R.string.muscular)) }
-                                    )
+                                    Spacer(Modifier.height(8.dp))
+
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        BikeEquipment.entries.forEach { accessory ->
+                                            val isSelected = accessory in filters.accessories
+                                            FilterChip(
+                                                selected = isSelected,
+                                                onClick = {
+                                                    val updated = if (isSelected)
+                                                        filters.accessories - accessory
+                                                    else
+                                                        filters.accessories + accessory
+                                                    onFiltersSelected(
+                                                        filters.bikeSize,
+                                                        updated,
+                                                        filters.minPrice,
+                                                        filters.maxPrice
+                                                    )
+                                                },
+                                                label = { Text(stringResource(accessory.labelRes())) }
+                                            )
+                                        }
+                                    }
                                 }
 
                                 Spacer(Modifier.height(24.dp))
+
+                                // ── Prix ───────────────────────────────────────
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .padding(top = 8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.pricing_day_amount),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = "${filters.minPrice.toInt()} € – ${filters.maxPrice.toInt()} €",
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+
+                                    Spacer(Modifier.height(8.dp))
+
+                                    RangeSlider(
+                                        value = filters.minPrice..filters.maxPrice,
+                                        onValueChange = { range ->
+                                            onFiltersSelected(
+                                                filters.bikeSize,
+                                                filters.accessories,
+                                                range.start,
+                                                range.endInclusive
+                                            )
+                                        },
+                                        valueRange = 0f..maxBikePrice,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp),
+                                        colors = SliderDefaults.colors(
+                                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                                            inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                                alpha = 0.6f
+                                            ),
+                                            thumbColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -356,10 +523,12 @@ private fun MapSearchBarPreview() {
         )
         SearchBar(
             filters = filters,
+            maxBikePrice = 150f,
             onAddressClick = {},
             onCategorySelected = {},
             onElectricSelected = {},
-            onDatesSelected = { _, _ -> }
+            onDatesSelected = { _, _ -> },
+            onFiltersSelected = { _, _, _, _ -> }
         )
     }
 }

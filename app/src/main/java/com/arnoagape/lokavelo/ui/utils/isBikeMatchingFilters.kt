@@ -38,5 +38,21 @@ fun isBikeMatchingFilters(
         if (bike.electric != filters.electricOnly) return false
     }
 
+    // 📐 Taille
+    if (filters.bikeSize != null) {
+        if (bike.size != null && bike.size != filters.bikeSize) return false
+    }
+
+    // 🎒 Accessoires — le vélo doit posséder TOUS les accessoires sélectionnés
+    if (filters.accessories.isNotEmpty()) {
+        if (!bike.accessories.containsAll(filters.accessories)) return false
+    }
+
+    // 💶 Prix
+    if (filters.minPrice > 0f || filters.maxPrice < 100f) {
+        val priceInEuros = bike.priceInCents / 100f
+        if (priceInEuros < filters.minPrice || priceInEuros > filters.maxPrice) return false
+    }
+
     return true
 }

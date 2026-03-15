@@ -89,6 +89,9 @@
     <string name="all">Tous</string>
     <string name="conversation">Conversation</string>
     <string name="deleted_user">Utilisateur supprimé</string>
+    <string name="filters">Filtres</string>
+    <string name="reset">Réinitialiser</string>
+    <string name="apply">Appliquer</string>
 
     // SUCCESS
     <string name="success_user_updated">Infos mises à jour</string>

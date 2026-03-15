@@ -89,6 +89,9 @@
     <string name="all">All</string>
     <string name="conversation">Conversation</string>
     <string name="deleted_user">Deleted user</string>
+    <string name="filters">Filters</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
 
     // SUCCESS
     <string name="success_user_updated">Details updated successfully</string>
