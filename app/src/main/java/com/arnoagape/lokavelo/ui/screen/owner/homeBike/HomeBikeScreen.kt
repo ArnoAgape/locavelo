@@ -48,6 +48,8 @@ import com.arnoagape.lokavelo.domain.model.Bike
 import com.arnoagape.lokavelo.ui.common.Event
 import com.arnoagape.lokavelo.ui.common.EventsEffect
 import com.arnoagape.lokavelo.ui.common.components.ConfirmDeleteDialog
+import com.arnoagape.lokavelo.ui.common.components.ErrorOverlay
+import com.arnoagape.lokavelo.ui.common.components.ErrorType
 import com.arnoagape.lokavelo.ui.screen.owner.rental.HomeRentalContent
 import com.arnoagape.lokavelo.ui.theme.LokaveloTheme
 
@@ -194,6 +196,7 @@ fun HomeBikeScreen(
                 onToggleSelection = { viewModel.toggleSelection(it) },
                 onEnterSelectionMode = { viewModel.enterSelectionMode() }
             )
+
             1 -> HomeRentalContent(
                 modifier = Modifier.padding(padding),
                 state = rentalState,
@@ -257,18 +260,7 @@ fun HomeBikeContent(
         }
 
         is HomeBikeUiState.Empty -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.no_bike),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
+            ErrorOverlay(type = ErrorType.EMPTY_BIKES)
         }
 
         is HomeBikeUiState.Error.Generic -> {

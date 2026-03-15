@@ -74,7 +74,7 @@
     <string name="city">City</string>
     <string name="take_picture">Take a picture</string>
     <string name="browse_gallery">Browse gallery</string>
-    <string name="no_bike">To rent out your bike, tap the button "+"</string>
+    <string name="no_bike">Tap here to rent out your bike</string>
     <string name="empty_messaging">No new messages</string>
     <string name="empty_rentals">No rentals</string>
     <string name="finished">Finished</string>

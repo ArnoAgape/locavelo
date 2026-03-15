@@ -34,36 +34,40 @@ class MessagingHomeViewModel @Inject constructor(
         if (currentUserId == null) {
             flowOf(MessagingHomeUiState.Empty())
         } else {
-        conversationRepository
-            .observeUserConversations(currentUserId)
-            .flatMapLatest { conversations ->
-                    combine(
-                        conversations.map { conversation ->
+            conversationRepository
+                .observeUserConversations(currentUserId)
+                .flatMapLatest { conversations ->
 
-                            bikeRepository
-                                .observeBike(conversation.bikeId)
-                                .map { bike ->
+                    if (conversations.isEmpty()) {
+                        flowOf(MessagingHomeUiState.Empty())
+                    } else {
 
-                                    ConversationItemScreen(
-                                        conversation = conversation,
-                                        bike = bike,
-                                        displayName =
-                                            if (conversation.ownerId == currentUserId)
-                                                conversation.renterName
-                                            else
-                                                conversation.ownerName,
-                                        lastMessage = conversation.lastMessage,
-                                        lastMessageTime = conversation.lastMessageTime,
-                                        isOwner = conversation.ownerId == currentUserId,
-                                        unreadCount = conversation.unreadCount[currentUserId] ?: 0
-                                    )
-                                }
+                        combine(
+                            conversations.map { conversation ->
+                                bikeRepository
+                                    .observeBike(conversation.bikeId)
+                                    .map { bike ->
+                                        ConversationItemScreen(
+                                            conversation = conversation,
+                                            bike = bike,
+                                            displayName =
+                                                if (conversation.ownerId == currentUserId)
+                                                    conversation.renterName
+                                                else
+                                                    conversation.ownerName,
+                                            lastMessage = conversation.lastMessage,
+                                            lastMessageTime = conversation.lastMessageTime,
+                                            isOwner = conversation.ownerId == currentUserId,
+                                            unreadCount = conversation.unreadCount[currentUserId] ?: 0
+                                        )
+                                    }
+                            }
+                        ) { list ->
+                            MessagingHomeUiState.Success(list.toList())
                         }
-                    ) { list ->
-                        MessagingHomeUiState.Success(list.toList())
                     }
                 }
-            }
+        }
             .onStart {
                 emit(MessagingHomeUiState.Loading)
             }

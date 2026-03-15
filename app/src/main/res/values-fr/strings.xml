@@ -74,7 +74,7 @@
     <string name="city">Ville</string>
     <string name="take_picture">Prends une photo</string>
     <string name="browse_gallery">Choisis dans la galerie</string>
-    <string name="no_bike">Pour mettre en location ton vélo, appuie sur le bouton "+"</string>
+    <string name="no_bike">Appuie ici pour mettre en location ton vélo</string>
     <string name="empty_messaging">Aucun nouveau message</string>
     <string name="empty_rentals">Aucune location</string>
     <string name="finished">Terminé</string>

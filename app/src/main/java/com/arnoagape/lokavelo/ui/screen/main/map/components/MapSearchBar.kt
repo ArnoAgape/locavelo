@@ -112,7 +112,9 @@ fun SearchBar(
                 )
             }
 
-            VerticalDivider()
+            VerticalDivider(
+                modifier = Modifier.padding(vertical = 12.dp)
+            )
 
             // 📅 Dates
             Row(

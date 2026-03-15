@@ -45,7 +45,7 @@
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
-            android:theme="@style/Theme.Lokavelo">
+            android:theme="@style/Theme.Lokavelo.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

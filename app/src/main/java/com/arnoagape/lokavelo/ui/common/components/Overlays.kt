@@ -59,26 +59,33 @@ fun ErrorOverlay(
     onRetry: () -> Unit = {}
 ) {
 
-    val (message, imageRes) = when (type) {
+    val (message, images) = when (type) {
 
         ErrorType.NETWORK -> Pair(
             stringResource(R.string.error_no_network),
-            R.drawable.ic_bike_no_wifi
+            listOf(R.drawable.ic_bike_no_wifi)
+        )
+
+        ErrorType.EMPTY_BIKES -> Pair(
+            stringResource(R.string.no_bike),
+            listOf(
+                R.drawable.ic_bike_add_bike_arrow
+            )
         )
 
         ErrorType.EMPTY_MESSAGES -> Pair(
             stringResource(R.string.empty_messaging),
-            R.drawable.ic_bike_no_message
+            listOf(R.drawable.ic_bike_no_message)
         )
 
         ErrorType.EMPTY_RENTALS -> Pair(
             stringResource(R.string.empty_messaging),
-            R.drawable.ic_bike_no_message
+            listOf(R.drawable.ic_bike_no_message)
         )
 
         ErrorType.GENERIC -> Pair(
             stringResource(R.string.error_generic),
-            R.drawable.ic_bike_broken
+            listOf(R.drawable.ic_bike_broken)
         )
     }
 
@@ -92,20 +99,31 @@ fun ErrorOverlay(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                modifier = Modifier.height(140.dp)
-            )
+            images.forEachIndexed { index, imageRes ->
 
-            Spacer(Modifier.height(24.dp))
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = null,
+                    modifier = Modifier.height(140.dp)
+                )
 
-            Text(
-                text = message,
-                style = MaterialTheme.typography.titleMedium
-            )
+                Spacer(Modifier.height(24.dp))
 
-            if (type != ErrorType.EMPTY_MESSAGES && type != ErrorType.EMPTY_RENTALS) {
+                if (index == 0) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+                }
+            }
+
+            if (
+                type != ErrorType.EMPTY_MESSAGES &&
+                type != ErrorType.EMPTY_RENTALS &&
+                type != ErrorType.EMPTY_BIKES
+            ) {
 
                 Spacer(Modifier.height(12.dp))
 
@@ -119,6 +137,7 @@ fun ErrorOverlay(
 
 enum class ErrorType {
     NETWORK,
+    EMPTY_BIKES,
     EMPTY_MESSAGES,
     EMPTY_RENTALS,
     GENERIC

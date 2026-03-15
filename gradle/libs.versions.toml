@@ -6,6 +6,7 @@ assertk = "0.28.1"
 coilCompose = "2.7.0"
 composeBom = "2026.03.00"
 coreKtx = "1.18.0"
+coreSplashscreen = "1.2.0"
 desugar_jdk_libs = "2.1.5"
 espressoCore = "3.7.0"
 firebaseBom = "34.10.0"
@@ -37,6 +38,7 @@ turbine = "1.2.1"
 [libraries]
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
