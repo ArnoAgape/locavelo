@@ -38,7 +38,8 @@ import java.time.ZoneId
 @Composable
 fun MainScreen(
     rootNavController: NavController,
-    navigateProtected: (Screen) -> Unit
+    navigateProtected: (Screen) -> Unit,
+    isSignedIn: Boolean
 ) {
 
     val tabNavController = rememberNavController()
@@ -56,12 +57,25 @@ fun MainScreen(
                     currentScreen = screenFromRoute(currentRoute) ?: Screen.Main.Map,
                     unreadMessages = unreadMessages,
                     onItemSelected = { screen ->
-                        tabNavController.navigate(screen.route) {
-                            popUpTo(tabNavController.graph.startDestinationId) {
-                                saveState = true
+
+                        val requiresAuth = screen is Screen.Owner.HomeBike
+                                || screen is Screen.Messaging.Home
+                                || screen is Screen.Account.AccountHome
+
+                        if (requiresAuth && !isSignedIn) {
+
+                            navigateProtected(screen)
+
+                        } else {
+
+                            tabNavController.navigate(screen.route) {
+                                popUpTo(tabNavController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
+
                         }
                     }
                 )

@@ -29,16 +29,14 @@ class MessagingHomeViewModel @Inject constructor(
     auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val currentUserId = requireNotNull(auth.currentUser?.uid)
+    private val currentUserId = auth.currentUser?.uid
     private val uiState: Flow<MessagingHomeUiState> =
+        if (currentUserId == null) {
+            flowOf(MessagingHomeUiState.Empty())
+        } else {
         conversationRepository
             .observeUserConversations(currentUserId)
             .flatMapLatest { conversations ->
-
-                if (conversations.isEmpty()) {
-                    flowOf(MessagingHomeUiState.Empty())
-                } else {
-
                     combine(
                         conversations.map { conversation ->
 
@@ -86,13 +84,21 @@ class MessagingHomeViewModel @Inject constructor(
         )
 
     val unreadCount: StateFlow<Int> =
-        conversationRepository
-            .observeUnreadCount(currentUserId)
-            .stateIn(
+        if (currentUserId == null) {
+            flowOf(0).stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 0
             )
+        } else {
+            conversationRepository
+                .observeUnreadCount(currentUserId)
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000),
+                    0
+                )
+        }
 }
 
 data class ConversationItemScreen(

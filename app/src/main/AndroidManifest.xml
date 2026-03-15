@@ -34,7 +34,7 @@
         </provider>
 
         <service
-            android:name=".LokaveloMessagingService"
+            android:name="com.arnoagape.lokavelo.data.service.messaging.LokaveloMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

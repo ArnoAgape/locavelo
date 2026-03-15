@@ -84,12 +84,25 @@ fun LokaveloApp() {
 
     fun navigateProtected(route: String) {
 
+        val currentRoute = navController.currentDestination?.route
+
         if (isSignedIn) {
-            navController.navigate(route)
+
+            if (currentRoute != route) {
+                navController.navigate(route) {
+                    launchSingleTop = true
+                }
+            }
+
         } else {
-            navController.navigate(
-                Screen.Login.createRoute(route)
-            )
+
+            if (currentRoute != Screen.Login.route) {
+                navController.navigate(
+                    Screen.Login.createRoute(route)
+                ) {
+                    launchSingleTop = true
+                }
+            }
         }
     }
 
@@ -109,7 +122,8 @@ fun LokaveloApp() {
                 rootNavController = navController,
                 navigateProtected = { screen ->
                     navigateProtected(screen)
-                }
+                },
+                isSignedIn = isSignedIn
             )
         }
 
